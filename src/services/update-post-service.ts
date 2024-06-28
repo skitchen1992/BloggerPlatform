@@ -1,7 +1,7 @@
 import { mongoDBRepository } from '../repositories/db-repository';
 import { postsCollection } from '../db/collection';
 import { ResultStatus } from '../types/common/result';
-import { UpdatePostSchema } from '../models';
+import { UpdatePostSchema } from '../Veiw';
 
 export const updatePostService = async (id: string, data: UpdatePostSchema) => {
   const updateResult = await mongoDBRepository.update(postsCollection, id, data);

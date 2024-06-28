@@ -1,14 +1,14 @@
-import { ErrorMessageSchema } from '../../models/errors/ErrorMessageSchema';
+import { ErrorMessageSchema } from '../../Veiw/errors/ErrorMessageSchema';
 
 export enum ResultStatus {
   Success = 'Success',
   NotFound = 'NotFound',
   Forbidden = 'Forbidden',
   Unauthorized = 'Unauthorized',
-  BagRequest = 'BagRequest',
+  BadRequest = 'BadRequest',
 }
 
-export type Result<T = null> = {
+export type Result<T> = {
   status: ResultStatus;
   errorMessage?: ErrorMessageSchema[];
   data: T;

@@ -1,4 +1,4 @@
-import { GetUserSchema } from '../../models';
+import { GetUserSchema } from '../../Veiw';
 import { CookieOptions } from 'express';
 
 declare global {

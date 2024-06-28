@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { COOKIE_KEY, HTTP_STATUSES } from '../../utils/consts';
-import { AuthUserSchema, AuthUserSchemaResponse, ResponseErrorSchema } from '../../models';
+import { AuthUserSchema, AuthUserSchemaResponse, ResponseErrorSchema } from '../../Veiw';
 import { RequestWithBody } from '../../types/request-types';
 import { hashBuilder } from '../../utils/helpers';
 import { queryRepository } from '../../repositories/queryRepository';

@@ -7,9 +7,9 @@ import {
   GetDeviceSchema,
   GetPostListSchema,
   GetPostSchema,
-  GetUserListSchema,
+  GetUserListView,
   GetUserSchema,
-} from '../models';
+} from '../Veiw';
 import {
   blogsCollection,
   commentsCollection,
@@ -22,7 +22,7 @@ import { mapperRepository } from './mapperRepository';
 import { Result, ResultStatus } from '../types/common/result';
 import { GetPostsQuery, PostDbType } from '../types/post-types';
 import { CommentDbType, GetCommentsQuery } from '../types/comments-types';
-import { GetCommentSchema } from '../models/comments/GetCommentSchema';
+import { GetCommentSchema } from '../Veiw/comments/GetCommentSchema';
 import { EmailConfirmationWithId, GetUsersQuery, IUserByEmail, UserDbType } from '../types/users-types';
 import { mongoDBRepository } from './db-repository';
 import { DeviceAuthSessionDbType } from '../types/device-auth-session-types';
@@ -174,7 +174,7 @@ class QueryRepository {
       GetUserSchema
     >(usersCollection, filters, fieldsToRemove);
 
-    const users: GetUserListSchema = {
+    const users: GetUserListView = {
       pagesCount: getPageCount(totalCount, filters.pageSize),
       page: filters.page,
       pageSize: filters.pageSize,
@@ -225,7 +225,7 @@ class QueryRepository {
     if (hasUserByLogin || hasUserByEmail) {
       return {
         data: hasUserByLogin ? 'login' : 'email',
-        status: ResultStatus.BagRequest,
+        status: ResultStatus.BadRequest,
       };
     } else {
       return {

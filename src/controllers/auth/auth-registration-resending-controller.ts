@@ -1,11 +1,11 @@
 import { Response } from 'express';
-import { ResponseErrorSchema } from '../../models';
+import { ResponseErrorSchema } from '../../Veiw';
 import { RequestWithBody } from '../../types/request-types';
 import { HTTP_STATUSES } from '../../utils/consts';
 import { queryRepository } from '../../repositories/queryRepository';
 import { ResultStatus } from '../../types/common/result';
 import { getCurrentDate, isExpiredDate } from '../../utils/dates/dates';
-import { AuthRegistrationResendingSchema } from '../../models/auth/AuthRegistrationResendingSchema';
+import { AuthRegistrationResendingSchema } from '../../Veiw/auth/AuthRegistrationResendingSchema';
 import { emailService } from '../../services/email-service';
 import { deleteUserService } from '../../services/delete-user-service';
 import { updateUserConfirmationService } from '../../services/update-user-confermation-service';
@@ -18,7 +18,7 @@ export const authRegistrationResendingController = async (
   try {
     const { status, data } = await queryRepository.getUserByEmail(req.body.email);
 
-    if (status === ResultStatus.BagRequest) {
+    if (status === ResultStatus.BadRequest) {
       res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
         errorsMessages: [
           {

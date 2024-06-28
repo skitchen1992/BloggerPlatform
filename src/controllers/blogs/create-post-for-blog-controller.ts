@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
-import { CreatePostSchemaResponse, ResponseErrorSchema } from '../../models';
+import { CreatePostSchemaResponse, ResponseErrorSchema } from '../../Veiw';
 import { RequestWithParamsAndBody } from '../../types/request-types';
-import { CreatePostForBlogSchema } from '../../models/posts/CreatePostForBlogSchema';
+import { CreatePostForBlogSchema } from '../../Veiw/posts/CreatePostForBlogSchema';
 import { createPostForBlogService } from '../../services/create-post-for-blog-service';
 import { queryRepository } from '../../repositories/queryRepository';
 import { ResultStatus } from '../../types/common/result';

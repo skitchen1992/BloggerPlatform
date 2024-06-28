@@ -5,7 +5,7 @@ import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middlew
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { validateCreatePostSchema, validateUpdatePostSchema } from '../middlewares/posts';
-import { CreateCommentSchema, CreatePostSchema, UpdatePostSchema } from '../models';
+import { CreateCommentSchema, CreatePostSchema, UpdatePostSchema } from '../Veiw';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
 import { validateCreateCommentSchema } from '../middlewares/posts/validate-schemas/validate-create-comment-schema';
 import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-middleware';

@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { ResponseErrorSchema } from '../../models';
+import { ResponseErrorSchema } from '../../Veiw';
 import { RequestWithBody } from '../../types/request-types';
-import { AuthRegistrationSchema } from '../../models/auth/AuthRegistrationSchema';
+import { AuthRegistrationSchema } from '../../Veiw/auth/AuthRegistrationSchema';
 import { HTTP_STATUSES } from '../../utils/consts';
 import { emailService } from '../../services/email-service';
 import { queryRepository } from '../../repositories/queryRepository';
@@ -16,7 +16,7 @@ export const authRegistrationController = async (
   try {
     const { status, data } = await queryRepository.isExistsUser(req.body.login, req.body.email);
 
-    if (status === ResultStatus.BagRequest) {
+    if (status === ResultStatus.BadRequest) {
       res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
         errorsMessages: [
           {

@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { GetPostListSchema } from '../../models';
+import { GetPostListSchema } from '../../Veiw';
 import { HTTP_STATUSES } from '../../utils/consts';
 import { RequestWithQuery } from '../../types/request-types';
 import { GetPostsQuery } from '../../types/post-types';

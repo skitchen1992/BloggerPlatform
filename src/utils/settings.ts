@@ -13,7 +13,7 @@ export const SETTINGS = {
 
   DB: {
     NAME: {
-      PORTAL: 'portal',
+      PORTAL: 'bloggerPlatform',
     },
     COLLECTION: {
       BLOGS: 'blogs',

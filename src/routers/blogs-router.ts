@@ -5,8 +5,8 @@ import { validateBlogPostSchema, validateBlogPutSchema } from '../middlewares/bl
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
-import { CreateBlogSchema, UpdateBlogSchema } from '../models';
-import { CreatePostForBlogSchema } from '../models/posts/CreatePostForBlogSchema';
+import { CreateBlogSchema, UpdateBlogSchema } from '../Veiw';
+import { CreatePostForBlogSchema } from '../Veiw/posts/CreatePostForBlogSchema';
 import { validateCreatePostForBlogSchema } from '../middlewares/blogs/validate-schemas/validate-create-post-for-blog-schema';
 
 export const blogsRouter = Router();

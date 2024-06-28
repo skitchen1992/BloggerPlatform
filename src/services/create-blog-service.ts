@@ -1,4 +1,4 @@
-import { CreateBlogSchema } from '../models';
+import { CreateBlogSchema } from '../Veiw';
 import { mongoDBRepository } from '../repositories/db-repository';
 import { BlogDbType } from '../types/blog-types';
 import { blogsCollection } from '../db/collection';

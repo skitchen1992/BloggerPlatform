@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
-import { UpdateBlogSchema } from '../../models';
+import { UpdateBlogSchema } from '../../Veiw';
 import { RequestWithParamsAndBody } from '../../types/request-types';
 import { updateBlogService } from '../../services/update-blog-service';
 import { ResultStatus } from '../../types/common/result';

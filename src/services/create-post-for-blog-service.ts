@@ -1,7 +1,7 @@
 import { mongoDBRepository } from '../repositories/db-repository';
 import { postsCollection } from '../db/collection';
 import { PostDbType } from '../types/post-types';
-import { CreatePostForBlogSchema } from '../models/posts/CreatePostForBlogSchema';
+import { CreatePostForBlogSchema } from '../Veiw/posts/CreatePostForBlogSchema';
 import { queryRepository } from '../repositories/queryRepository';
 import { ResultStatus } from '../types/common/result';
 import { getCurrentDate } from '../utils/dates/dates';

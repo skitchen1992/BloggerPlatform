@@ -1,4 +1,4 @@
-import { CreatePostSchema, GetBlogSchema } from '../models';
+import { CreatePostSchema, GetBlogSchema } from '../Veiw';
 import { mongoDBRepository } from '../repositories/db-repository';
 import { postsCollection } from '../db/collection';
 import { PostDbType } from '../types/post-types';

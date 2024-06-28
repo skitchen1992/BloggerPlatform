@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
-import { GetPostListSchema } from '../../models';
+import { GetPostListSchema } from '../../Veiw';
 import { RequestWithQueryAndParams } from '../../types/request-types';
 import { GetPostsQuery } from '../../types/post-types';
 import { queryRepository } from '../../repositories/queryRepository';

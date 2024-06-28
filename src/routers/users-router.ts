@@ -3,7 +3,7 @@ import { getUsersQueryParams, PATH_URL } from '../utils/consts';
 import * as controllers from '../controllers';
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
-import { CreateUserSchema } from '../models';
+import { CreateUserSchema } from '../Veiw';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { validateUserPostSchema } from '../middlewares/users';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';

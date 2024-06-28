@@ -3,7 +3,7 @@ import { usersCollection } from '../db/collection';
 import { UserDbType } from '../types/users-types';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { ResultStatus } from '../types/common/result';
-import { CreateUserWithConfirmationSchema } from '../models/auth/CreateUserWithConfirmationSchema';
+import { CreateUserWithConfirmationSchema } from '../Veiw/auth/CreateUserWithConfirmationSchema';
 import { add, getCurrentDate } from '../utils/dates/dates';
 
 export const createUserWithConfirmationService = async (body: CreateUserWithConfirmationSchema) => {
@@ -26,6 +26,6 @@ export const createUserWithConfirmationService = async (body: CreateUserWithConf
   if (acknowledged) {
     return { data: insertedId.toString(), status: ResultStatus.Success };
   } else {
-    return { data: null, status: ResultStatus.BagRequest };
+    return { data: null, status: ResultStatus.BadRequest };
   }
 };

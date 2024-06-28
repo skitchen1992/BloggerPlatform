@@ -1,4 +1,4 @@
-import { CreateBlogSchema } from '../../../src/models';
+import { CreateBlogSchema } from '../../../src/Veiw';
 
 export const ID = '1A2B3C4D5E6F7A8B9C0D1E2F';
 export const dataSetNewBlog: CreateBlogSchema = {

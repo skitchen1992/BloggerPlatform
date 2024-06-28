@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
-import { CreateBlogSchema, CreateBlogSchemaResponse, ResponseErrorSchema } from '../../models';
+import { CreateBlogSchema, CreateBlogSchemaResponse, ResponseErrorSchema } from '../../Veiw';
 import { RequestWithBody } from '../../types/request-types';
 import { createBlogService } from '../../services/create-blog-service';
 import { queryRepository } from '../../repositories/queryRepository';

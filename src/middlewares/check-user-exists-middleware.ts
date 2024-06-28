@@ -10,7 +10,7 @@ export const checkUserExistsMiddleware = {
         body(fields).custom(async (input, meta) => {
           const { status } = await queryRepository.isExistsUser(input, meta.path);
 
-          if (status === ResultStatus.BagRequest) {
+          if (status === ResultStatus.BadRequest) {
             throw new Error();
           }
         }),
@@ -24,7 +24,7 @@ export const checkUserExistsMiddleware = {
         param(fields).custom(async (input, meta) => {
           const { status } = await queryRepository.isExistsUser(input, meta.path);
 
-          if (status === ResultStatus.BagRequest) {
+          if (status === ResultStatus.BadRequest) {
             throw new Error();
           }
         }),

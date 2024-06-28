@@ -1,4 +1,4 @@
-import { CreateCommentSchema, GetUserSchema } from '../models';
+import { CreateCommentSchema, GetUserSchema } from '../Veiw';
 import { mongoDBRepository } from '../repositories/db-repository';
 import { commentsCollection } from '../db/collection';
 import { CommentDbType } from '../types/comments-types';

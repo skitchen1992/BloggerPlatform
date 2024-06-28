@@ -10,7 +10,7 @@ export const addVisitRecordService = async (ip: string, url: string) => {
   const totalCount: number = await queryRepository.getDocumentsCount(ip, url, subtractSeconds(new Date(), 10));
 
   if (totalCount > 4) {
-    return { status: ResultStatus.BagRequest, data: null };
+    return { status: ResultStatus.BadRequest, data: null };
   }
 
   const objectId = new ObjectId();
@@ -27,6 +27,6 @@ export const addVisitRecordService = async (ip: string, url: string) => {
   if (insertOneResult.insertedId) {
     return { status: ResultStatus.Success, data: insertOneResult.insertedId.toString() };
   } else {
-    return { status: ResultStatus.BagRequest, data: null };
+    return { status: ResultStatus.BadRequest, data: null };
   }
 };

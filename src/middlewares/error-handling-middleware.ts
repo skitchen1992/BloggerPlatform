@@ -1,9 +1,9 @@
 import { RequestWithBody } from '../types/request-types';
-import { ResponseErrorSchema } from '../models';
+import { ResponseErrorSchema } from '../Veiw';
 import { NextFunction, Response } from 'express';
 import { Result, validationResult } from 'express-validator';
 import { HTTP_STATUSES } from '../utils/consts';
-import { ErrorMessageSchema } from '../models/errors/ErrorMessageSchema';
+import { ErrorMessageSchema } from '../Veiw/errors/ErrorMessageSchema';
 import { FieldValidationError } from 'express-validator/src/base';
 
 export const errorHandlingMiddleware = <T>(

@@ -29,12 +29,12 @@ afterAll(async () => {
 });
 
 describe('addVisitRecordService', () => {
-  it(`Should get ${ResultStatus.BagRequest} if totalCount is greater than 5`, async () => {
+  it(`Should get ${ResultStatus.BadRequest} if totalCount is greater than 5`, async () => {
     await documentsCollection.insertMany(testSeeder.createDocumentsListDto(5));
 
     const result = await addVisitRecordService('1', 'url');
 
-    expect(result).toEqual({ status: ResultStatus.BagRequest, data: null });
+    expect(result).toEqual({ status: ResultStatus.BadRequest, data: null });
   });
 
   it(`Should get ${ResultStatus.Success} if totalCount is greater than 5`, async () => {

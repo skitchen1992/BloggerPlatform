@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { GetCommentListSchema } from '../../models';
+import { GetCommentListSchema } from '../../Veiw';
 import { HTTP_STATUSES } from '../../utils/consts';
 import { RequestWithQueryAndParams } from '../../types/request-types';
 import { GetPostsQuery } from '../../types/post-types';

@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
-import { CreateCommentSchema, ResponseErrorSchema } from '../../models';
+import { CreateCommentSchema, ResponseErrorSchema } from '../../Veiw';
 import { RequestWithParamsAndBody } from '../../types/request-types';
-import { CreateCommentSchemaResponse } from '../../models/comments/CreateCommentSchemaResponse';
+import { CreateCommentSchemaResponse } from '../../Veiw/comments/CreateCommentSchemaResponse';
 import { createCommentService } from '../../services/create-comment-service';
 import { queryRepository } from '../../repositories/queryRepository';
 import { ResultStatus } from '../../types/common/result';

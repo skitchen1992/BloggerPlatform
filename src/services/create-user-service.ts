@@ -1,26 +1,40 @@
-import { CreateUserSchema } from '../models';
-import { mongoDBRepository } from '../repositories/db-repository';
-import { usersCollection } from '../db/collection';
-import { UserDbType } from '../types/users-types';
-import { hashBuilder } from '../utils/helpers';
+import { CreateUserSchema } from '../Veiw';
+import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { ResultStatus } from '../types/common/result';
-import { getCurrentDate } from '../utils/dates/dates';
+import { add, getDateFromObjectId } from '../utils/dates/dates';
+import { UserModel } from '../models/user';
+import { ObjectId } from 'mongodb';
 
-export const createUserService = async (body: CreateUserSchema) => {
-  const passwordHash = await hashBuilder.hash(body.password);
+class UserService {
+  async createUser(body: CreateUserSchema) {
+    try {
+      const passwordHash = await hashBuilder.hash(body.password);
 
-  const newUser: UserDbType = {
-    login: body.login,
-    password: passwordHash,
-    email: body.email,
-    createdAt: getCurrentDate(),
-  };
+      const id = new ObjectId();
 
-  const { insertedId, acknowledged } = await mongoDBRepository.add<UserDbType>(usersCollection, newUser);
+      const newUser = new UserModel({
+        login: body.login,
+        password: passwordHash,
+        email: body.email,
+        createdAt: getDateFromObjectId(id),
+        emailConfirmation: {
+          isConfirmed: false,
+          confirmationCode: getUniqueId(),
+          expirationDate: add(new Date(), { hours: 1 }),
+        },
+        _id: id,
+      });
 
-  if (acknowledged) {
-    return { data: insertedId.toString(), status: ResultStatus.Success };
-  } else {
-    return { data: null, status: ResultStatus.BagRequest };
+      const savedUser = await newUser.save();
+
+      return { data: savedUser._id.toString(), status: ResultStatus.Success };
+
+    } catch (error) {
+      console.log(`User not saved:  ${error}`);
+      return { data: null, status: ResultStatus.BadRequest };
+    }
   }
-};
+}
+
+export const userService = new UserService();
+

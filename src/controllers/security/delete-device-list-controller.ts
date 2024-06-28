@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { COOKIE_KEY, HTTP_STATUSES } from '../../utils/consts';
-import { GetDeviceSchema } from '../../models';
+import { GetDeviceSchema } from '../../Veiw';
 import { RequestEmpty } from '../../types/request-types';
 import { ResultStatus } from '../../types/common/result';
 import { deleteDeviceListService } from '../../services/delete-device-list-service';

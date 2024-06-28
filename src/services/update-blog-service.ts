@@ -2,7 +2,7 @@ import { mongoDBRepository } from '../repositories/db-repository';
 import { BlogDbType } from '../types/blog-types';
 import { blogsCollection } from '../db/collection';
 import { ResultStatus } from '../types/common/result';
-import { UpdateBlogSchema } from '../models';
+import { UpdateBlogSchema } from '../Veiw';
 
 export const updateBlogService = async (id: string, data: UpdateBlogSchema) => {
   const updateResult = await mongoDBRepository.update<BlogDbType>(blogsCollection, id, data);

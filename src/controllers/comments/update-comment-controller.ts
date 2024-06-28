@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
 import { RequestWithParamsAndBody } from '../../types/request-types';
-import { UpdateCommentSchema } from '../../models/comments/UpdateCommentSchema';
+import { UpdateCommentSchema } from '../../Veiw/comments/UpdateCommentSchema';
 import { queryRepository } from '../../repositories/queryRepository';
 import { ResultStatus } from '../../types/common/result';
 import { updateCommentService } from '../../services/update-comment-service';

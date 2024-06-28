@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
-import { GetPostSchema, ResponseErrorSchema } from '../../models';
+import { GetPostSchema, ResponseErrorSchema } from '../../Veiw';
 import { RequestWithParams } from '../../types/request-types';
 import { mongoDBRepository } from '../../repositories/db-repository';
 import { postsCollection } from '../../db/collection';

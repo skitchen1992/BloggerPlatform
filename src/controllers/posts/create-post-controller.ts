@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
-import { CreatePostSchema, CreatePostSchemaResponse, ResponseErrorSchema } from '../../models';
+import { CreatePostSchema, CreatePostSchemaResponse, ResponseErrorSchema } from '../../Veiw';
 import { RequestWithBody } from '../../types/request-types';
 import { createPostService } from '../../services/create-post-service';
 import { queryRepository } from '../../repositories/queryRepository';

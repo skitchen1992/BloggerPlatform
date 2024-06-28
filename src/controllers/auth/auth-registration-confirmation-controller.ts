@@ -1,10 +1,10 @@
 import { Response } from 'express';
-import { ResponseErrorSchema } from '../../models';
+import { ResponseErrorSchema } from '../../Veiw';
 import { RequestWithBody } from '../../types/request-types';
 import { HTTP_STATUSES } from '../../utils/consts';
 import { queryRepository } from '../../repositories/queryRepository';
 import { ResultStatus } from '../../types/common/result';
-import { AuthRegistrationConfirmationSchema } from '../../models/auth/AuthRegistrationConfirmationSchema';
+import { AuthRegistrationConfirmationSchema } from '../../Veiw/auth/AuthRegistrationConfirmationSchema';
 import { getCurrentDate, isExpiredDate } from '../../utils/dates/dates';
 import { updateUserConfirmationService } from '../../services/update-user-confermation-service';
 
@@ -15,7 +15,7 @@ export const authRegistrationConfirmationController = async (
   try {
     const { status, data } = await queryRepository.getUserByConfirmationCode(req.body.code);
 
-    if (status === ResultStatus.BagRequest) {
+    if (status === ResultStatus.BadRequest) {
       res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
         errorsMessages: [
           {

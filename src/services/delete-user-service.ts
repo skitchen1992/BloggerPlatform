@@ -1,11 +1,10 @@
-import { mongoDBRepository } from '../repositories/db-repository';
-import { usersCollection } from '../db/collection';
 import { ResultStatus } from '../types/common/result';
+import { userRepository } from '../repositories/user-repository';
 
 export const deleteUserService = async (id: string) => {
-  const deleteResult = await mongoDBRepository.delete(usersCollection, id);
+  const { status } = await userRepository.deleteUserById(id);
 
-  if (deleteResult.deletedCount === 1) {
+  if (status === ResultStatus.Success) {
     return { data: null, status: ResultStatus.Success };
   } else {
     return { data: null, status: ResultStatus.NotFound };
