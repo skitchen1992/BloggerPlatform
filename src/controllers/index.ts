@@ -16,10 +16,6 @@ export { deletePostController } from './posts/delete-post-controller';
 export { getCommentsForPostController } from './posts/get-comments-for-post-controller';
 export { createCommentController } from './posts/create-comment-controller';
 
-export { getUsersController } from './users/get-users-controller';
-export { createUserController } from './users/create-user-controller';
-export { deleteUserController } from './users/delete-user-controller';
-
 export { authController } from './auth/auth-controller';
 export { meController } from './auth/me-controller';
 export { authRegistrationController } from './auth/auth-registration-controller';

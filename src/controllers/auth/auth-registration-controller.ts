@@ -7,7 +7,7 @@ import { emailService } from '../../services/email-service';
 import { queryRepository } from '../../repositories/queryRepository';
 import { ResultStatus } from '../../types/common/result';
 import { createUserWithConfirmationService } from '../../services/create-user-with-confirmation-service';
-import { deleteUserService } from '../../services/delete-user-service';
+import { userService } from '../../services/user-service';
 
 export const authRegistrationController = async (
   req: RequestWithBody<AuthRegistrationSchema>,
@@ -41,7 +41,7 @@ export const authRegistrationController = async (
 
           return;
         } catch (e) {
-          await deleteUserService(userId!);
+          await userService.deleteUserById(userId!);
         }
       }
 

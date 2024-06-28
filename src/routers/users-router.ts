@@ -7,6 +7,7 @@ import { CreateUserSchema } from '../Veiw';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { validateUserPostSchema } from '../middlewares/users';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
+import { userController } from '../controllers/user-controller';
 
 export const usersRouter = Router();
 
@@ -15,7 +16,7 @@ usersRouter.get(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(getUsersQueryParams),
   errorHandlingMiddleware<CreateUserSchema>,
-  controllers.getUsersController
+  userController.getUsers
 );
 
 usersRouter.post(
@@ -24,7 +25,7 @@ usersRouter.post(
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateUserPostSchema),
   errorHandlingMiddleware<CreateUserSchema>,
-  controllers.createUserController
+  userController.createUser
 );
 
 usersRouter.delete(
@@ -32,5 +33,5 @@ usersRouter.delete(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  controllers.deleteUserController
+  userController.deleteUser
 );

@@ -7,9 +7,9 @@ import { ResultStatus } from '../../types/common/result';
 import { getCurrentDate, isExpiredDate } from '../../utils/dates/dates';
 import { AuthRegistrationResendingSchema } from '../../Veiw/auth/AuthRegistrationResendingSchema';
 import { emailService } from '../../services/email-service';
-import { deleteUserService } from '../../services/delete-user-service';
 import { updateUserConfirmationService } from '../../services/update-user-confermation-service';
 import { getUniqueId } from '../../utils/helpers';
+import { userService } from '../../services/user-service';
 
 export const authRegistrationResendingController = async (
   req: RequestWithBody<AuthRegistrationResendingSchema>,
@@ -64,7 +64,7 @@ export const authRegistrationResendingController = async (
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
       return;
     } catch (e) {
-      await deleteUserService(data!.id);
+      await userService.deleteUserById(data!.id);
     }
   } catch (e) {
     res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
