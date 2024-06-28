@@ -1,0 +1,14 @@
+# Лог-файлы
+*.log
+
+# Директория node_modules
+node_modules
+
+# Скомпилированные файлы
+/dist
+/coverage
+
+.idea
+.vscode
+.data
+.env
