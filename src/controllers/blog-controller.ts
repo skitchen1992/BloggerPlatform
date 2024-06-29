@@ -5,10 +5,10 @@ import {
   CreatePostSchemaResponse,
   GetBlogListView,
   GetBlogSchema,
-  GetPostListSchema,
+  GetPostListView,
   ResponseErrorSchema,
   UpdateBlogSchema,
-} from '../Veiw';
+} from '../view';
 import {
   RequestWithBody,
   RequestWithParams,
@@ -20,7 +20,7 @@ import { GetBlogsQuery } from '../types/blog-types';
 import { HTTP_STATUSES } from '../utils/consts';
 import { GetPostsQuery } from '../types/post-types';
 import { ResultStatus } from '../types/common/result';
-import { CreatePostForBlogSchema } from '../Veiw/posts/CreatePostForBlogSchema';
+import { CreatePostForBlogSchema } from '../view/posts/CreatePostForBlogSchema';
 import { blogRepository } from '../repositories/blog-repository';
 import { postRepository } from '../repositories/post-repository';
 import { blogService } from '../services/blog-service';
@@ -57,7 +57,7 @@ class BlogController {
 
   async getPostsForBlog(
     req: RequestWithQueryAndParams<GetPostsQuery, { blogId: string }>,
-    res: Response<GetPostListSchema>,
+    res: Response<GetPostListView>,
   ) {
     try {
       const { status } = await blogRepository.getBlogById(req.params.blogId);

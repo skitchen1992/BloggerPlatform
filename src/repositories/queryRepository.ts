@@ -5,11 +5,11 @@ import {
   GetBlogSchema,
   GetCommentListSchema, GetCommentSchema,
   GetDeviceSchema,
-  GetPostListSchema,
-  GetPostSchema,
+  GetPostListView,
+  GetPostVeiw,
   GetUserListView,
   GetUserView,
-} from '../Veiw';
+} from '../view';
 import {
   blogsCollection,
   commentsCollection,
@@ -55,7 +55,7 @@ class QueryRepository {
   }
 
   public async getPostById(id: string) {
-    const post = await mapperRepository.getEntityAndMapIdField<PostDbType, GetPostSchema>(postsCollection, id);
+    const post = await mapperRepository.getEntityAndMapIdField<PostDbType, GetPostVeiw>(postsCollection, id);
     return { data: post, status: post ? ResultStatus.Success : ResultStatus.NotFound };
   }
 
@@ -64,10 +64,10 @@ class QueryRepository {
 
     const { entities: postList, totalCount } = await mapperRepository.getEntitiesAndMapIdFieldInArray<
       PostDbType,
-      GetPostSchema
+      GetPostVeiw
     >(postsCollection, filters);
 
-    const posts: GetPostListSchema = {
+    const posts: GetPostListView = {
       pagesCount: getPageCount(totalCount, filters.pageSize),
       page: filters.page,
       pageSize: filters.pageSize,

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { HTTP_STATUSES } from '../../utils/consts';
-import { AuthUserInfoSchemaResponse } from '../../Veiw';
+import { AuthUserInfoSchemaResponse } from '../../view';
 import { RequestEmpty } from '../../types/request-types';
 
 export const meController = async (req: RequestEmpty, res: Response<AuthUserInfoSchemaResponse>) => {

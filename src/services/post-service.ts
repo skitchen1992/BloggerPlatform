@@ -1,40 +1,16 @@
-import { CreateBlogSchema, UpdateBlogSchema } from '../view';
-import { BlogModel } from '../models/blog';
 import { ObjectId } from 'mongodb';
 import { Result, ResultStatus } from '../types/common/result';
 import { getDateFromObjectId } from '../utils/dates/dates';
 import { CreatePostForBlogSchema } from '../view/posts/CreatePostForBlogSchema';
 import { blogRepository } from '../repositories/blog-repository';
 import { PostModel } from '../models/post';
+import { CreateCommentSchema, GetUserView, UpdatePostSchema } from '../view';
+import { CommentModel } from '../models/comment';
 
-class BlogService {
-  async createBlog(body: CreateBlogSchema): Promise<Result<string | null>> {
+class PostService {
+  async createPost(body: CreatePostForBlogSchema, params: { blogId: string }): Promise<Result<string | null>> {
     try {
-      const id = new ObjectId();
 
-      const newBlog = new BlogModel({
-        name: body.name,
-        description: body.description,
-        websiteUrl: body.websiteUrl,
-        createdAt: getDateFromObjectId(id),
-        isMembership: false,
-        _id: id,
-      });
-
-      const savedBlog = await newBlog.save();
-
-      return { data: savedBlog._id.toString(), status: ResultStatus.Success };
-
-    } catch (error) {
-      console.log(`Blog not created: ${error}`);
-      return {
-        data: null, status: ResultStatus.BadRequest,
-      };
-    }
-  }
-
-  async createPostForBlog(body: CreatePostForBlogSchema, params: { blogId: string }): Promise<Result<string | null>> {
-    try {
       const { status, data } = await blogRepository.getBlogById(params.blogId);
 
       if (status === ResultStatus.NotFound) {
@@ -64,40 +40,73 @@ class BlogService {
     }
   };
 
-  async updateBlog(id: string, data: UpdateBlogSchema): Promise<Result<null>> {
+  async updatePost(id: string, data: UpdatePostSchema) {
     try {
-
-      const updateResult = await BlogModel.updateOne({ _id: new ObjectId(id) }, data);
+      const updateResult = await PostModel.updateOne({ _id: new ObjectId(id) }, data);
 
       if (updateResult.modifiedCount === 1) {
         return { data: null, status: ResultStatus.Success };
       } else {
         return { data: null, status: ResultStatus.NotFound };
       }
+
     } catch (error) {
-      console.log(`Blog not updated: ${error}`);
+      console.log(`Post not updated: ${error}`);
       return {
         data: null, status: ResultStatus.BadRequest,
       };
     }
-  }
+  };
 
-  async deleteBlog(id: string): Promise<Result<null>> {
+  async deletePost(id: string) {
     try {
-      const deleteResult = await BlogModel.deleteOne({ _id: new ObjectId(id) });
+      const deleteResult = await PostModel.deleteOne({ _id: new ObjectId(id) });
 
       if (deleteResult.deletedCount === 1) {
         return { data: null, status: ResultStatus.Success };
       } else {
         return { data: null, status: ResultStatus.NotFound };
       }
+
     } catch (error) {
-      console.log(`Blog not deleted: ${error}`);
+      console.log(`Post not deleted: ${error}`);
       return {
         data: null, status: ResultStatus.BadRequest,
       };
     }
-  }
+  };
+
+  async createComment(
+    body: CreateCommentSchema,
+    params: { postId: string },
+    user: GetUserView,
+  ) {
+    try {
+
+      const id = new ObjectId();
+
+      const newComment = new CommentModel({
+        content: body.content,
+        commentatorInfo: {
+          userId: user.id,
+          userLogin: user.login,
+        },
+        postId: params.postId,
+        createdAt: getDateFromObjectId(id),
+        _id: id,
+      });
+
+      const savedComment = await newComment.save();
+
+      return { data: savedComment._id.toString(), status: ResultStatus.Success };
+
+    } catch (error) {
+      console.log(`Comment not created: ${error}`);
+      return {
+        data: null, status: ResultStatus.BadRequest,
+      };
+    }
+  };
 }
 
-export const blogService = new BlogService();
+export const postService = new PostService();

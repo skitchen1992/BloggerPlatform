@@ -1,4 +1,4 @@
-export type CreatePostSchema = {
+export type CreatePostView = {
   title: string;
   shortDescription: string;
   content: string;

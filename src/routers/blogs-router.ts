@@ -4,8 +4,8 @@ import { validateBlogPostSchema, validateBlogPutSchema } from '../middlewares/bl
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
-import { CreateBlogSchema, UpdateBlogSchema } from '../Veiw';
-import { CreatePostForBlogSchema } from '../Veiw/posts/CreatePostForBlogSchema';
+import { CreateBlogSchema, UpdateBlogSchema } from '../view';
+import { CreatePostForBlogSchema } from '../view/posts/CreatePostForBlogSchema';
 import {
   validateCreatePostForBlogSchema,
 } from '../middlewares/blogs/validate-schemas/validate-create-post-for-blog-schema';
@@ -20,7 +20,8 @@ blogsRouter.get(
   blogController.getBlogs,
 );
 
-blogsRouter.get(PATH_URL.ID,
+blogsRouter.get(
+  PATH_URL.ID,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   blogController.getBlogById,

@@ -1,8 +1,6 @@
-import {
-  usersCollection,
-} from '../db/collection';
+import { usersCollection } from '../db/collection';
 import { Result, ResultStatus } from '../types/common/result';
-import {  searchQueryBuilder } from '../utils/helpers';
+import { searchQueryBuilder } from '../utils/helpers';
 import { EmailConfirmationWithId, GetUsersQuery, IUserByEmail, UserDbType } from '../types/users-types';
 import { mongoDBRepository } from './db-repository';
 import { UserModel } from '../models/user';

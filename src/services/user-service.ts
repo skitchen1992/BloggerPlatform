@@ -1,4 +1,4 @@
-import { CreateUserSchema } from '../Veiw';
+import { CreateUserSchema } from '../view';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { Result, ResultStatus } from '../types/common/result';
 import { add, getDateFromObjectId } from '../utils/dates/dates';

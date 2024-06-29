@@ -1,6 +1,6 @@
-import {  GetBlogsQuery } from '../types/blog-types';
+import { GetBlogsQuery } from '../types/blog-types';
 import { Result, ResultStatus } from '../types/common/result';
-import {  searchQueryBuilder } from '../utils/helpers';
+import { searchQueryBuilder } from '../utils/helpers';
 import { BlogModel } from '../models/blog';
 import { BlogMapper } from '../mappers/blog-mapper';
 import { BlogListDTO } from '../dto/blog-list-dto';
@@ -8,14 +8,18 @@ import { BlogDTO } from '../dto/blog-dto';
 
 
 class BlogRepository {
-  public async getBlogById(id: string): Promise<Result<BlogDTO | null>>  {
+  public async getBlogById(id: string): Promise<Result<BlogDTO | null>> {
+    try {
+      const blog = await BlogModel.findById(id);
 
-    const blog = await BlogModel.findById(id);
-
-    return {
-      data: blog ? BlogMapper.toBlogDTO(blog) : null,
-      status: blog ? ResultStatus.Success : ResultStatus.NotFound,
-    };
+      return {
+        data: BlogMapper.toBlogDTO(blog!), status: ResultStatus.Success,
+      };
+    } catch (e) {
+      return {
+        data: null, status: ResultStatus.NotFound,
+      };
+    }
   }
 
   public async getBlogs(query: GetBlogsQuery): Promise<Result<BlogListDTO>> {

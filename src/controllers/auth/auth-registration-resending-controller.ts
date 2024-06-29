@@ -1,11 +1,11 @@
 import { Response } from 'express';
-import { ResponseErrorSchema } from '../../Veiw';
+import { ResponseErrorSchema } from '../../view';
 import { RequestWithBody } from '../../types/request-types';
 import { HTTP_STATUSES } from '../../utils/consts';
 import { queryRepository } from '../../repositories/queryRepository';
 import { ResultStatus } from '../../types/common/result';
 import { getCurrentDate, isExpiredDate } from '../../utils/dates/dates';
-import { AuthRegistrationResendingSchema } from '../../Veiw/auth/AuthRegistrationResendingSchema';
+import { AuthRegistrationResendingSchema } from '../../view/auth/AuthRegistrationResendingSchema';
 import { emailService } from '../../services/email-service';
 import { updateUserConfirmationService } from '../../services/update-user-confermation-service';
 import { getUniqueId } from '../../utils/helpers';

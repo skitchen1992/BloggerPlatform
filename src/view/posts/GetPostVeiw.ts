@@ -1,4 +1,4 @@
-export type GetPostSchema = {
+export type GetPostVeiw = {
   id: string;
   title: string;
   shortDescription: string;

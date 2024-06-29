@@ -1,4 +1,4 @@
-import { GetUserView } from '../../Veiw';
+import { GetUserView } from '../../view';
 import { CookieOptions } from 'express';
 
 declare global {

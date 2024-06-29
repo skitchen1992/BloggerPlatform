@@ -3,7 +3,7 @@ import { usersCollection } from '../db/collection';
 import { UserDbType } from '../types/users-types';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { ResultStatus } from '../types/common/result';
-import { CreateUserWithConfirmationSchema } from '../Veiw/auth/CreateUserWithConfirmationSchema';
+import { CreateUserWithConfirmationSchema } from '../view/auth/CreateUserWithConfirmationSchema';
 import { add, getCurrentDate } from '../utils/dates/dates';
 
 export const createUserWithConfirmationService = async (body: CreateUserWithConfirmationSchema) => {

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { COOKIE_KEY, HTTP_STATUSES } from '../../utils/consts';
-import { AuthUserSchemaResponse, ResponseErrorSchema } from '../../Veiw';
+import { AuthUserSchemaResponse, ResponseErrorSchema } from '../../view';
 import { RequestEmpty } from '../../types/request-types';
 import { jwtService } from '../../services/jwt-service';
 import { JwtPayload } from 'jsonwebtoken';

@@ -1,15 +1,14 @@
 import { RequestWithBody } from '../types/request-types';
-import { ResponseErrorSchema } from '../Veiw';
+import { ResponseErrorSchema, ErrorMessageSchema } from '../view';
 import { NextFunction, Response } from 'express';
 import { Result, validationResult } from 'express-validator';
 import { HTTP_STATUSES } from '../utils/consts';
-import { ErrorMessageSchema } from '../Veiw/errors/ErrorMessageSchema';
 import { FieldValidationError } from 'express-validator/src/base';
 
 export const errorHandlingMiddleware = <T>(
   req: RequestWithBody<T>,
   res: Response<ResponseErrorSchema>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const errorsResult = validationResult(req) as Result<FieldValidationError>;
 

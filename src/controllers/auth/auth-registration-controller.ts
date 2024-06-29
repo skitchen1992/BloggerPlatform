@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { ResponseErrorSchema } from '../../Veiw';
+import { ResponseErrorSchema } from '../../view';
 import { RequestWithBody } from '../../types/request-types';
-import { AuthRegistrationSchema } from '../../Veiw/auth/AuthRegistrationSchema';
+import { AuthRegistrationSchema } from '../../view/auth/AuthRegistrationSchema';
 import { HTTP_STATUSES } from '../../utils/consts';
 import { emailService } from '../../services/email-service';
 import { queryRepository } from '../../repositories/queryRepository';

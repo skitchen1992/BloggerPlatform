@@ -1,4 +1,4 @@
-import { ErrorMessageSchema } from '../../Veiw';
+import { ErrorMessageSchema } from '../../view';
 
 export enum ResultStatus {
   Success = 'Success',
