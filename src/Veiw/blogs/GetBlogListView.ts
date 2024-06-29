@@ -1,6 +1,6 @@
 import { GetBlogSchema } from './GetBlogSchema';
 
-export type GetBlogListSchema = {
+export type GetBlogListView = {
   items: GetBlogSchema[];
   pagesCount: number;
   page: number;

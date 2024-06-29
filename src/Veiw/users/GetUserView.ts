@@ -1,4 +1,4 @@
-export type GetUserSchema = {
+export type GetUserView = {
   id: string;
   login: string;
   email: string;

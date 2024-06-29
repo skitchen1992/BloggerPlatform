@@ -1,4 +1,4 @@
-import { GetCommentSchema } from './GetCommentSchema';
+import type { GetCommentSchema } from './GetCommentSchema';
 
 export type GetCommentListSchema = {
   items: GetCommentSchema[];

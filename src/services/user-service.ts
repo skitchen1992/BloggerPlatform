@@ -1,13 +1,13 @@
 import { CreateUserSchema } from '../Veiw';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
-import { ResultStatus } from '../types/common/result';
+import { Result, ResultStatus } from '../types/common/result';
 import { add, getDateFromObjectId } from '../utils/dates/dates';
 import { UserModel } from '../models/user';
 import { ObjectId } from 'mongodb';
 import { userRepository } from '../repositories/user-repository';
 
 class UserService {
-  async createUser(body: CreateUserSchema) {
+  async createUser(body: CreateUserSchema): Promise<Result<string | null>>  {
     try {
       const passwordHash = await hashBuilder.hash(body.password);
 
@@ -31,12 +31,12 @@ class UserService {
       return { data: savedUser._id.toString(), status: ResultStatus.Success };
 
     } catch (error) {
-      console.log(`User not saved:  ${error}`);
+      console.log(`User not created:  ${error}`);
       return { data: null, status: ResultStatus.BadRequest };
     }
   }
 
-  async deleteUserById(id: string) {
+  async deleteUserById(id: string): Promise<Result<null>> {
     try {
       const { status } = await userRepository.deleteUserById(id);
 

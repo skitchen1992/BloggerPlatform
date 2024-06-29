@@ -1,4 +1,4 @@
-import { ErrorMessageSchema } from '../../Veiw/errors/ErrorMessageSchema';
+import { ErrorMessageSchema } from '../../Veiw';
 
 export enum ResultStatus {
   Success = 'Success',
@@ -10,6 +10,6 @@ export enum ResultStatus {
 
 export type Result<T> = {
   status: ResultStatus;
-  errorMessage?: ErrorMessageSchema[];
   data: T;
+  errorMessage?: ErrorMessageSchema[];
 };

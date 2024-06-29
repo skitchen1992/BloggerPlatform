@@ -1,4 +1,4 @@
-import { CreateCommentSchema, GetUserSchema } from '../Veiw';
+import { CreateCommentSchema, GetUserView } from '../Veiw';
 import { mongoDBRepository } from '../repositories/db-repository';
 import { commentsCollection } from '../db/collection';
 import { CommentDbType } from '../types/comments-types';
@@ -8,7 +8,7 @@ import { getCurrentDate } from '../utils/dates/dates';
 export const createCommentService = async (
   body: CreateCommentSchema,
   params: { postId: string },
-  user: GetUserSchema
+  user: GetUserView
 ) => {
   const newComment: CommentDbType = {
     content: body.content,

@@ -12,7 +12,6 @@ import { UserListDTO } from '../dto/user-list-dto';
 
 
 class UserRepository {
-
   public async getUserById(id: string): Promise<Result<UserDTO | null>> {
     const user = await UserModel.findById(id);
 

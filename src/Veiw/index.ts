@@ -1,5 +1,5 @@
 export type { GetBlogSchema } from './blogs/GetBlogSchema';
-export type { GetBlogListSchema } from './blogs/GetBlogListSchema';
+export type { GetBlogListView } from './blogs/GetBlogListView';
 export type { CreateBlogSchema } from './blogs/CreateBlogSchema';
 export type { CreateBlogSchemaResponse } from './blogs/CreateBlogSchemaResponse';
 export type { UpdateBlogSchema } from './blogs/UpdateBlogSchema';
@@ -9,7 +9,7 @@ export type { CreatePostSchema } from './posts/CreatePostSchema';
 export type { CreatePostSchemaResponse } from './posts/CreatePostSchemaResponse';
 export type { UpdatePostSchema } from './posts/UpdatePostSchema';
 export type { ResponseErrorSchema } from './errors/ResponseErrorSchema';
-export type { GetUserSchema } from './users/GetUserSchema';
+export type { GetUserView } from './users/GetUserView';
 export type { GetUserListView } from './users/GetUserListView';
 export type { CreateUserSchema } from './users/CreateUserSchema';
 export type { CreateUserSchemaResponse } from './users/CreateUserSchemaResponse';
@@ -19,3 +19,5 @@ export type { AuthUserInfoSchemaResponse } from './auth/AuthUserInfoSchemaRespon
 export type { AuthUserSchema } from './auth/AuthUserSchema';
 export type { AuthUserSchemaResponse } from './auth/AuthUserSchemaResponse';
 export type { GetDeviceSchema } from './security/GetDeviceListSchema';
+export { GetCommentSchema } from './comments/GetCommentSchema';
+export { ErrorMessageSchema } from './errors/ErrorMessageSchema';

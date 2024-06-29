@@ -1,11 +1,3 @@
-export { getBlogsController } from './blogs/get-blogs-controller';
-export { getBlogByIdController } from './blogs/get-blog-by-id-controller';
-export { createBlogController } from './blogs/create-blog-controller';
-export { updateBlogController } from './blogs/update-blog-controller';
-export { deleteBlogController } from './blogs/delete-blog-controller';
-export { getPostsForBlogController } from './blogs/get-posts-for-blog-controller';
-export { createPostForBlogController } from './blogs/create-post-for-blog-controller';
-
 export { deleteAllDataController } from './testing/delete-all-data';
 
 export { getPostsController } from './posts/get-posts-controller';

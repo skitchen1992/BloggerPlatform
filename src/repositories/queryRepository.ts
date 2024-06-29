@@ -1,14 +1,14 @@
 import { getPageCount, searchQueryBuilder } from '../utils/helpers';
 import { BlogDbType, GetBlogsQuery } from '../types/blog-types';
 import {
-  GetBlogListSchema,
+  GetBlogListView,
   GetBlogSchema,
-  GetCommentListSchema,
+  GetCommentListSchema, GetCommentSchema,
   GetDeviceSchema,
   GetPostListSchema,
   GetPostSchema,
   GetUserListView,
-  GetUserSchema,
+  GetUserView,
 } from '../Veiw';
 import {
   blogsCollection,
@@ -22,11 +22,11 @@ import { mapperRepository } from './mapperRepository';
 import { Result, ResultStatus } from '../types/common/result';
 import { GetPostsQuery, PostDbType } from '../types/post-types';
 import { CommentDbType, GetCommentsQuery } from '../types/comments-types';
-import { GetCommentSchema } from '../Veiw/comments/GetCommentSchema';
 import { EmailConfirmationWithId, GetUsersQuery, IUserByEmail, UserDbType } from '../types/users-types';
 import { mongoDBRepository } from './db-repository';
 import { DeviceAuthSessionDbType } from '../types/device-auth-session-types';
 import { getCurrentDate } from '../utils/dates/dates';
+
 
 class QueryRepository {
   public async getBlogById(id: string) {
@@ -35,7 +35,7 @@ class QueryRepository {
     return { data: blog, status: blog ? ResultStatus.Success : ResultStatus.NotFound };
   }
 
-  public async getBlogs(query: GetBlogsQuery): Promise<Result<GetBlogListSchema>> {
+  public async getBlogs(query: GetBlogsQuery): Promise<Result<GetBlogListView>> {
     const filters = searchQueryBuilder.getBlogs(query);
 
     const { entities: blogList, totalCount } = await mapperRepository.getEntitiesAndMapIdFieldInArray<
@@ -43,7 +43,7 @@ class QueryRepository {
       GetBlogSchema
     >(blogsCollection, filters);
 
-    const blogs: GetBlogListSchema = {
+    const blogs: GetBlogListView = {
       pagesCount: getPageCount(totalCount, filters.pageSize),
       page: filters.page,
       pageSize: filters.pageSize,
@@ -111,7 +111,7 @@ class QueryRepository {
   }
 
   public async getUserById(id: string, fieldsToRemove: string[] = ['password', 'emailConfirmation']) {
-    const user = await mapperRepository.getEntityAndMapIdField<UserDbType, GetUserSchema>(
+    const user = await mapperRepository.getEntityAndMapIdField<UserDbType, GetUserView>(
       usersCollection,
       id,
       fieldsToRemove
@@ -171,7 +171,7 @@ class QueryRepository {
 
     const { entities: userList, totalCount } = await mapperRepository.getEntitiesAndMapIdFieldInArray<
       UserDbType,
-      GetUserSchema
+      GetUserView
     >(usersCollection, filters, fieldsToRemove);
 
     const users: GetUserListView = {

@@ -1,10 +1,10 @@
-import { GetUserSchema } from '../../Veiw';
+import { GetUserView } from '../../Veiw';
 import { CookieOptions } from 'express';
 
 declare global {
   namespace Express {
     interface Locals {
-      user?: GetUserSchema;
+      user?: GetUserView;
     }
     interface Request {
       getCookie(name: string): string | undefined;
