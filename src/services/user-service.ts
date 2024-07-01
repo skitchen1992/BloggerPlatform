@@ -4,7 +4,7 @@ import { Result, ResultStatus } from '../types/common/result';
 import { add, getDateFromObjectId } from '../utils/dates/dates';
 import { UserModel } from '../models/user';
 import { ObjectId } from 'mongodb';
-import { userRepository } from '../repositories/user-repository';
+
 
 class UserService {
   async createUser(body: CreateUserSchema): Promise<Result<string | null>>  {
@@ -38,18 +38,30 @@ class UserService {
 
   async deleteUserById(id: string): Promise<Result<null>> {
     try {
-      const { status } = await userRepository.deleteUserById(id);
+      const user = await UserModel.findByIdAndDelete(id);
 
-      if (status === ResultStatus.Success) {
-        return { data: null, status: ResultStatus.Success };
-      } else {
-        return { data: null, status: ResultStatus.NotFound };
-      }
+      return {
+        data: null,
+        status: user ? ResultStatus.Success : ResultStatus.NotFound,
+      };
     } catch (error) {
       console.log(`User not deleted: ${error}`);
       return { data: null, status: ResultStatus.BadRequest };
     }
   }
+
+  async updateUserFieldById(id: string, field: string, data: unknown): Promise<Result<null>> {
+    const updateResult = await UserModel.updateOne(
+      { _id: id },
+      { $set: { [field]: data } }
+    );
+
+    if (updateResult.modifiedCount === 1) {
+      return {data: null, status: ResultStatus.Success };
+    } else {
+      return {data: null, status: ResultStatus.NotFound };
+    }
+  };
 
 }
 

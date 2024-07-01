@@ -1,23 +1,11 @@
-import {
-  RequestWithParams,
-  RequestWithParamsAndBody,
-  RequestWithQueryAndParams,
-} from '../types/request-types';
-import { GetPostsQuery } from '../types/post-types';
-import {
-  ResponseErrorSchema,
-  CreateCommentSchema, GetCommentListSchema, GetCommentSchema,
-} from '../view';
+import { RequestWithParams, RequestWithParamsAndBody } from '../types/request-types';
+import { GetCommentSchema } from '../view';
 import { HTTP_STATUSES } from '../utils/consts';
 import { Response } from 'express';
 import { ResultStatus } from '../types/common/result';
-import { postService } from '../services/post-service';
-import { CreateCommentSchemaResponse } from '../view/comments/CreateCommentSchemaResponse';
 import { commentRepository } from '../repositories/comment-repository';
 import { UpdateCommentSchema } from '../view/comments/UpdateCommentSchema';
 import { commentService } from '../services/comment-service';
-import { queryRepository } from '../repositories/queryRepository';
-import { deleteCommentService } from '../services/delete-comment-service';
 
 class CommentController {
   async getCommentById(

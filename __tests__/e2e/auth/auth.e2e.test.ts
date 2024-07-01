@@ -7,7 +7,7 @@ import { app } from '../../../src/app';
 import { createAuthorizationHeader } from '../../test-helpers';
 import { SETTINGS } from '../../../src/utils/settings';
 import { testSeeder } from '../../test.seeder';
-import { createUserWithConfirmationService } from '../../../src/services/create-user-with-confirmation-service';
+import { userService } from '../../../src/services/user-service';
 
 let req: TestAgent<Test>;
 let mongoServer: MongoMemoryServer;
@@ -101,7 +101,7 @@ describe(`Endpoint (POST) - ${PATH_URL.AUTH.REGISTRATION}`, () => {
   it(`Should get status ${HTTP_STATUSES.BAD_REQUEST_400}`, async () => {
     const data = testSeeder.createUserDto();
 
-    await createUserWithConfirmationService(data);
+    await userService.createUser(data);
 
     const res = await req
       .post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.REGISTRATION}`)

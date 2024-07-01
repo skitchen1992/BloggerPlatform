@@ -5,8 +5,8 @@ import { connectToDb, db } from '../../../src/db/collection';
 import { app } from '../../../src/app';
 import TestAgent from 'supertest/lib/agent';
 import { testSeeder } from '../../test.seeder';
-import { createUserWithConfirmationService } from '../../../src/services/create-user-with-confirmation-service';
 import { ID } from './datasets';
+import { userService } from '../../../src/services/user-service';
 
 let req: TestAgent<Test>;
 let mongoServer: MongoMemoryServer;
@@ -33,7 +33,7 @@ describe(`Endpoint (GET) - ${PATH_URL.SECURITY.DEVICES}`, () => {
   it('Should get 2 devices', async () => {
     const data = testSeeder.createUserDto();
 
-    await createUserWithConfirmationService(data);
+    await userService.createUser(data);
 
     await req
       .post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`)
@@ -70,7 +70,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICES}`, () => {
   it('Should get 0 devices', async () => {
     const data = testSeeder.createUserDto();
 
-    await createUserWithConfirmationService(data);
+    await userService.createUser(data);
 
     await req
       .post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`)
@@ -105,7 +105,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICE_ID}`, () => {
   it(`Should get 0 devices ${HTTP_STATUSES.NO_CONTENT_204}`, async () => {
     const data = testSeeder.createUserDto();
 
-    await createUserWithConfirmationService(data);
+    await userService.createUser(data);
 
     await req
       .post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`)
@@ -144,7 +144,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICE_ID}`, () => {
     const data = testSeeder.createUserListDto(2);
 
     for (const item of data) {
-      await createUserWithConfirmationService(item);
+      await userService.createUser(item);
     }
 
     const res1 = await req
@@ -186,7 +186,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICE_ID}`, () => {
   it(`Should get status ${HTTP_STATUSES.NOT_FOUND_404}`, async () => {
     const data = testSeeder.createUserDto();
 
-    await createUserWithConfirmationService(data);
+    await userService.createUser(data);
 
     await req
       .post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`)

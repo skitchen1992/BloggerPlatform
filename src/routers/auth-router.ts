@@ -11,6 +11,7 @@ import { validateAuthRegistrationSchema } from '../middlewares/auth/validate-sch
 import { validateAuthRegistrationConfirmationSchema } from '../middlewares/auth/validate-schemas/validate-auth-registration-confirmation-schema';
 import { validateAuthRegistrationResendingSchema } from '../middlewares/auth/validate-schemas/validate-auth-registration-resending-schema';
 import { guardVisitMiddleware } from '../middlewares/guard-visit-middleware';
+import { authController } from '../controllers/auth-controller';
 
 export const authRouter = Router();
 
@@ -20,21 +21,24 @@ authRouter.post(
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateAuthPostSchema),
   errorHandlingMiddleware<AuthUserSchema>,
-  controllers.authController
+  authController.auth,
+  //controllers.authController
 );
 
 authRouter.post(
   PATH_URL.AUTH.REFRESH_TOKEN,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  controllers.refreshTokenController
+  authController.refreshToken,
+  //controllers.refreshTokenController
 );
 
 authRouter.post(
   PATH_URL.AUTH.LOGOUT,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  controllers.logoutTokenController
+  authController.logoutTokenController,
+  //controllers.logoutTokenController
 );
 
 authRouter.get(
@@ -42,7 +46,8 @@ authRouter.get(
   bearerTokenAuthMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  controllers.meController
+  authController.me
+  // controllers.meController
 );
 
 authRouter.post(
@@ -51,7 +56,8 @@ authRouter.post(
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateAuthRegistrationSchema),
   errorHandlingMiddleware,
-  controllers.authRegistrationController
+  authController.authRegistration,
+  //controllers.authRegistrationController
 );
 
 authRouter.post(
@@ -60,7 +66,8 @@ authRouter.post(
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateAuthRegistrationConfirmationSchema),
   errorHandlingMiddleware,
-  controllers.authRegistrationConfirmationController
+  authController.authRegistrationConfirmation,
+  //controllers.authRegistrationConfirmationController
 );
 
 authRouter.post(
@@ -69,5 +76,6 @@ authRouter.post(
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateAuthRegistrationResendingSchema),
   errorHandlingMiddleware,
-  controllers.authRegistrationResendingController
+  authController.authRegistrationResending,
+  //controllers.authRegistrationResendingController
 );
