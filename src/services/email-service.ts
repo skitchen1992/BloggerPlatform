@@ -1,4 +1,4 @@
-import { emailRepository } from '../repositories/emailRepository';
+import { mailerService } from './mailer-service';
 import { PATH_URL } from '../utils/consts';
 
 class EmailService {
@@ -8,7 +8,7 @@ class EmailService {
     const text = `Please confirm your email address by clicking the following link: link`;
     const html = `<p>Please confirm your email address by clicking the link below:</p><p><a href="${link}">Confirm Email</a></p>`;
 
-    await emailRepository.sendMail(to, subject, text, html);
+    await mailerService.sendMail(to, subject, text, html);
   }
 }
 

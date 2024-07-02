@@ -12,7 +12,6 @@ import { BlogDbType } from '../../../src/types/blog-types';
 import { PostDbType } from '../../../src/types/post-types';
 import { ID } from './datasets';
 import { after } from 'node:test';
-import { ObjectId } from 'mongodb';
 import { getCurrentDate } from '../../../src/utils/dates/dates';
 
 describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {

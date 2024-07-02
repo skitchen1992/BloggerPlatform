@@ -21,9 +21,10 @@ import { getCurrentDate, isExpiredDate } from '../utils/dates/dates';
 import { AuthRegistrationResendingSchema } from '../view/auth/AuthRegistrationResendingSchema';
 
 class AuthController {
-  async auth(req: RequestWithBody<AuthUserSchema>, res: Response<ResponseErrorSchema | AuthUserSchemaResponse>,
+  async login(req: RequestWithBody<AuthUserSchema>, res: Response<ResponseErrorSchema | AuthUserSchemaResponse>,
   ) {
     try {
+
       const { data: user, status } = await userRepository.getUserByFields(['login', 'email'], req.body.loginOrEmail);
 
       if (status !== ResultStatus.Success) {
@@ -131,7 +132,7 @@ class AuthController {
     }
   };
 
-  async logoutTokenController(req: RequestEmpty, res: Response<ResponseErrorSchema | AuthUserSchemaResponse>,
+  async logoutToken(req: RequestEmpty, res: Response<ResponseErrorSchema | AuthUserSchemaResponse>,
   ) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);

@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { SETTINGS } from '../utils/settings';
 
-export class EmailRepository {
+export class MailerService {
   private transporter;
 
   constructor() {
@@ -38,4 +38,4 @@ export class EmailRepository {
   }
 }
 
-export const emailRepository = new EmailRepository();
+export const mailerService = new MailerService();

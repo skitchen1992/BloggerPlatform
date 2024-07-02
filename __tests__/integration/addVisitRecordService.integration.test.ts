@@ -1,4 +1,3 @@
-import { addVisitRecordService } from '../../src/services/add-visit-record-service';
 import TestAgent from 'supertest/lib/agent';
 import { agent, Test } from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -6,6 +5,7 @@ import { connectToDb, db, documentsCollection } from '../../src/db/collection';
 import { app } from '../../src/app';
 import { testSeeder } from '../test.seeder';
 import { ResultStatus } from '../../src/types/common/result';
+import { visitService } from '../../src/services/visit-service';
 
 let req: TestAgent<Test>;
 let mongoServer: MongoMemoryServer;
@@ -32,7 +32,7 @@ describe('addVisitRecordService', () => {
   it(`Should get ${ResultStatus.BadRequest} if totalCount is greater than 5`, async () => {
     await documentsCollection.insertMany(testSeeder.createDocumentsListDto(5));
 
-    const result = await addVisitRecordService('1', 'url');
+    const result = await visitService.calculateVisit('1', 'url');
 
     expect(result).toEqual({ status: ResultStatus.BadRequest, data: null });
   });
@@ -40,7 +40,7 @@ describe('addVisitRecordService', () => {
   it(`Should get ${ResultStatus.Success} if totalCount is greater than 5`, async () => {
     await documentsCollection.insertMany(testSeeder.createDocumentsListDto(1));
 
-    const result = await addVisitRecordService('1', 'url');
+    const result = await visitService.calculateVisit('1', 'url');
 
     expect(result.status).toEqual(ResultStatus.Success);
   });

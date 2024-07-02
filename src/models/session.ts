@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import { SETTINGS } from '../utils/settings';
 
-export interface IDeviceSessionSchema extends Document {
+export interface ISessionSchema extends Document {
   _id: ObjectId;
   userId: string;
   ip: string;
@@ -13,7 +13,7 @@ export interface IDeviceSessionSchema extends Document {
   deviceId: string;
 }
 
-const DeviceSessionSchema = new mongoose.Schema<IDeviceSessionSchema>({
+const SessionSchema = new mongoose.Schema<ISessionSchema>({
   userId: { type: String, require: true },
   ip: { type: String, require: true },
   title: { type: String, require: true },
@@ -22,4 +22,4 @@ const DeviceSessionSchema = new mongoose.Schema<IDeviceSessionSchema>({
   tokenExpirationDate: { type: String, require: true },
   deviceId: { type: String, require: true },
 });
-export const DeviceSessionModel = mongoose.model<IDeviceSessionSchema>(SETTINGS.DB.COLLECTION.DEVICE_AUTH_SESSIONS, DeviceSessionSchema);
+export const SessionModel = mongoose.model<ISessionSchema>(SETTINGS.DB.COLLECTION.DEVICE_AUTH_SESSIONS, SessionSchema);

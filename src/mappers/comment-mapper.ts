@@ -5,7 +5,7 @@ export class CommentMapper {
   static toCommentDTO(comment: ICommentSchema): CommentDTO {
     return new CommentDTO(
       comment._id.toString(),
-      comment.title,
+      comment.content,
       comment.commentatorInfo,
       comment.createdAt,
     );

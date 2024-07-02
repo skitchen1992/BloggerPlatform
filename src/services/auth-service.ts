@@ -4,8 +4,8 @@ import { fromUnixTimeToISO, getCurrentDate, getDateFromObjectId } from '../utils
 import { ObjectId } from 'mongodb';
 import { jwtService } from './jwt-service';
 import { ACCESS_TOKEN_EXPIRED_IN, REFRESH_TOKEN_EXPIRED_IN } from '../utils/consts';
-import { DeviceSessionModel } from '../models/device-session';
-import { deviceSessionRepository } from '../repositories/device-session-repository';
+import { SessionModel } from '../models/session';
+import { sessionRepository } from '../repositories/session-repository';
 import { JwtPayload } from 'jsonwebtoken';
 
 
@@ -27,7 +27,7 @@ class AuthService {
 
       const refreshToken = jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
 
-      const data = new DeviceSessionModel({
+      const data = new SessionModel({
         _id: objectId,
         userId,
         ip,
@@ -50,7 +50,7 @@ class AuthService {
 
   async refreshToken(userId: string, deviceId: string, exp: number) {
     try {
-      const { data: device } = await deviceSessionRepository.getDeviceByFields(
+      const { data: device } = await sessionRepository.getDeviceByFields(
         ['deviceId'],
         deviceId,
       );
@@ -76,7 +76,7 @@ class AuthService {
       //   return { status: ResultStatus.Unauthorized, data: null };
       // }
 
-      await DeviceSessionModel.updateOne({ _id: device._id }, {
+      await SessionModel.updateOne({ _id: device._id }, {
         tokenExpirationDate: jwtService.getTokenExpirationDate(newRefreshToken),
         lastActiveDate: getCurrentDate(),
       });
@@ -98,7 +98,7 @@ class AuthService {
       return { status: ResultStatus.Unauthorized, data: null };
     }
 
-    const { data: device } = await deviceSessionRepository.getDeviceByFields(
+    const { data: device } = await sessionRepository.getDeviceByFields(
       ['deviceId'],
       deviceId,
     );
@@ -115,7 +115,7 @@ class AuthService {
     //   return { status: ResultStatus.Unauthorized, data: null };
     // }
 
-    await DeviceSessionModel.findByIdAndDelete(device._id);
+    await SessionModel.findByIdAndDelete(device._id);
 
     return { data: null, status: ResultStatus.Success };
   };

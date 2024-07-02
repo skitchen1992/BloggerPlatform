@@ -9,11 +9,9 @@ import { app } from '../../../src/app';
 import { blogsCollection, connectToDb, postsCollection } from '../../../src/db/collection';
 import { BlogDbType } from '../../../src/types/blog-types';
 import { ID } from './datasets';
-import { PostDbType } from '../../../src/types/post-types';
 import { mongoDBRepository } from '../../../src/repositories/db-repository';
-import { queryRepository } from '../../../src/repositories/queryRepository';
-import { body } from 'express-validator';
 import { getCurrentDate } from '../../../src/utils/dates/dates';
+import { postRepository } from '../../../src/repositories/post-repository';
 
 describe(`Endpoint (GET) - ${PATH_URL.BLOGS}`, () => {
   let req: TestAgent<Test>;
@@ -446,7 +444,7 @@ describe(`Endpoint (POST) - ${PATH_URL.POSTS_FOR_BLOG}`, () => {
       })
     );
 
-    const { data } = await queryRepository.getPostById(res.body.id);
+    const { data } = await postRepository.getPostById(res.body.id);
 
     const { title, shortDescription, content, blogId: blogID, blogName } = data!;
 

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { PATH_URL } from '../utils/consts';
-import * as controllers from '../controllers';
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
@@ -21,8 +20,7 @@ authRouter.post(
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateAuthPostSchema),
   errorHandlingMiddleware<AuthUserSchema>,
-  authController.auth,
-  //controllers.authController
+  authController.login,
 );
 
 authRouter.post(
@@ -30,15 +28,13 @@ authRouter.post(
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   authController.refreshToken,
-  //controllers.refreshTokenController
 );
 
 authRouter.post(
   PATH_URL.AUTH.LOGOUT,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  authController.logoutTokenController,
-  //controllers.logoutTokenController
+  authController.logoutToken,
 );
 
 authRouter.get(
@@ -47,7 +43,6 @@ authRouter.get(
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   authController.me
-  // controllers.meController
 );
 
 authRouter.post(
@@ -57,7 +52,6 @@ authRouter.post(
   checkExactMiddleware(validateAuthRegistrationSchema),
   errorHandlingMiddleware,
   authController.authRegistration,
-  //controllers.authRegistrationController
 );
 
 authRouter.post(
@@ -67,7 +61,6 @@ authRouter.post(
   checkExactMiddleware(validateAuthRegistrationConfirmationSchema),
   errorHandlingMiddleware,
   authController.authRegistrationConfirmation,
-  //controllers.authRegistrationConfirmationController
 );
 
 authRouter.post(
@@ -77,5 +70,4 @@ authRouter.post(
   checkExactMiddleware(validateAuthRegistrationResendingSchema),
   errorHandlingMiddleware,
   authController.authRegistrationResending,
-  //controllers.authRegistrationResendingController
 );

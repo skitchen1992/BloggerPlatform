@@ -17,10 +17,9 @@ class UserRepository {
   }
 
   public async getUserByFields(fields: (keyof IUserSchema)[], input: string): Promise<Result<IUserSchema | null>> {
-    const query = fields.reduce((acc, field) => {
-      acc[field] = input;
-      return acc;
-    }, {} as { [key: string]: string });
+    const queries = fields.map(field => ({ [field]: input }));
+
+    const query = { $or: queries };
 
     const user = await UserModel.findOne(query);
 

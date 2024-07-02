@@ -28,7 +28,7 @@ export const connectToDb = async (mongoUrl: string): Promise<boolean> => {
     usersCollection = db.collection<UserDbType>(SETTINGS.DB.COLLECTION.USERS);
     commentsCollection = db.collection<CommentDbType>(SETTINGS.DB.COLLECTION.COMMENTS);
     deviceAuthSessionsCollection = db.collection<DeviceAuthSessionDbType>(SETTINGS.DB.COLLECTION.DEVICE_AUTH_SESSIONS);
-    documentsCollection = db.collection<DocumentDbType>(SETTINGS.DB.COLLECTION.DOCUMENTS);
+    documentsCollection = db.collection<DocumentDbType>(SETTINGS.DB.COLLECTION.VISITS);
 
     await client.connect();
 

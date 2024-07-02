@@ -21,7 +21,7 @@ export const SETTINGS = {
       USERS: 'users',
       COMMENTS: 'comments',
       DEVICE_AUTH_SESSIONS: 'deviceAuthSessions',
-      DOCUMENTS: 'documents',
+      VISITS: 'visits',
     },
   },
 };
