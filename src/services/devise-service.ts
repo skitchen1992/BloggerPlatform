@@ -3,6 +3,7 @@ import { jwtService } from './jwt-service';
 import { JwtPayload } from 'jsonwebtoken';
 import { sessionRepository } from '../repositories/session-repository';
 import { SessionModel } from '../models/session';
+import { getDateFromObjectId } from '../utils/dates/dates';
 
 class DeviceService {
   async deleteDeviceList(refreshToken: string) {
@@ -19,7 +20,14 @@ class DeviceService {
         await SessionModel.deleteMany({});
 
         const newSession = new SessionModel({
-          ...deviceAuthSession,
+          _id: deviceAuthSession._id,
+          userId: deviceAuthSession.userId,
+          ip: deviceAuthSession.ip,
+          title: deviceAuthSession.title,
+          lastActiveDate: deviceAuthSession.lastActiveDate,
+          tokenIssueDate: deviceAuthSession.tokenIssueDate,
+          tokenExpirationDate: deviceAuthSession.tokenExpirationDate,
+          deviceId: deviceAuthSession.deviceId,
         });
 
         await newSession.save();
