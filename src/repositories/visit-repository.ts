@@ -5,12 +5,11 @@ class VisitRepository {
     const filters = {
       ip,
       url,
-      date: { $gte: new Date(date) }, // Ensure date is converted to Date object
+      date: { $gte: date },
     };
 
-    return await VisitModel.countDocuments(filters);
+    return VisitModel.countDocuments(filters);
   }
-
 }
 
 export const visitRepository = new VisitRepository();

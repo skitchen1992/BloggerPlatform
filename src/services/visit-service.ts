@@ -8,7 +8,7 @@ class VisitService {
   async calculateVisit(ip: string, url: string): Promise<Result<string | null>> {
     try {
       const totalCount: number = await visitRepository.getDocumentsCount(ip, url, subtractSeconds(new Date(), 10));
-
+      console.log("totalCount", totalCount);
       if (totalCount > 4) {
         return { status: ResultStatus.BadRequest, data: null };
       }
