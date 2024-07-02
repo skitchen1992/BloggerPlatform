@@ -8,7 +8,7 @@ import { ResultStatus } from '../types/common/result';
 import { sessionRepository } from '../repositories/session-repository';
 import { deviseService } from '../services/devise-service';
 
-class DeviceController {
+class SecurityController {
   async getDevices(req: RequestEmpty, res: Response<GetDeviceSchema[]>) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
@@ -99,4 +99,4 @@ class DeviceController {
   };
 }
 
-export const deviceController = new DeviceController();
+export const securityController = new SecurityController();

@@ -6,32 +6,32 @@ import { SessionModel } from '../models/session';
 
 class DeviceService {
   async deleteDeviceList(refreshToken: string) {
-    const { deviceId } = (jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
+    try {
+      const { deviceId } = (jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
 
-    if (!deviceId) {
-      return { status: ResultStatus.Unauthorized, data: null };
-    }
+      if (!deviceId) {
+        return { status: ResultStatus.Unauthorized, data: null };
+      }
 
-    const { data: deviceAuthSession } = await sessionRepository.getDeviceByFields(['deviceId'], deviceId);
+      const { data: deviceAuthSession } = await sessionRepository.getDeviceByFields(['deviceId'], deviceId);
 
-    if (!deviceAuthSession) {
-      return { status: ResultStatus.NotFound, data: null };
-    }
+      if (deviceAuthSession) {
+        await SessionModel.deleteMany();
 
-    if (deviceAuthSession) {
-      await SessionModel.deleteMany();
+        const newSession = new SessionModel({
+          deviceAuthSession,
+        });
 
-      const newSession = new SessionModel(deviceAuthSession);
-      const savedSession = await newSession.save();
+        await newSession.save();
 
-
-      if (savedSession) {
         return { status: ResultStatus.Success, data: null };
       } else {
-        return { status: ResultStatus.NotFound, data: null };
+        return { status: ResultStatus.Unauthorized, data: null };
       }
+    } catch (e) {
+      console.log(e);
+      return { status: ResultStatus.Unauthorized, data: null };
     }
-    return { status: ResultStatus.NotFound, data: null };
   };
 
   async deleteDevice(refreshToken: string, deviceIdForDelete: string) {

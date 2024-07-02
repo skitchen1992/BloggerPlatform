@@ -3,13 +3,11 @@ import { SessionModel, ISessionSchema } from '../models/session';
 import { getCurrentDate } from '../utils/dates/dates';
 import { SessionMapper } from '../mappers/session-mapper';
 
-
 class SessionRepository {
   public async getDeviceByFields(fields: (keyof ISessionSchema)[], input: string): Promise<Result<ISessionSchema | null>> {
-    const query = fields.reduce((acc, field) => {
-      acc[field] = input;
-      return acc;
-    }, {} as { [key: string]: string });
+    const queries = fields.map(field => ({ [field]: input }));
+
+    const query = { $or: queries };
 
     const devise = await SessionModel.findOne(query);
 
