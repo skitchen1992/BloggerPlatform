@@ -16,10 +16,10 @@ class DeviceService {
       const { data: deviceAuthSession } = await sessionRepository.getDeviceByFields(['deviceId'], deviceId);
 
       if (deviceAuthSession) {
-        await SessionModel.deleteMany();
+        await SessionModel.deleteMany({});
 
         const newSession = new SessionModel({
-          deviceAuthSession,
+          ...deviceAuthSession,
         });
 
         await newSession.save();
