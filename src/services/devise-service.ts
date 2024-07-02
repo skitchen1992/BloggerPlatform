@@ -40,6 +40,17 @@ class DeviceService {
     if (!deviceId || !userId) {
       return { status: ResultStatus.Unauthorized, data: null };
     }
+
+    const { data: deviceAuthSession } = await sessionRepository.getDeviceByFields(['deviceId'], deviceIdForDelete);
+
+    if (!deviceAuthSession) {
+      return { status: ResultStatus.NotFound, data: null };
+    }
+
+    if (deviceAuthSession.userId !== userId) {
+      return { status: ResultStatus.Forbidden, data: null };
+    }
+
     const deleteResult = await SessionModel.deleteOne({ deviceId: deviceIdForDelete });
 
     if (deleteResult.deletedCount === 1) {
@@ -51,4 +62,3 @@ class DeviceService {
 }
 
 export const deviseService = new DeviceService();
-
