@@ -5,6 +5,7 @@ import { IUserSchema, UserModel } from '../models/user';
 import { UserMapper } from '../mappers/user-mapper';
 import { UserDTO } from '../dto/user-dto';
 import { UserListDTO } from '../dto/user-list-dto';
+import { ObjectId } from 'mongodb';
 
 class UserRepository {
   public async getUserById(id: string): Promise<Result<UserDTO | null>> {
@@ -16,7 +17,7 @@ class UserRepository {
     };
   }
 
-  public async getUserByFields(fields: (keyof IUserSchema)[], input: string): Promise<Result<IUserSchema | null>> {
+  public async getUserByFields(fields: (keyof IUserSchema)[], input: string | ObjectId): Promise<Result<IUserSchema | null>> {
     const queries = fields.map(field => ({ [field]: input }));
 
     const query = { $or: queries };

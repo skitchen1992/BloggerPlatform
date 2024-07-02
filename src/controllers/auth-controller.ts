@@ -19,6 +19,7 @@ import { userService } from '../services/user-service';
 import { AuthRegistrationConfirmationSchema } from '../view/auth/AuthRegistrationConfirmationSchema';
 import { getCurrentDate, isExpiredDate } from '../utils/dates/dates';
 import { AuthRegistrationResendingSchema } from '../view/auth/AuthRegistrationResendingSchema';
+import { ObjectId } from 'mongodb';
 
 class AuthController {
   async login(req: RequestWithBody<AuthUserSchema>, res: Response<ResponseErrorSchema | AuthUserSchemaResponse>,
@@ -195,7 +196,7 @@ class AuthController {
       const { data: userId, status: userStatus } = await userService.createUser(req.body);
 
       if (userStatus === ResultStatus.Success && userId) {
-        const { data, status } = await userRepository.getUserByFields(['_id'], userId);
+        const { data, status } = await userRepository.getUserByFields(['_id'], new ObjectId(userId));
 
         if (status === ResultStatus.Success) {
           try {
