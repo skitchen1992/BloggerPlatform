@@ -55,7 +55,7 @@ class UserRepository {
   public async getUsers(query: GetUsersQuery): Promise<Result<UserListDTO>> {
     const filters = searchQueryBuilder.getUsers(query);
 
-    const users = await UserModel.find(filters.query);
+    const users = await UserModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize);
 
     const totalCount = await UserModel.countDocuments(filters.query);
 

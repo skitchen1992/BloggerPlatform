@@ -1,32 +1,35 @@
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
 import { agent, Test } from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { connectToDb, db } from '../../../src/db/collection';
 import { app } from '../../../src/app';
 import TestAgent from 'supertest/lib/agent';
 import { testSeeder } from '../../test.seeder';
 import { ID } from './datasets';
 import { userService } from '../../../src/services/user-service';
+import { db } from '../../../src';
 
 let req: TestAgent<Test>;
 let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await connectToDb(mongoServer.getUri());
+  const uri = mongoServer.getUri();
+
+  if (!db.isConnected()) {
+    await db.connect(uri);
+  }
 
   req = agent(app);
-
-  await db.dropDatabase();
 });
 
 beforeEach(async () => {
-  await db.dropDatabase();
+  await db.cleanDB();
 });
 
 afterAll(async () => {
-  await db.dropDatabase();
+  await db.dropDB();
   await mongoServer.stop();
+  await db.disconnect();
 });
 
 describe(`Endpoint (GET) - ${PATH_URL.SECURITY.DEVICES}`, () => {
@@ -172,7 +175,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICE_ID}`, () => {
       .set('Cookie', cookie1)
       .expect(HTTP_STATUSES.OK_200);
 
-    const devises2 = await req
+    await req
       .get(`${PATH_URL.SECURITY.ROOT}${PATH_URL.SECURITY.DEVICES}`)
       .set('Cookie', cookie1)
       .expect(HTTP_STATUSES.OK_200);

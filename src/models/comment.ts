@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { SETTINGS } from '../utils/settings';
 
-export interface ICommentSchema extends Document {
+export interface ICommentSchema {
   _id: ObjectId;
   content: string;
   commentatorInfo: {

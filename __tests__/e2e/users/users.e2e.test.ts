@@ -11,26 +11,34 @@ import { SETTINGS } from '../../../src/utils/settings';
 import * as data from '../users/datasets';
 import { ID } from '../blogs/datasets';
 import { after } from 'node:test';
-
 import { getCurrentDate } from '../../../src/utils/dates/dates';
+import { db } from '../../../src';
+
+let req: TestAgent<Test>;
+let mongoServer: MongoMemoryServer;
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  const uri = mongoServer.getUri();
+
+  if (!db.isConnected()) {
+    await db.connect(uri);
+  }
+
+  req = agent(app);
+});
+
+beforeEach(async () => {
+  await db.cleanDB();
+});
+
+afterAll(async () => {
+  await db.dropDB();
+  await mongoServer.stop();
+  await db.disconnect();
+});
 
 describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
-  let req: TestAgent<Test>;
-  let mongoServer: MongoMemoryServer;
-
-  beforeEach(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    await connectToDb(mongoServer.getUri());
-
-    req = agent(app);
-
-    await usersCollection.deleteMany();
-  });
-
-  afterEach(async () => {
-    await usersCollection.deleteMany();
-  });
-
   it('Should get empty array', async () => {
     const res = await req
       .get(PATH_URL.USERS)

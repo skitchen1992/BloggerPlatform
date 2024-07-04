@@ -34,5 +34,22 @@ export class Database {
   public async disconnect(): Promise<void> {
     await mongoose.disconnect();
   }
+
+  public async dropDB(): Promise<void> {
+    await mongoose.connection.dropDatabase();
+  }
+
+  public async cleanDB(): Promise<void> {
+    const collections = mongoose.connection.collections;
+    for (const key in collections) {
+      const collection = collections[key];
+      await collection.deleteMany({});
+    }
+    console.log('Database cleaned');
+  }
+
+  public isConnected(): boolean {
+    return mongoose.connection.readyState === 1;
+  }
 }
 

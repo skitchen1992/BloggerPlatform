@@ -19,7 +19,7 @@ class PostRepository {
   public async getPosts(query: GetPostsQuery, params?: { blogId: string }): Promise<Result<PostListDTO>> {
     const filters = searchQueryBuilder.getPosts(query, params);
 
-    const posts = await PostModel.find(filters.query);
+    const posts = await PostModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize);
 
     const totalCount = await PostModel.countDocuments(filters.query);
 

@@ -21,7 +21,7 @@ class CommentRepository {
   ) {
     const filters = searchQueryBuilder.getComments(query, params);
 
-    const comments = await CommentModel.find(filters.query);
+    const comments = await CommentModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize);;
 
     const totalCount = await CommentModel.countDocuments(filters.query);
 

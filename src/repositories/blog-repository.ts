@@ -6,7 +6,6 @@ import { BlogMapper } from '../mappers/blog-mapper';
 import { BlogListDTO } from '../dto/blog-list-dto';
 import { BlogDTO } from '../dto/blog-dto';
 
-
 class BlogRepository {
   public async getBlogById(id: string): Promise<Result<BlogDTO | null>> {
     try {
@@ -25,7 +24,7 @@ class BlogRepository {
   public async getBlogs(query: GetBlogsQuery): Promise<Result<BlogListDTO>> {
     const filters = searchQueryBuilder.getBlogs(query);
 
-    const blogs = await BlogModel.find(filters.query);
+    const blogs = await BlogModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize);
 
     const totalCount = await BlogModel.countDocuments(filters.query);
 

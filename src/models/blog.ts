@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { SETTINGS } from '../utils/settings';
 
-export interface IBlogSchema extends Document {
+export interface IBlogSchema {
   _id: ObjectId;
   name: string;
   description: string;

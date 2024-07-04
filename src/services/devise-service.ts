@@ -3,7 +3,6 @@ import { jwtService } from './jwt-service';
 import { JwtPayload } from 'jsonwebtoken';
 import { sessionRepository } from '../repositories/session-repository';
 import { SessionModel } from '../models/session';
-import { getDateFromObjectId } from '../utils/dates/dates';
 
 class DeviceService {
   async deleteDeviceList(refreshToken: string) {

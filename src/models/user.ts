@@ -8,7 +8,7 @@ interface EmailConfirmation {
   isConfirmed: boolean;
 }
 
-export interface IUserSchema extends Document {
+export interface IUserSchema  {
   login: string;
   email: string;
   password: string;

@@ -2,32 +2,35 @@ import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
 import TestAgent from 'supertest/lib/agent';
 import { agent, Test } from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { connectToDb, db } from '../../../src/db/collection';
 import { app } from '../../../src/app';
 import { createAuthorizationHeader } from '../../test-helpers';
 import { SETTINGS } from '../../../src/utils/settings';
 import { testSeeder } from '../../test.seeder';
 import { userService } from '../../../src/services/user-service';
+import { db } from '../../../src';
 
 let req: TestAgent<Test>;
 let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await connectToDb(mongoServer.getUri());
+  const uri = mongoServer.getUri();
+
+  if (!db.isConnected()) {
+    await db.connect(uri);
+  }
 
   req = agent(app);
-
-  await db.dropDatabase();
 });
 
 beforeEach(async () => {
-  await db.dropDatabase();
+  await db.cleanDB();
 });
 
 afterAll(async () => {
-  await db.dropDatabase();
+  await db.dropDB();
   await mongoServer.stop();
+  await db.disconnect();
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.AUTH.LOGIN}`, () => {
