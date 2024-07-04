@@ -4,15 +4,9 @@ import * as data from './datasets';
 import { SETTINGS } from '../../../src/utils/settings';
 import { agent, Test } from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { blogsCollection, commentsCollection, connectToDb, postsCollection } from '../../../src/db/collection';
 import { app } from '../../../src/app';
 import TestAgent from 'supertest/lib/agent';
-import { mongoDBRepository } from '../../../src/repositories/db-repository';
-import { BlogDbType } from '../../../src/types/blog-types';
-import { PostDbType } from '../../../src/types/post-types';
 import { ID } from './datasets';
-import { after } from 'node:test';
-import { getCurrentDate } from '../../../src/utils/dates/dates';
 import { db } from '../../../src';
 import { BlogModel } from '../../../src/models/blog';
 import { testSeeder } from '../../test.seeder';
@@ -27,20 +21,16 @@ beforeAll(async () => {
   const uri = mongoServer.getUri();
 
   if (!db.isConnected()) {
+
     await db.connect(uri);
   }
 
   req = agent(app);
 });
 
-beforeEach(async () => {
-  await db.cleanDB();
-});
-
-afterAll(async () => {
+afterEach(async () => {
   await db.dropDB();
   await mongoServer.stop();
-  await db.disconnect();
 });
 
 describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
@@ -638,30 +628,6 @@ describe(`Endpoint (POST) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
 });
 
 describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
-  let req: TestAgent<Test>;
-  let mongoServer: MongoMemoryServer;
-
-  beforeEach(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    await connectToDb(mongoServer.getUri());
-
-    req = agent(app);
-
-    await blogsCollection.deleteMany();
-    await postsCollection.deleteMany();
-    await commentsCollection.deleteMany();
-  });
-
-  afterEach(async () => {
-    await blogsCollection.deleteMany();
-    await postsCollection.deleteMany();
-    await commentsCollection.deleteMany();
-  });
-
-  after(async () => {
-    await mongoServer.stop();
-  });
-
   it('Should get empty array comment', async () => {
     const login = 'testLogin';
     const password = 'string';
@@ -681,22 +647,11 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     const res = await req
       .get(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
@@ -731,22 +686,11 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     await req
       .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
@@ -797,22 +741,11 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     await req
       .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)

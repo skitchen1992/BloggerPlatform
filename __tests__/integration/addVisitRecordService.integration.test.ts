@@ -13,18 +13,18 @@ let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await db.connect(mongoServer.getUri());
+  const uri = mongoServer.getUri();
+
+  if (!db.isConnected()) {
+
+    await db.connect(uri);
+  }
 
   req = agent(app);
 });
 
-beforeEach(async () => {
-  await db.cleanDB();
-})
-
-afterAll(async () => {
+afterEach(async () => {
   await db.dropDB();
-  await db.disconnect();
   await mongoServer.stop();
 });
 

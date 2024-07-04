@@ -7,7 +7,7 @@ import { CommentListDTO } from '../dto/comment-list-dto';
 
 class CommentRepository {
   public async getCommentById(id: string) {
-    const comment = await CommentModel.findById(id);
+    const comment = await CommentModel.findById(id).lean();
 
     return {
       data: comment ? CommentMapper.toCommentDTO(comment) : null,
@@ -21,7 +21,7 @@ class CommentRepository {
   ) {
     const filters = searchQueryBuilder.getComments(query, params);
 
-    const comments = await CommentModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize);;
+    const comments = await CommentModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize).lean();
 
     const totalCount = await CommentModel.countDocuments(filters.query);
 

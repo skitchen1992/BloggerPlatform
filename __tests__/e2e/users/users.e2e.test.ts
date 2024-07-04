@@ -2,17 +2,18 @@ import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
 import TestAgent from 'supertest/lib/agent';
 import { agent, Test } from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { connectToDb, usersCollection } from '../../../src/db/collection';
 import { app } from '../../../src/app';
-import { mongoDBRepository } from '../../../src/repositories/db-repository';
-import { UserDbType } from '../../../src/types/users-types';
 import { createAuthorizationHeader } from '../../test-helpers';
 import { SETTINGS } from '../../../src/utils/settings';
 import * as data from '../users/datasets';
 import { ID } from '../blogs/datasets';
-import { after } from 'node:test';
-import { getCurrentDate } from '../../../src/utils/dates/dates';
 import { db } from '../../../src';
+import { testSeeder } from '../../test.seeder';
+import { UserModel } from '../../../src/models/user';
+import { UserMapper } from '../../../src/mappers/user-mapper';
+import { getUniqueId } from '../../../src/utils/helpers';
+import { ObjectId } from 'mongodb';
+import { getCurrentDate , add} from '../../../src/utils/dates/dates';
 
 let req: TestAgent<Test>;
 let mongoServer: MongoMemoryServer;
@@ -22,20 +23,16 @@ beforeAll(async () => {
   const uri = mongoServer.getUri();
 
   if (!db.isConnected()) {
+
     await db.connect(uri);
   }
 
   req = agent(app);
 });
 
-beforeEach(async () => {
-  await db.cleanDB();
-});
-
-afterAll(async () => {
+afterEach(async () => {
   await db.dropDB();
   await mongoServer.stop();
-  await db.disconnect();
 });
 
 describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
@@ -49,14 +46,7 @@ describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
   });
 
   it('Should get not empty array', async () => {
-    const createdAt = getCurrentDate();
-
-    const { insertedId } = await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'T8ksjEq-LV',
-      password: 'string',
-      email: 'example@example.com',
-      createdAt,
-    });
+    const userList = await UserModel.insertMany(testSeeder.createUserListDto(1));
 
     const res = await req
       .get(PATH_URL.USERS)
@@ -70,80 +60,34 @@ describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
       page: 1,
       pageSize: 10,
       totalCount: 1,
-      items: [
-        {
-          id: insertedId.toString(),
-          login: 'T8ksjEq-LV',
-          email: 'example@example.com',
-          createdAt,
-        },
-      ],
+      items: userList.map((user) => (UserMapper.toUserDTO(user))),
     });
   });
 
   it('Should get second page', async () => {
-    const firstUserCreatedAt = getCurrentDate();
-
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'Login Nik',
-      password: 'string',
-      email: '1@example.com',
-      createdAt: firstUserCreatedAt,
-    });
-
-    const secondUserCreatedAt = getCurrentDate();
-
-    const secondUser = await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'Login Pig',
-      password: 'string',
-      email: '2@example.com',
-      createdAt: secondUserCreatedAt,
-    });
+    const userList = await UserModel.insertMany(testSeeder.createUserListDto(2));
 
     const res = await req
-      .get(`${PATH_URL.USERS}/?pageSize=1&pageNumber=1&searchLoginTerm=Login Pig`)
+      .get(`${PATH_URL.USERS}/?pageSize=1&pageNumber=2`)
       .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
       .expect(HTTP_STATUSES.OK_200);
 
     expect(res.body.items.length).toBe(1);
 
     expect(res.body).toEqual({
-      pagesCount: 1,
-      page: 1,
+      pagesCount: 2,
+      page: 2,
       pageSize: 1,
-      totalCount: 1,
-      items: [
-        {
-          id: secondUser.insertedId.toString(),
-          login: 'Login Pig',
-          email: '2@example.com',
-          createdAt: secondUserCreatedAt,
-        },
-      ],
+      totalCount: 2,
+      items: [UserMapper.toUserDTO(userList[1])],
     });
   });
 
   it('Should find user by login', async () => {
-    const firstUserCreatedAt = getCurrentDate();
-
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'Login Nik',
-      password: 'string',
-      email: '1@example.com',
-      createdAt: firstUserCreatedAt,
-    });
-
-    const secondUserCreatedAt = getCurrentDate();
-
-    const secondUser = await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'Login Pig',
-      password: 'string',
-      email: '2@example.com',
-      createdAt: secondUserCreatedAt,
-    });
+    const userList = await UserModel.insertMany(testSeeder.createUserListDto(2));
 
     const res = await req
-      .get(`${PATH_URL.USERS}/?searchLoginTerm=Pig`)
+      .get(`${PATH_URL.USERS}/?searchLoginTerm=test0`)
       .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
       .expect(HTTP_STATUSES.OK_200);
 
@@ -154,38 +98,15 @@ describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
       page: 1,
       pageSize: 10,
       totalCount: 1,
-      items: [
-        {
-          id: secondUser.insertedId.toString(),
-          login: 'Login Pig',
-          email: '2@example.com',
-          createdAt: secondUserCreatedAt,
-        },
-      ],
+      items: [UserMapper.toUserDTO(userList[0])],
     });
   });
 
   it('Should find user by email', async () => {
-    const firstUserCreatedAt = getCurrentDate();
-
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'Login Nik',
-      password: 'string',
-      email: 'test@example.com',
-      createdAt: firstUserCreatedAt,
-    });
-
-    const secondUserCreatedAt = getCurrentDate();
-
-    const secondUser = await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'Login Pig',
-      password: 'string',
-      email: 'unio@example.com',
-      createdAt: secondUserCreatedAt,
-    });
+    const userList = await UserModel.insertMany(testSeeder.createUserListDto(2));
 
     const res = await req
-      .get(`${PATH_URL.USERS}/?searchEmailTerm=unio@example.com`)
+      .get(`${PATH_URL.USERS}/?searchEmailTerm=test0@gmail.com`)
       .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
       .expect(HTTP_STATUSES.OK_200);
 
@@ -196,80 +117,42 @@ describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
       page: 1,
       pageSize: 10,
       totalCount: 1,
-      items: [
-        {
-          id: secondUser.insertedId.toString(),
-          login: 'Login Pig',
-          email: 'unio@example.com',
-          createdAt: secondUserCreatedAt,
-        },
-      ],
+      items: [UserMapper.toUserDTO(userList[0])],
     });
   });
 
   it('Should get array by filters', async () => {
-    const createdAt = getCurrentDate();
 
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'loSer',
-      password: 'string',
-      email: 'email2p@gg.om',
-      createdAt,
-    });
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'log01',
-      password: 'string',
-      email: 'emai@gg.com',
-      createdAt,
-    });
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'log02',
-      password: 'string',
-      email: 'email2p@g.com',
-      createdAt,
-    });
+    const providedUsers = [
+      { login: 'loSer', password: 'string', email: 'email2p@gg.om' },
+      { login: 'log01', password: 'string', email: 'emai@gg.com' },
+      { login: 'log02', password: 'string', email: 'email2p@g.com' },
+      { login: 'uer15', password: 'string', email: 'emarrr1@gg.com' },
+      { login: 'user01', password: 'string', email: 'email1p@gg.cm' },
+      { login: 'user02', password: 'string', email: 'email1p@gg.com' },
+      { login: 'user03', password: 'string', email: 'email1p@gg.cou' },
+      { login: 'user05', password: 'string', email: 'email1p@gg.coi' },
+      { login: 'usr-1-01', password: 'string', email: 'email3@gg.com' }
+    ];
+    function createUsersArray(users: Array<{login: string, password: string, email: string}>): Array<any> {
+      return users.map((user, index) => ({
+        login: user.login,
+        email: user.email,
+        password: user.password,
+        createdAt: getCurrentDate(),
+        emailConfirmation: {
+          confirmationCode: getUniqueId(),
+          expirationDate: add(new Date(), { hours: 1 }),
+          isConfirmed: true,
+        },
+        _id: new ObjectId(),
+      }));
+    }
 
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'uer15',
-      password: 'string',
-      email: 'emarrr1@gg.com',
-      createdAt,
-    });
+    const users = createUsersArray(providedUsers);
 
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'user01',
-      password: 'string',
-      email: 'email1p@gg.cm',
-      createdAt,
-    });
+    await UserModel.insertMany(users);
 
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'user02',
-      password: 'string',
-      email: 'email1p@gg.com',
-      createdAt,
-    });
-
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'user03',
-      password: 'string',
-      email: 'email1p@gg.cou',
-      createdAt,
-    });
-
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'user05',
-      password: 'string',
-      email: 'email1p@gg.coi',
-      createdAt,
-    });
-
-    await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'usr-1-01',
-      password: 'string',
-      email: 'email3@gg.com',
-      createdAt,
-    });
     const res = await req
       .get(
         `${PATH_URL.USERS}/?pageSize=15&pageNumber=1&searchLoginTerm=seR&searchEmailTerm=.com&sortDirection=asc&sortBy=login`
@@ -300,22 +183,6 @@ describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.USERS}`, () => {
-  let req: TestAgent<Test>;
-  let mongoServer: MongoMemoryServer;
-
-  beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    await connectToDb(mongoServer.getUri());
-
-    req = agent(app);
-
-    await usersCollection.deleteMany();
-  });
-
-  after(async () => {
-    await mongoServer.stop();
-  });
-
   it('Should add user', async () => {
     const res = await req
       .post(PATH_URL.USERS)
@@ -331,16 +198,16 @@ describe(`Endpoint (POST) - ${PATH_URL.USERS}`, () => {
       expect.objectContaining({
         login: 'yqORsIlX-V',
         email: 'example@example.com',
-      })
+      }),
     );
 
-    const dbRes = await mongoDBRepository.getById<UserDbType>(usersCollection, res.body.id);
+    const dbRes = await UserModel.findById( res.body.id).lean()
 
     expect(dbRes).toEqual(
       expect.objectContaining({
         login: 'yqORsIlX-V',
         email: 'example@example.com',
-      })
+      }),
     );
   });
 
@@ -376,30 +243,14 @@ describe(`Endpoint (POST) - ${PATH_URL.USERS}`, () => {
 });
 
 describe(`Endpoint (DELETE) - ${PATH_URL.USERS}${PATH_URL.ID}`, () => {
-  let req: TestAgent<Test>;
-  let mongoServer: MongoMemoryServer;
-
-  beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    await connectToDb(mongoServer.getUri());
-
-    req = agent(app);
-
-    await usersCollection.deleteMany();
-  });
 
   it('Should delete user', async () => {
-    const createdAt = getCurrentDate();
 
-    const { insertedId } = await mongoDBRepository.add<UserDbType>(usersCollection, {
-      login: 'T8ksjEq-LV',
-      password: 'string',
-      email: 'example@example.com',
-      createdAt,
-    });
+    const userList = await UserModel.insertMany(testSeeder.createUserListDto(1));
+    const userId =userList[0]._id.toString()
 
     await req
-      .delete(`${PATH_URL.USERS}/${insertedId.toString()}`)
+      .delete(`${PATH_URL.USERS}/${userId}`)
       .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
       .expect(HTTP_STATUSES.NO_CONTENT_204);
   });

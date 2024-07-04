@@ -17,20 +17,16 @@ beforeAll(async () => {
   const uri = mongoServer.getUri();
 
   if (!db.isConnected()) {
+
     await db.connect(uri);
   }
 
   req = agent(app);
 });
 
-beforeEach(async () => {
-  await db.cleanDB();
-});
-
-afterAll(async () => {
+afterEach(async () => {
   await db.dropDB();
   await mongoServer.stop();
-  await db.disconnect();
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.AUTH.LOGIN}`, () => {
