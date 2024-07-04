@@ -1,41 +1,18 @@
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
-import TestAgent from 'supertest/lib/agent';
-import { agent, Test } from 'supertest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { app } from '../../../src/app';
 import { createAuthorizationHeader } from '../../test-helpers';
 import { SETTINGS } from '../../../src/utils/settings';
 import * as data from '../users/datasets';
 import { ID } from '../blogs/datasets';
-import { db } from '../../../src';
 import { testSeeder } from '../../test.seeder';
 import { UserModel } from '../../../src/models/user';
 import { UserMapper } from '../../../src/mappers/user-mapper';
 import { getUniqueId } from '../../../src/utils/helpers';
 import { ObjectId } from 'mongodb';
-import { getCurrentDate , add} from '../../../src/utils/dates/dates';
-
-let req: TestAgent<Test>;
-let mongoServer: MongoMemoryServer;
-
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  if (!db.isConnected()) {
-
-    await db.connect(uri);
-  }
-
-  req = agent(app);
-});
-
-afterEach(async () => {
-  await db.dropDB();
-  await mongoServer.stop();
-});
+import { getCurrentDate, add } from '../../../src/utils/dates/dates';
+import { req } from '../../jest.setup';
 
 describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
+
   it('Should get empty array', async () => {
     const res = await req
       .get(PATH_URL.USERS)
@@ -132,9 +109,10 @@ describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
       { login: 'user02', password: 'string', email: 'email1p@gg.com' },
       { login: 'user03', password: 'string', email: 'email1p@gg.cou' },
       { login: 'user05', password: 'string', email: 'email1p@gg.coi' },
-      { login: 'usr-1-01', password: 'string', email: 'email3@gg.com' }
+      { login: 'usr-1-01', password: 'string', email: 'email3@gg.com' },
     ];
-    function createUsersArray(users: Array<{login: string, password: string, email: string}>): Array<any> {
+
+    function createUsersArray(users: Array<{ login: string, password: string, email: string }>): Array<any> {
       return users.map((user, index) => ({
         login: user.login,
         email: user.email,
@@ -155,7 +133,7 @@ describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
 
     const res = await req
       .get(
-        `${PATH_URL.USERS}/?pageSize=15&pageNumber=1&searchLoginTerm=seR&searchEmailTerm=.com&sortDirection=asc&sortBy=login`
+        `${PATH_URL.USERS}/?pageSize=15&pageNumber=1&searchLoginTerm=seR&searchEmailTerm=.com&sortDirection=asc&sortBy=login`,
       )
       .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
       .expect(HTTP_STATUSES.OK_200);
@@ -183,6 +161,7 @@ describe(`Endpoint (GET) - ${PATH_URL.USERS}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.USERS}`, () => {
+
   it('Should add user', async () => {
     const res = await req
       .post(PATH_URL.USERS)
@@ -201,7 +180,7 @@ describe(`Endpoint (POST) - ${PATH_URL.USERS}`, () => {
       }),
     );
 
-    const dbRes = await UserModel.findById( res.body.id).lean()
+    const dbRes = await UserModel.findById(res.body.id).lean();
 
     expect(dbRes).toEqual(
       expect.objectContaining({
@@ -247,7 +226,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.USERS}${PATH_URL.ID}`, () => {
   it('Should delete user', async () => {
 
     const userList = await UserModel.insertMany(testSeeder.createUserListDto(1));
-    const userId =userList[0]._id.toString()
+    const userId = userList[0]._id.toString();
 
     await req
       .delete(`${PATH_URL.USERS}/${userId}`)
@@ -262,3 +241,4 @@ describe(`Endpoint (DELETE) - ${PATH_URL.USERS}${PATH_URL.ID}`, () => {
       .expect(HTTP_STATUSES.NOT_FOUND_404);
   });
 });
+

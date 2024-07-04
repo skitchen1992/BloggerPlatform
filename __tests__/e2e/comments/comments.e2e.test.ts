@@ -1,40 +1,16 @@
 import { createAuthorizationHeader, createBearerAuthorizationHeader } from '../../test-helpers';
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
-import { SETTINGS } from '../../../src/utils/settings';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { agent, Test } from 'supertest';
-import TestAgent from 'supertest/lib/agent';
-import { app } from '../../../src/app';
+import { SETTINGS } from '../../../src/utils/settings';;
 import { ID } from './datasets';
-import { db } from '../../../src';
 import { BlogModel } from '../../../src/models/blog';
 import { testSeeder } from '../../test.seeder';
 import { CommentModel } from '../../../src/models/comment';
 import { CommentMapper } from '../../../src/mappers/comment-mapper';
 import { PostModel } from '../../../src/models/post';
+import { req } from '../../jest.setup';
 
-let req: TestAgent<Test>;
-let mongoServer: MongoMemoryServer;
-
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  if (!db.isConnected()) {
-
-    await db.connect(uri);
-  }
-
-  req = agent(app);
-});
-
-afterEach(async () => {
-  await db.dropDB();
-  await mongoServer.stop();
-});
 
 describe(`Endpoint (GET) - ${PATH_URL.COMMENTS}`, () => {
-
   it('Should get comment', async () => {
     const commentList = await CommentModel.insertMany(testSeeder.createCommentListDto(1));
     const commentId = commentList[0]._id.toString();
@@ -50,6 +26,7 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENTS}`, () => {
 });
 
 describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
+
   it('Should update comment', async () => {
     const login = 'testLogin';
     const password = 'string';
@@ -96,7 +73,7 @@ describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         content: 'content content content content',
-      })
+      }),
     );
   });
 
@@ -482,3 +459,4 @@ describe(`Endpoint (DELETE) - ${PATH_URL.COMMENTS}`, () => {
       .expect(HTTP_STATUSES.FORBIDDEN_403);
   });
 });
+

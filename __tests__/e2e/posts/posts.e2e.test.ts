@@ -2,38 +2,16 @@ import { createAuthorizationHeader, createBearerAuthorizationHeader } from '../.
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
 import * as data from './datasets';
 import { SETTINGS } from '../../../src/utils/settings';
-import { agent, Test } from 'supertest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { app } from '../../../src/app';
-import TestAgent from 'supertest/lib/agent';
 import { ID } from './datasets';
-import { db } from '../../../src';
 import { BlogModel } from '../../../src/models/blog';
 import { testSeeder } from '../../test.seeder';
 import { PostModel } from '../../../src/models/post';
 import { PostMapper } from '../../../src/mappers/post-mapper';
+import { req } from '../../jest.setup';
 
-let req: TestAgent<Test>;
-let mongoServer: MongoMemoryServer;
-
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  if (!db.isConnected()) {
-
-    await db.connect(uri);
-  }
-
-  req = agent(app);
-});
-
-afterEach(async () => {
-  await db.dropDB();
-  await mongoServer.stop();
-});
 
 describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
+
   it('Should get empty array', async () => {
     const res = await req.get(PATH_URL.POSTS).expect(HTTP_STATUSES.OK_200);
 
@@ -82,6 +60,7 @@ describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
 });
 
 describe(`Endpoint (GET) by ID - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
+
   it('Should get a post', async () => {
     const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
     const blogId = blogList[0]._id.toString();
@@ -106,6 +85,7 @@ describe(`Endpoint (GET) by ID - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.POSTS}`, () => {
+
   it('Should add post', async () => {
     const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
     const blogId = blogList[0]._id.toString();
@@ -272,6 +252,7 @@ describe(`Endpoint (POST) - ${PATH_URL.POSTS}`, () => {
 });
 
 describe(`Endpoint (PUT) - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
+
   it('Should update post', async () => {
     const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
     const blogId = blogList[0]._id.toString();
@@ -455,6 +436,7 @@ describe(`Endpoint (PUT) - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
 });
 
 describe(`Endpoint (DELETE) - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
+
   it('Should delete post', async () => {
     const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
     const blogId = blogList[0]._id.toString();
@@ -490,6 +472,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
+
   it('Should get created comment', async () => {
     const login = 'testLogin';
     const password = 'string';
@@ -628,6 +611,7 @@ describe(`Endpoint (POST) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
 });
 
 describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
+
   it('Should get empty array comment', async () => {
     const login = 'testLogin';
     const password = 'string';
@@ -758,3 +742,4 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
     await req.get(`${PATH_URL.POSTS}/${ID}${PATH_URL.COMMENTS}`).expect(HTTP_STATUSES.NOT_FOUND_404);
   });
 });
+

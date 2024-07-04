@@ -6,27 +6,8 @@ import TestAgent from 'supertest/lib/agent';
 import { testSeeder } from '../../test.seeder';
 import { ID } from './datasets';
 import { userService } from '../../../src/services/user-service';
-import { db } from '../../../src';
+import { req } from '../../jest.setup';
 
-let req: TestAgent<Test>;
-let mongoServer: MongoMemoryServer;
-
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  if (!db.isConnected()) {
-
-    await db.connect(uri);
-  }
-
-  req = agent(app);
-});
-
-afterEach(async () => {
-  await db.dropDB();
-  await mongoServer.stop();
-});
 
 describe(`Endpoint (GET) - ${PATH_URL.SECURITY.DEVICES}`, () => {
   it('Should get 2 devices', async () => {
@@ -66,6 +47,7 @@ describe(`Endpoint (GET) - ${PATH_URL.SECURITY.DEVICES}`, () => {
 });
 
 describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICES}`, () => {
+
   it('Should get 0 devices', async () => {
     const data = testSeeder.createUserDto();
 
@@ -101,6 +83,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICES}`, () => {
 });
 
 describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICE_ID}`, () => {
+
   it(`Should get 0 devices ${HTTP_STATUSES.NO_CONTENT_204}`, async () => {
     const data = testSeeder.createUserDto();
 
@@ -216,3 +199,4 @@ describe(`Endpoint (DELETE) - ${PATH_URL.SECURITY.DEVICE_ID}`, () => {
       .expect(HTTP_STATUSES.NOT_FOUND_404);
   });
 });
+

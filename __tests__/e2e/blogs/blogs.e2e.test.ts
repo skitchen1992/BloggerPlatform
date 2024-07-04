@@ -1,42 +1,21 @@
-import { createAuthorizationHeader } from '../../test-helpers';
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
 import * as data from './datasets';
 import { SETTINGS } from '../../../src/utils/settings';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { agent, Test } from 'supertest';
-import TestAgent from 'supertest/lib/agent';
-import { app } from '../../../src/app';
-import { ID } from './datasets';
 import { getCurrentDate } from '../../../src/utils/dates/dates';
-import { db } from '../../../src';
 import { BlogModel } from '../../../src/models/blog';
 import { testSeeder } from '../../test.seeder';
 import { BlogMapper } from '../../../src/mappers/blog-mapper';
 import { ObjectId } from 'mongodb';
+import { req } from '../../jest.setup';
 import { PostModel } from '../../../src/models/post';
 import { PostMapper } from '../../../src/mappers/post-mapper';
+import { ID } from './datasets';
+import { createAuthorizationHeader } from '../../test-helpers';
 
-let req: TestAgent<Test>;
-let mongoServer: MongoMemoryServer;
 
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  if (!db.isConnected()) {
-
-    await db.connect(uri);
-  }
-
-  req = agent(app);
-});
-
-afterEach(async () => {
-  await db.dropDB();
-  await mongoServer.stop();
-});
 
 describe(`Endpoint (GET) - ${PATH_URL.BLOGS}`, () => {
+
   it('Should get empty array', async () => {
     const res = await req.get(PATH_URL.BLOGS).expect(HTTP_STATUSES.OK_200);
 
@@ -182,6 +161,7 @@ describe(`Endpoint (GET) by ID - ${PATH_URL.BLOGS}${PATH_URL.ID}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.BLOGS}`, () => {
+
   it('Should add blog', async () => {
     const res = await req
       .post(PATH_URL.BLOGS)
@@ -294,6 +274,7 @@ describe(`Endpoint (POST) - ${PATH_URL.BLOGS}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.POSTS_FOR_BLOG}`, () => {
+
   it('Should add post for blog', async () => {
     const result = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
 
@@ -335,6 +316,7 @@ describe(`Endpoint (POST) - ${PATH_URL.POSTS_FOR_BLOG}`, () => {
 });
 
 describe(`Endpoint (PUT) - ${PATH_URL.BLOGS}${PATH_URL.ID}`, () => {
+
   it('Should update blog', async () => {
     const result = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
 
@@ -479,6 +461,7 @@ describe(`Endpoint (PUT) - ${PATH_URL.BLOGS}${PATH_URL.ID}`, () => {
 });
 
 describe(`Endpoint (DELETE) - ${PATH_URL.BLOGS}${PATH_URL.ID}`, () => {
+
   it('Should delete blog', async () => {
     const result = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
 
@@ -497,3 +480,4 @@ describe(`Endpoint (DELETE) - ${PATH_URL.BLOGS}${PATH_URL.ID}`, () => {
       .expect(HTTP_STATUSES.NOT_FOUND_404);
   });
 });
+

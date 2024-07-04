@@ -1,33 +1,11 @@
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
-import TestAgent from 'supertest/lib/agent';
-import { agent, Test } from 'supertest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { app } from '../../../src/app';
 import { createAuthorizationHeader } from '../../test-helpers';
 import { SETTINGS } from '../../../src/utils/settings';
 import { testSeeder } from '../../test.seeder';
 import { userService } from '../../../src/services/user-service';
-import { db } from '../../../src';
+import { req } from '../../jest.setup';
 
-let req: TestAgent<Test>;
-let mongoServer: MongoMemoryServer;
 
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  if (!db.isConnected()) {
-
-    await db.connect(uri);
-  }
-
-  req = agent(app);
-});
-
-afterEach(async () => {
-  await db.dropDB();
-  await mongoServer.stop();
-});
 
 describe(`Endpoint (POST) - ${PATH_URL.AUTH.LOGIN}`, () => {
   it(`Should get status ${HTTP_STATUSES.NO_CONTENT_204}`, async () => {
@@ -86,6 +64,7 @@ describe(`Endpoint (POST) - ${PATH_URL.AUTH.LOGIN}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.AUTH.REGISTRATION}`, () => {
+
   it(`Should get status ${HTTP_STATUSES.NO_CONTENT_204}`, async () => {
     await req
       .post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.REGISTRATION}`)
@@ -121,3 +100,4 @@ describe(`Endpoint (POST) - ${PATH_URL.AUTH.REGISTRATION}`, () => {
     });
   });
 });
+

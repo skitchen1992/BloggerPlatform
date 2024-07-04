@@ -1,19 +1,7 @@
-import mongoose from 'mongoose';
 import { SETTINGS } from '../utils/settings';
+import mongoose from 'mongoose';
 
-export class Database {
-  private static instance: Database;
-
-  private constructor() {
-  }
-
-  public static getInstance(): Database {
-    if (!Database.instance) {
-      Database.instance = new Database();
-    }
-    return Database.instance;
-  }
-
+class Database {
   public async connect(url?: string): Promise<boolean> {
     try {
       if (!url) {
@@ -23,20 +11,22 @@ export class Database {
       await mongoose.connect(url, {
         dbName: SETTINGS.DB.NAME.PORTAL,
       });
-      console.log('Connected to database');
+      console.log('MongoDB connected');
       return true;
     } catch (error) {
-      console.error('Error connecting to database', error);
-      return false;
+      console.error('MongoDB connection error:', error);
+      return true;
     }
   }
 
   public async disconnect(): Promise<void> {
-    await mongoose.disconnect();
-  }
-
-  public async dropDB(): Promise<void> {
-    await mongoose.connection.dropDatabase();
+    try {
+      await mongoose.disconnect();
+      console.log('MongoDB disconnected');
+    } catch (error) {
+      console.error('Error disconnecting from MongoDB:', error);
+      throw error;
+    }
   }
 
   public async cleanDB(): Promise<void> {
@@ -48,8 +38,10 @@ export class Database {
     console.log('Database cleaned');
   }
 
-  public isConnected(): boolean {
-    return mongoose.connection.readyState === 1;
+  public async dropDB(): Promise<void> {
+    await mongoose.connection.dropDatabase();
   }
 }
+
+export const db = new Database();
 
