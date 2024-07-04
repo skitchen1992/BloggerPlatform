@@ -1,4 +1,4 @@
-export type CreateUserWithConfirmationSchema = {
+export type CreateUserWithConfirmationRequestView = {
   /**
    * maxLength: 10
    * minLength: 3

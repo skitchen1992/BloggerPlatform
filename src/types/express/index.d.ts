@@ -1,10 +1,10 @@
-import { GetUserView } from '../../view';
+import { GetUserResponseView } from '../../view';
 import { CookieOptions } from 'express';
 
 declare global {
   namespace Express {
     interface Locals {
-      user?: GetUserView;
+      user?: GetUserResponseView;
     }
     interface Request {
       getCookie(name: string): string | undefined;

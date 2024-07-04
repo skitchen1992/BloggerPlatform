@@ -1,4 +1,4 @@
-export type GetPostVeiw = {
+export type GetPostResponseView = {
   id: string;
   title: string;
   shortDescription: string;

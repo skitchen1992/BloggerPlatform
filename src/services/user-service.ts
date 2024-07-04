@@ -1,4 +1,4 @@
-import { CreateUserSchema } from '../view';
+import { CreateUserRequestView } from '../view';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { Result, ResultStatus } from '../types/common/result';
 import { add, getDateFromObjectId } from '../utils/dates/dates';
@@ -7,7 +7,7 @@ import { ObjectId } from 'mongodb';
 
 
 class UserService {
-  async createUser(body: CreateUserSchema): Promise<Result<string | null>>  {
+  async createUser(body: CreateUserRequestView): Promise<Result<string | null>>  {
     try {
       const passwordHash = await hashBuilder.hash(body.password);
 

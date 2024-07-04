@@ -1,4 +1,4 @@
-export type GetBlogSchema = {
+export type CreateBlogSchemaResponseView = {
   id: string;
   name: string;
   description: string;

@@ -3,7 +3,7 @@ import { PATH_URL } from '../utils/consts';
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
-import { UpdateCommentSchema } from '../view/comments/UpdateCommentSchema';
+import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
 import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-middleware';
 import { validateCommentsPutSchema } from '../middlewares/comments';
 import { commentController } from '../controllers/comment-controller';
@@ -22,7 +22,7 @@ commentsRouter.put(
   bearerTokenAuthMiddleware,
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateCommentsPutSchema),
-  errorHandlingMiddleware<UpdateCommentSchema>,
+  errorHandlingMiddleware<UpdateCommentRequestView>,
   commentController.updateComment
 );
 

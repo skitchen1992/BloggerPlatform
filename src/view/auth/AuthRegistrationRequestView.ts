@@ -1,4 +1,4 @@
-export type AuthRegistrationSchema = {
+export type AuthRegistrationRequestView = {
   email: string;
   login: string;
   password: string;

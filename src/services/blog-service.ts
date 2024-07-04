@@ -1,14 +1,14 @@
-import { CreateBlogSchema, UpdateBlogSchema } from '../view';
+import { CreateBlogRequestView, UpdateBlogRequestView } from '../view';
 import { BlogModel } from '../models/blog';
 import { ObjectId } from 'mongodb';
 import { Result, ResultStatus } from '../types/common/result';
 import { getDateFromObjectId } from '../utils/dates/dates';
-import { CreatePostForBlogSchema } from '../view/posts/CreatePostForBlogSchema';
+import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
 import { blogRepository } from '../repositories/blog-repository';
 import { PostModel } from '../models/post';
 
 class BlogService {
-  async createBlog(body: CreateBlogSchema): Promise<Result<string | null>> {
+  async createBlog(body: CreateBlogRequestView): Promise<Result<string | null>> {
     try {
       const id = new ObjectId();
 
@@ -33,7 +33,7 @@ class BlogService {
     }
   }
 
-  async createPostForBlog(body: CreatePostForBlogSchema, params: { blogId: string }): Promise<Result<string | null>> {
+  async createPostForBlog(body: CreatePostForBlogRequestView, params: { blogId: string }): Promise<Result<string | null>> {
     try {
       const { status, data } = await blogRepository.getBlogById(params.blogId);
 
@@ -64,7 +64,7 @@ class BlogService {
     }
   };
 
-  async updateBlog(id: string, data: UpdateBlogSchema): Promise<Result<null>> {
+  async updateBlog(id: string, data: UpdateBlogRequestView): Promise<Result<null>> {
     try {
 
       const updateResult = await BlogModel.updateOne({ _id: new ObjectId(id) }, data);

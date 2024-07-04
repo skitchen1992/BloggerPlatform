@@ -1,4 +1,4 @@
-export type AuthUserSchema = {
+export type AuthUserRequestView = {
   loginOrEmail: string;
   password: string;
 };

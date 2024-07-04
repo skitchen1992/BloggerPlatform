@@ -1,6 +1,6 @@
 import { RequestEmpty, RequestWithParams } from '../types/request-types';
 import { Response } from 'express';
-import { GetDeviceSchema } from '../view';
+import { GetDeviceResponseView } from '../view';
 import { COOKIE_KEY, HTTP_STATUSES } from '../utils/consts';
 import { jwtService } from '../services/jwt-service';
 import { JwtPayload } from 'jsonwebtoken';
@@ -9,7 +9,7 @@ import { sessionRepository } from '../repositories/session-repository';
 import { deviseService } from '../services/devise-service';
 
 class SecurityController {
-  async getDevices(req: RequestEmpty, res: Response<GetDeviceSchema[]>) {
+  async getDevices(req: RequestEmpty, res: Response<GetDeviceResponseView[]>) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
 
@@ -38,7 +38,7 @@ class SecurityController {
     }
   };
 
-  async deleteDeviceList(req: RequestEmpty, res: Response<GetDeviceSchema[]>) {
+  async deleteDeviceList(req: RequestEmpty, res: Response<GetDeviceResponseView[]>) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
 

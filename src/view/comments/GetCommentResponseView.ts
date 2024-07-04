@@ -1,4 +1,4 @@
-export type GetCommentSchema = {
+export type GetCommentResponseView = {
   id: string;
   content: string;
   commentatorInfo: {

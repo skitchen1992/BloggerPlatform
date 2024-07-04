@@ -1,4 +1,4 @@
-export type CreateCommentSchemaResponse = {
+export type CreateCommentSchemaResponseView = {
   id: string;
   content: string;
   commentatorInfo: {

@@ -3,9 +3,9 @@ import { RequestEmpty, RequestWithBody } from '../types/request-types';
 import { COOKIE_KEY, HTTP_STATUSES } from '../utils/consts';
 import { ResultStatus } from '../types/common/result';
 import {
-  AuthUserInfoSchemaResponse,
-  AuthUserSchema,
-  AuthUserSchemaResponse,
+  AuthUserInfoSchemaResponseView,
+  AuthUserRequestView,
+  AuthUserSchemaResponseView,
   ResponseErrorSchema,
 } from '../view';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
@@ -13,16 +13,16 @@ import { userRepository } from '../repositories/user-repository';
 import { authService } from '../services/auth-service';
 import { jwtService } from '../services/jwt-service';
 import { JwtPayload } from 'jsonwebtoken';
-import { AuthRegistrationSchema } from '../view/auth/AuthRegistrationSchema';
+import { AuthRegistrationRequestView } from '../view/auth/AuthRegistrationRequestView';
 import { emailService } from '../services/email-service';
 import { userService } from '../services/user-service';
-import { AuthRegistrationConfirmationSchema } from '../view/auth/AuthRegistrationConfirmationSchema';
+import { AuthRegistrationConfirmationRequestView } from '../view/auth/AuthRegistrationConfirmationRequestView';
 import { getCurrentDate, isExpiredDate } from '../utils/dates/dates';
-import { AuthRegistrationResendingSchema } from '../view/auth/AuthRegistrationResendingSchema';
+import { AuthRegistrationResendingRequestView } from '../view/auth/AuthRegistrationResendingRequestView';
 import { ObjectId } from 'mongodb';
 
 class AuthController {
-  async login(req: RequestWithBody<AuthUserSchema>, res: Response<ResponseErrorSchema | AuthUserSchemaResponse>,
+  async login(req: RequestWithBody<AuthUserRequestView>, res: Response<ResponseErrorSchema | AuthUserSchemaResponseView>,
   ) {
     try {
 
@@ -101,7 +101,7 @@ class AuthController {
   };
 
 
-  async refreshToken(req: RequestEmpty, res: Response<ResponseErrorSchema | AuthUserSchemaResponse>,
+  async refreshToken(req: RequestEmpty, res: Response<ResponseErrorSchema | AuthUserSchemaResponseView>,
   ) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
@@ -133,7 +133,7 @@ class AuthController {
     }
   };
 
-  async logoutToken(req: RequestEmpty, res: Response<ResponseErrorSchema | AuthUserSchemaResponse>,
+  async logoutToken(req: RequestEmpty, res: Response<ResponseErrorSchema | AuthUserSchemaResponseView>,
   ) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
@@ -162,9 +162,9 @@ class AuthController {
     }
   };
 
-  async me(req: RequestEmpty, res: Response<AuthUserInfoSchemaResponse>) {
+  async me(req: RequestEmpty, res: Response<AuthUserInfoSchemaResponseView>) {
     try {
-      const user: AuthUserInfoSchemaResponse = {
+      const user: AuthUserInfoSchemaResponseView = {
         email: res.locals.user!.email,
         login: res.locals.user!.login,
         userId: res.locals.user!.id,
@@ -177,7 +177,7 @@ class AuthController {
     }
   };
 
-  async authRegistration(req: RequestWithBody<AuthRegistrationSchema>, res: Response<ResponseErrorSchema>) {
+  async authRegistration(req: RequestWithBody<AuthRegistrationRequestView>, res: Response<ResponseErrorSchema>) {
     try {
       const { status, data } = await userRepository.isExistsUser(req.body.login, req.body.email);
 
@@ -234,7 +234,7 @@ class AuthController {
     }
   };
 
-  async authRegistrationConfirmation(req: RequestWithBody<AuthRegistrationConfirmationSchema>, res: Response<ResponseErrorSchema>,
+  async authRegistrationConfirmation(req: RequestWithBody<AuthRegistrationConfirmationRequestView>, res: Response<ResponseErrorSchema>,
   ) {
     try {
       const { status, data } = await userRepository.getUserByConfirmationCode(req.body.code);
@@ -305,7 +305,7 @@ class AuthController {
     }
   };
 
-  async authRegistrationResending(req: RequestWithBody<AuthRegistrationResendingSchema>, res: Response<ResponseErrorSchema>,
+  async authRegistrationResending(req: RequestWithBody<AuthRegistrationResendingRequestView>, res: Response<ResponseErrorSchema>,
   ) {
     try {
       const { status, data } = await userRepository.getUserByFields(['email'], req.body.email);
@@ -350,7 +350,7 @@ class AuthController {
         await userService.updateUserFieldById(data!._id.toString(), 'emailConfirmation.confirmationCode', getUniqueId());
 
 
-        const { status, data: updatedUser  } = await userRepository.getUserByFields(['email'], req.body.email);
+        const { data: updatedUser } = await userRepository.getUserByFields(['email'], req.body.email);
 
         await emailService.sendRegisterEmail(req.body.email, updatedUser!.emailConfirmation.confirmationCode);
 

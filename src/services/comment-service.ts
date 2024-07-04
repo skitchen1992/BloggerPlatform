@@ -1,11 +1,11 @@
 import { ObjectId } from 'mongodb';
 import { ResultStatus } from '../types/common/result';
 import { CommentModel } from '../models/comment';
-import { UpdateCommentSchema } from '../view/comments/UpdateCommentSchema';
+import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
 
 class CommentService {
 
-  async updateComment(id: string, data: UpdateCommentSchema) {
+  async updateComment(id: string, data: UpdateCommentRequestView) {
     try {
       const updateResult = await CommentModel.updateOne({ _id: new ObjectId(id) }, data);
 

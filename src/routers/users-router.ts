@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getUsersQueryParams, PATH_URL } from '../utils/consts';
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
-import { CreateUserSchema } from '../view';
+import { CreateUserRequestView } from '../view';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { validateUserPostSchema } from '../middlewares/users';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
@@ -14,7 +14,7 @@ usersRouter.get(
   PATH_URL.ROOT,
   basicAuthMiddleware,
   sanitizerQueryMiddleware(getUsersQueryParams),
-  errorHandlingMiddleware<CreateUserSchema>,
+  errorHandlingMiddleware<CreateUserRequestView>,
   userController.getUsers
 );
 
@@ -23,7 +23,7 @@ usersRouter.post(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateUserPostSchema),
-  errorHandlingMiddleware<CreateUserSchema>,
+  errorHandlingMiddleware<CreateUserRequestView>,
   userController.createUser
 );
 

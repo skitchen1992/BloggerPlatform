@@ -1,19 +1,19 @@
-import { CreateBlogSchema } from '../../../src/view';
+import { CreateBlogRequestView } from '../../../src/view';
 
 export const ID = '1A2B3C4D5E6F7A8B9C0D1E2F';
-export const dataSetNewBlog: CreateBlogSchema = {
+export const dataSetNewBlog: CreateBlogRequestView = {
   name: 'Test',
   description: 'Test description',
   websiteUrl: 'https://string.com',
 };
 
-export const dataSetUpdateBlog: CreateBlogSchema = {
+export const dataSetUpdateBlog: CreateBlogRequestView = {
   name: 'New test',
   description: 'New Test description',
   websiteUrl: 'https://string.ru',
 };
 
-export const dataSetNewBlog1: CreateBlogSchema = {
+export const dataSetNewBlog1: CreateBlogRequestView = {
   name: 'Test very long string in the world',
   description: 'Test description',
   websiteUrl: 'https://string.com',

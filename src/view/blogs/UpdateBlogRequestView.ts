@@ -1,4 +1,4 @@
-export type CreateBlogSchema = {
+export type UpdateBlogRequestView = {
   name: string;
   description: string;
   websiteUrl: string;

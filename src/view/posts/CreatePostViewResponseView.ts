@@ -1,8 +1,6 @@
-export type CreatePostSchemaResponse = {
-  id: string;
+export type CreatePostViewResponseView = {
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
-  blogName: string;
 };

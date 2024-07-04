@@ -1,4 +1,4 @@
-export type CreateUserSchemaResponse = {
+export type GetUserResponseView = {
   id: string;
   login: string;
   email: string;

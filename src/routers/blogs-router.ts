@@ -4,8 +4,8 @@ import { validateBlogPostSchema, validateBlogPutSchema } from '../middlewares/bl
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
-import { CreateBlogSchema, UpdateBlogSchema } from '../view';
-import { CreatePostForBlogSchema } from '../view/posts/CreatePostForBlogSchema';
+import { CreateBlogRequestView, UpdateBlogRequestView } from '../view';
+import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
 import {
   validateCreatePostForBlogSchema,
 } from '../middlewares/blogs/validate-schemas/validate-create-post-for-blog-schema';
@@ -41,7 +41,7 @@ blogsRouter.post(
   //remove for tests
   //checkExactMiddleware(validateUserPostSchema),
   validateBlogPostSchema(),
-  errorHandlingMiddleware<CreateBlogSchema>,
+  errorHandlingMiddleware<CreateBlogRequestView>,
   blogController.createBlog,
 );
 
@@ -50,7 +50,7 @@ blogsRouter.post(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   validateCreatePostForBlogSchema(),
-  errorHandlingMiddleware<CreatePostForBlogSchema>,
+  errorHandlingMiddleware<CreatePostForBlogRequestView>,
   blogController.createPostForBlog,
 );
 
@@ -59,7 +59,7 @@ blogsRouter.put(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   validateBlogPutSchema(),
-  errorHandlingMiddleware<UpdateBlogSchema>,
+  errorHandlingMiddleware<UpdateBlogRequestView>,
   blogController.updateBlog,
 );
 

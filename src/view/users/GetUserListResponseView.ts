@@ -1,6 +1,6 @@
 import { UserDTO } from '../../dto/user-dto';
 
-export type GetUserListView = {
+export type GetUserListResponseView = {
   items: UserDTO[];
   pagesCount: number;
   page: number;

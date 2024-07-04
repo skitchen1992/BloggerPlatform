@@ -1,13 +1,13 @@
 import { Response } from 'express';
 import {
-  CreateBlogSchema,
-  CreateBlogSchemaResponse,
-  CreatePostSchemaResponse,
-  GetBlogListView,
-  GetBlogSchema,
-  GetPostListView,
+  CreateBlogRequestView,
+  CreateBlogSchemaResponseView,
+  CreatePostSchemaResponseView,
+  GetBlogListRequestView,
+  GetBlogResponseView,
+  GetPostListResponseView,
   ResponseErrorSchema,
-  UpdateBlogSchema,
+  UpdateBlogRequestView,
 } from '../view';
 import {
   RequestWithBody,
@@ -20,13 +20,13 @@ import { GetBlogsQuery } from '../types/blog-types';
 import { HTTP_STATUSES } from '../utils/consts';
 import { GetPostsQuery } from '../types/post-types';
 import { ResultStatus } from '../types/common/result';
-import { CreatePostForBlogSchema } from '../view/posts/CreatePostForBlogSchema';
+import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
 import { blogRepository } from '../repositories/blog-repository';
 import { postRepository } from '../repositories/post-repository';
 import { blogService } from '../services/blog-service';
 
 class BlogController {
-  async getBlogs(req: RequestWithQuery<GetBlogsQuery>, res: Response<GetBlogListView>) {
+  async getBlogs(req: RequestWithQuery<GetBlogsQuery>, res: Response<GetBlogListRequestView>) {
     try {
       const { data } = await blogRepository.getBlogs(req.query);
       res.status(HTTP_STATUSES.OK_200).json(data);
@@ -36,7 +36,7 @@ class BlogController {
     }
   }
 
-  async getBlogById(req: RequestWithParams<{ id: string }>, res: Response<GetBlogSchema | null>) {
+  async getBlogById(req: RequestWithParams<{ id: string }>, res: Response<GetBlogResponseView | null>) {
     try {
       const { data, status } = await blogRepository.getBlogById(req.params.id);
 
@@ -57,7 +57,7 @@ class BlogController {
 
   async getPostsForBlog(
     req: RequestWithQueryAndParams<GetPostsQuery, { blogId: string }>,
-    res: Response<GetPostListView>,
+    res: Response<GetPostListResponseView>,
   ) {
     try {
       const { status } = await blogRepository.getBlogById(req.params.blogId);
@@ -75,7 +75,7 @@ class BlogController {
     }
   }
 
-  async createBlog(req: RequestWithBody<CreateBlogSchema>, res: Response<CreateBlogSchemaResponse | ResponseErrorSchema>) {
+  async createBlog(req: RequestWithBody<CreateBlogRequestView>, res: Response<CreateBlogSchemaResponseView | ResponseErrorSchema>) {
     try {
       const { data: blogId, status } = await blogService.createBlog(req.body);
 
@@ -95,8 +95,8 @@ class BlogController {
   }
 
   async createPostForBlog(
-    req: RequestWithParamsAndBody<CreatePostForBlogSchema, { blogId: string }>,
-    res: Response<CreatePostSchemaResponse | ResponseErrorSchema>,
+    req: RequestWithParamsAndBody<CreatePostForBlogRequestView, { blogId: string }>,
+    res: Response<CreatePostSchemaResponseView | ResponseErrorSchema>,
   ) {
     try {
       const { data: postId, status: blogStatus } = await blogService.createPostForBlog(req.body, req.params);
@@ -117,7 +117,7 @@ class BlogController {
     }
   }
 
-  async updateBlog(req: RequestWithParamsAndBody<UpdateBlogSchema, { id: string }>, res: Response) {
+  async updateBlog(req: RequestWithParamsAndBody<UpdateBlogRequestView, { id: string }>, res: Response) {
     try {
       const { status } = await blogService.updateBlog(req.params.id, req.body);
 

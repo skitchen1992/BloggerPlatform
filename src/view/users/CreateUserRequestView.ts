@@ -1,4 +1,4 @@
-export type CreateUserSchema = {
+export type CreateUserRequestView = {
   /**
    * maxLength: 10
    * minLength: 3

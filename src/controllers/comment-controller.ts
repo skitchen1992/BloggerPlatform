@@ -1,16 +1,16 @@
 import { RequestWithParams, RequestWithParamsAndBody } from '../types/request-types';
-import { GetCommentSchema } from '../view';
+import { GetCommentResponseView } from '../view';
 import { HTTP_STATUSES } from '../utils/consts';
 import { Response } from 'express';
 import { ResultStatus } from '../types/common/result';
 import { commentRepository } from '../repositories/comment-repository';
-import { UpdateCommentSchema } from '../view/comments/UpdateCommentSchema';
+import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
 import { commentService } from '../services/comment-service';
 
 class CommentController {
   async getCommentById(
     req: RequestWithParams<{ commentId: string }>,
-    res: Response<GetCommentSchema | null>,
+    res: Response<GetCommentResponseView | null>,
   ) {
     try {
       const { data, status } = await commentRepository.getCommentById(req.params.commentId);
@@ -30,7 +30,7 @@ class CommentController {
     }
   };
 
-  async updateComment(req: RequestWithParamsAndBody<UpdateCommentSchema, { commentId: string }>, res: Response) {
+  async updateComment(req: RequestWithParamsAndBody<UpdateCommentRequestView, { commentId: string }>, res: Response) {
     try {
       const currentUserId = res.locals.user?.id.toString();
 

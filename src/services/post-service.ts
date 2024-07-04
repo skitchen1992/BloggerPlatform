@@ -1,14 +1,14 @@
 import { ObjectId } from 'mongodb';
 import { Result, ResultStatus } from '../types/common/result';
 import { getDateFromObjectId } from '../utils/dates/dates';
-import { CreatePostForBlogSchema } from '../view/posts/CreatePostForBlogSchema';
+import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
 import { blogRepository } from '../repositories/blog-repository';
 import { PostModel } from '../models/post';
-import { CreateCommentSchema, GetUserView, UpdatePostSchema } from '../view';
+import { CreateCommentRequestView, GetUserResponseView, UpdatePostRequestView } from '../view';
 import { CommentModel } from '../models/comment';
 
 class PostService {
-  async createPost(body: CreatePostForBlogSchema, params: { blogId: string }): Promise<Result<string | null>> {
+  async createPost(body: CreatePostForBlogRequestView, params: { blogId: string }): Promise<Result<string | null>> {
     try {
 
       const { status, data } = await blogRepository.getBlogById(params.blogId);
@@ -40,7 +40,7 @@ class PostService {
     }
   };
 
-  async updatePost(id: string, data: UpdatePostSchema) {
+  async updatePost(id: string, data: UpdatePostRequestView) {
     try {
       const updateResult = await PostModel.updateOne({ _id: new ObjectId(id) }, data);
 
@@ -77,9 +77,9 @@ class PostService {
   };
 
   async createComment(
-    body: CreateCommentSchema,
+    body: CreateCommentRequestView,
     params: { postId: string },
-    user: GetUserView,
+    user: GetUserResponseView,
   ) {
     try {
 

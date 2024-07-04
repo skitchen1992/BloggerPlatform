@@ -7,23 +7,23 @@ import {
 } from '../types/request-types';
 import { GetPostsQuery } from '../types/post-types';
 import {
-  CreatePostView,
-  CreatePostSchemaResponse,
-  GetPostListView,
-  GetPostVeiw,
+  CreatePostViewResponseView,
+  CreatePostSchemaResponseView,
+  GetPostListResponseView,
+  GetPostResponseView,
   ResponseErrorSchema,
-  UpdatePostSchema, CreateCommentSchema, GetCommentListSchema,
+  UpdatePostRequestView, CreateCommentRequestView, GetCommentListRequestView,
 } from '../view';
 import { HTTP_STATUSES } from '../utils/consts';
 import { Response } from 'express';
 import { postRepository } from '../repositories/post-repository';
 import { ResultStatus } from '../types/common/result';
 import { postService } from '../services/post-service';
-import { CreateCommentSchemaResponse } from '../view/comments/CreateCommentSchemaResponse';
+import { CreateCommentSchemaResponseView } from '../view/comments/CreateCommentSchemaResponseView';
 import { commentRepository } from '../repositories/comment-repository';
 
 class PostController {
-  async getPosts(req: RequestWithQuery<GetPostsQuery>, res: Response<GetPostListView>) {
+  async getPosts(req: RequestWithQuery<GetPostsQuery>, res: Response<GetPostListResponseView>) {
     try {
       const { data } = await postRepository.getPosts(req.query);
 
@@ -34,7 +34,7 @@ class PostController {
     }
   };
 
-  async getPostById(req: RequestWithParams<{ id: string }>, res: Response<GetPostVeiw | ResponseErrorSchema>) {
+  async getPostById(req: RequestWithParams<{ id: string }>, res: Response<GetPostResponseView | ResponseErrorSchema>) {
     try {
       const { data, status } = await postRepository.getPostById(req.params.id);
 
@@ -49,7 +49,7 @@ class PostController {
     }
   };
 
-  async createPost(req: RequestWithBody<CreatePostView>, res: Response<CreatePostSchemaResponse | ResponseErrorSchema>) {
+  async createPost(req: RequestWithBody<CreatePostViewResponseView>, res: Response<CreatePostSchemaResponseView | ResponseErrorSchema>) {
     try {
       const {
         data: postId,
@@ -77,7 +77,7 @@ class PostController {
     }
   };
 
-  async updatePost(req: RequestWithParamsAndBody<UpdatePostSchema, { id: string }>, res: Response) {
+  async updatePost(req: RequestWithParamsAndBody<UpdatePostRequestView, { id: string }>, res: Response) {
     try {
       const { status } = await postService.updatePost(req.params.id, req.body);
 
@@ -114,8 +114,8 @@ class PostController {
   };
 
   async createComment(
-    req: RequestWithParamsAndBody<CreateCommentSchema, { postId: string }>,
-    res: Response<CreateCommentSchemaResponse | ResponseErrorSchema>,
+    req: RequestWithParamsAndBody<CreateCommentRequestView, { postId: string }>,
+    res: Response<CreateCommentSchemaResponseView | ResponseErrorSchema>,
   ) {
     try {
       const { data: commentId, status } = await postService.createComment(req.body, req.params, res.locals.user!);
@@ -147,7 +147,7 @@ class PostController {
 
   async getCommentsForPost(
     req: RequestWithQueryAndParams<GetPostsQuery, { postId: string }>,
-    res: Response<GetCommentListSchema>,
+    res: Response<GetCommentListRequestView>,
   ) {
     try {
       const { data: comments } = await commentRepository.getComments(req.query, { postId: req.params.postId });
