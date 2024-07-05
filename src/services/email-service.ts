@@ -12,7 +12,7 @@ class EmailService {
   }
 
   async sendRecoveryPassEmail(to: string, confirmationCode: string) {
-    const link = `https://blogger-platform-bay.vercel.app/${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.NEW_PASSWORD}?recoveryCode=${confirmationCode}`;
+    const link = `https://blogger-platform-bay.vercel.app/${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.PASSWORD_RECOVERY}?recoveryCode=${confirmationCode}`;
     const subject = 'Password recovery';
     const text = `To finish password recovery please follow the link below: link`;
     const html = `<p>To finish password recovery please follow the link below:</p><p><a href="${link}">Password recovery</a></p>`;
