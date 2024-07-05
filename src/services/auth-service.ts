@@ -153,7 +153,7 @@ class AuthService {
 
     const { data: user, status } = await userRepository.getUserByFields(['_id'], userId);
 
-    if (user?.recoveryCode?.isUsed) {
+    if (user?.recoveryCode?.isUsed || user?.recoveryCode?.code !== recoveryCode) {
       return { status: ResultStatus.BadRequest, data: null };
     }
 

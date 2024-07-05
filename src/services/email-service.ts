@@ -8,7 +8,7 @@ class EmailService {
     const text = `Please confirm your email address by clicking the following link: link`;
     const html = `<p>Please confirm your email address by clicking the link below:</p><p><a href="${link}">Confirm Email</a></p>`;
 
-    mailerService.sendMail(to, subject, text, html);
+    await mailerService.sendMail(to, subject, text, html);
   }
 
   async sendRecoveryPassEmail(to: string, confirmationCode: string) {
@@ -17,7 +17,7 @@ class EmailService {
     const text = `To finish password recovery please follow the link below: link`;
     const html = `<p>To finish password recovery please follow the link below:</p><p><a href="${link}">Password recovery</a></p>`;
 
-    mailerService.sendMail(to, subject, text, html);
+    await mailerService.sendMail(to, subject, text, html);
   }
 
 }
