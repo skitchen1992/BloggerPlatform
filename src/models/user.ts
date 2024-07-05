@@ -8,13 +8,19 @@ interface EmailConfirmation {
   isConfirmed: boolean;
 }
 
-export interface IUserSchema  {
+interface RecoveryCode {
+  code: string;
+  isUsed: boolean;
+}
+
+export interface IUserSchema {
+  _id: ObjectId;
   login: string;
   email: string;
   password: string;
   createdAt: string;
   emailConfirmation: EmailConfirmation;
-  _id: ObjectId;
+  recoveryCode?: RecoveryCode;
 }
 
 export const UserSchema = new mongoose.Schema<IUserSchema>({
@@ -26,6 +32,10 @@ export const UserSchema = new mongoose.Schema<IUserSchema>({
     confirmationCode: { type: String, require: true },
     expirationDate: { type: String, require: true },
     isConfirmed: { type: Boolean, require: true },
+  },
+  recoveryCode: {
+    code: { type: String, require: true },
+    isUsed: { type: Boolean, require: true },
   },
 
 });

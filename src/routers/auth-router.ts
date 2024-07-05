@@ -11,6 +11,12 @@ import { validateAuthRegistrationConfirmationSchema } from '../middlewares/auth/
 import { validateAuthRegistrationResendingSchema } from '../middlewares/auth/validate-schemas/validate-auth-registration-resending-schema';
 import { guardVisitMiddleware } from '../middlewares/guard-visit-middleware';
 import { authController } from '../controllers/auth-controller';
+import {
+  validateAuthPostPasswordRecoverySchema
+} from '../middlewares/auth/validate-schemas/validate-auth-post-password-recovery-schema';
+import {
+  validateAuthPostNewPasswordSchema
+} from '../middlewares/auth/validate-schemas/validate-auth-post-new-password-schema';
 
 export const authRouter = Router();
 
@@ -21,6 +27,24 @@ authRouter.post(
   checkExactMiddleware(validateAuthPostSchema),
   errorHandlingMiddleware<AuthUserRequestView>,
   authController.login,
+);
+
+authRouter.post(
+  PATH_URL.AUTH.PASSWORD_RECOVERY,
+  guardVisitMiddleware,
+  sanitizerQueryMiddleware(),
+  checkExactMiddleware(validateAuthPostPasswordRecoverySchema),
+  errorHandlingMiddleware,
+  authController.passwordRecovery,
+);
+
+authRouter.post(
+  PATH_URL.AUTH.NEW_PASSWORD,
+  guardVisitMiddleware,
+  sanitizerQueryMiddleware(),
+  checkExactMiddleware(validateAuthPostNewPasswordSchema),
+  errorHandlingMiddleware,
+  authController.newPassword,
 );
 
 authRouter.post(

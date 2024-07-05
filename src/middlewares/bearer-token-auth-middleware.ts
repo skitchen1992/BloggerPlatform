@@ -14,7 +14,7 @@ export const bearerTokenAuthMiddleware = async (req: Request, res: Response, nex
 
   const [_, token] = authHeader.split(' ');
 
-  const { userId } = (jwtService.decodeToken(token) as JwtPayload) ?? {};
+  const { userId } = (jwtService.verifyToken(token) as JwtPayload) ?? {};
 
   if (!userId) {
     res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);

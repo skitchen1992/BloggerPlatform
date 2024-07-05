@@ -20,6 +20,8 @@ import { AuthRegistrationConfirmationRequestView } from '../view/auth/AuthRegist
 import { getCurrentDate, isExpiredDate } from '../utils/dates/dates';
 import { AuthRegistrationResendingRequestView } from '../view/auth/AuthRegistrationResendingRequestView';
 import { ObjectId } from 'mongodb';
+import { RecoveryPassRequestView } from '../view/auth/RecoveryPassRequestView';
+import { NewPassRequestView } from '../view/auth/NewPassRequestView';
 
 class AuthController {
   async login(req: RequestWithBody<AuthUserRequestView>, res: Response<ResponseErrorResponseView | AuthUserSchemaResponseView>,
@@ -93,6 +95,41 @@ class AuthController {
         req.setCookie(COOKIE_KEY.REFRESH_TOKEN, data.refreshToken);
 
         res.status(HTTP_STATUSES.OK_200).json({ accessToken: data.accessToken });
+      }
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
+    }
+  };
+
+  async passwordRecovery(req: RequestWithBody<RecoveryPassRequestView>, res: Response<ResponseErrorResponseView | null>,
+  ) {
+    try {
+      const { status } = await authService.recoveryPass(req.body.email);
+
+      if (status === ResultStatus.Success) {
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+      }
+
+      if (status === ResultStatus.BadRequest) {
+        res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+      }
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
+    }
+  };
+
+  async newPassword(req: RequestWithBody<NewPassRequestView>, res: Response<ResponseErrorResponseView | null>,
+  ) {
+    try {
+      const { status } = await authService.newPass(req.body.newPassword, req.body.recoveryCode);
+
+      if (status === ResultStatus.Success) {
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+      }
+      if (status === ResultStatus.BadRequest) {
+        res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
       }
     } catch (e) {
       console.log(e);

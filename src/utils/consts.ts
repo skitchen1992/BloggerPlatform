@@ -35,6 +35,8 @@ export const PATH_URL = {
   AUTH: {
     ROOT: '/auth',
     LOGIN: '/login',
+    PASSWORD_RECOVERY: '/password-recovery',
+    NEW_PASSWORD: '/new-password',
     ME: '/me',
     REGISTRATION: '/registration',
     REGISTRATION_CONFIRMATION: '/registration-confirmation',
@@ -55,6 +57,7 @@ export const COOKIE_KEY = {
 
 export const ACCESS_TOKEN_EXPIRED_IN = 10;
 export const REFRESH_TOKEN_EXPIRED_IN = 20;
+export const RECOVERY_PASS_TOKEN_EXPIRED = "1h";
 
 export const getBlogsQueryParams: (keyof Required<GetBlogsQuery>)[] = [
   'searchNameTerm',

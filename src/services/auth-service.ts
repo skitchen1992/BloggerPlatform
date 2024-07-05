@@ -1,12 +1,19 @@
-import { getUniqueId } from '../utils/helpers';
+import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { ResultStatus } from '../types/common/result';
-import { fromUnixTimeToISO, getCurrentDate, getDateFromObjectId } from '../utils/dates/dates';
+import { fromUnixTimeToISO, getCurrentDate, getDateFromObjectId, isExpiredDate } from '../utils/dates/dates';
 import { ObjectId } from 'mongodb';
 import { jwtService } from './jwt-service';
-import { ACCESS_TOKEN_EXPIRED_IN, REFRESH_TOKEN_EXPIRED_IN } from '../utils/consts';
+import {
+  ACCESS_TOKEN_EXPIRED_IN,
+  HTTP_STATUSES, RECOVERY_PASS_TOKEN_EXPIRED,
+  REFRESH_TOKEN_EXPIRED_IN,
+} from '../utils/consts';
 import { SessionModel } from '../models/session';
 import { sessionRepository } from '../repositories/session-repository';
 import { JwtPayload } from 'jsonwebtoken';
+import { userRepository } from '../repositories/user-repository';
+import { emailService } from './email-service';
+import { UserModel } from '../models/user';
 
 
 type Payload = {
@@ -66,15 +73,6 @@ class AuthService {
       const newAccessToken = jwtService.generateToken({ userId }, { expiresIn: ACCESS_TOKEN_EXPIRED_IN });
       const newRefreshToken = jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
 
-      // const { data: deviceAuthSession } = await queryRepository.getDeviceAuthSession(deviceId);
-      //
-      // if (!deviceAuthSession) {
-      //   return { status: ResultStatus.NotFound, data: null };
-      // }
-      //
-      // if (isExpiredDate(deviceAuthSession.tokenExpirationDate, getCurrentDate())) {
-      //   return { status: ResultStatus.Unauthorized, data: null };
-      // }
 
       await SessionModel.updateOne({ _id: device._id }, {
         tokenExpirationDate: jwtService.getTokenExpirationDate(newRefreshToken),
@@ -111,15 +109,65 @@ class AuthService {
       return { status: ResultStatus.Unauthorized, data: null };
     }
 
-    // if (isExpiredDate(device.tokenExpirationDate, getCurrentDate())) {
-    //   return { status: ResultStatus.Unauthorized, data: null };
-    // }
-
     await SessionModel.findByIdAndDelete(device._id);
 
     return { data: null, status: ResultStatus.Success };
   };
 
+  async recoveryPass(email: string) {
+    const { data: user, status } = await userRepository.getUserByFields(['email'], email);
+
+    if (status === ResultStatus.NotFound) {
+      const recoveryPassToken = jwtService.generateToken({ userId: null }, { expiresIn: RECOVERY_PASS_TOKEN_EXPIRED });
+
+      await emailService.sendRecoveryPassEmail(email, recoveryPassToken);
+
+      return { status: ResultStatus.Success, data: null };
+    }
+
+    const recoveryPassToken = jwtService.generateToken({ userId: user?._id.toString() }, { expiresIn: RECOVERY_PASS_TOKEN_EXPIRED });
+
+    await UserModel.updateOne({ _id: user!._id }, {
+      recoveryCode: {
+        code: recoveryPassToken,
+        isUsed: false,
+      },
+    });
+
+    await emailService.sendRecoveryPassEmail(email, recoveryPassToken);
+
+    return { data: null, status: ResultStatus.Success };
+  };
+
+  async newPass(newPassword: string, recoveryCode: string) {
+
+    const { userId, exp } = (jwtService.verifyToken(recoveryCode) as JwtPayload) ?? {};
+
+    if (!userId || !exp) {
+      return { status: ResultStatus.BadRequest, data: null };
+    }
+
+    if (isExpiredDate(fromUnixTimeToISO(exp), getCurrentDate())) {
+      return { status: ResultStatus.BadRequest, data: null };
+    }
+
+    const { data: user, status } = await userRepository.getUserByFields(['_id'], userId);
+
+    if (user?.recoveryCode?.isUsed) {
+      return { status: ResultStatus.BadRequest, data: null };
+    }
+
+    const passwordHash = await hashBuilder.hash(newPassword);
+
+    await UserModel.updateOne({ _id: userId }, {
+      password: passwordHash,
+      recoveryCode: {
+        isUsed: true,
+      },
+    });
+
+    return { data: null, status: ResultStatus.Success };
+  };
 }
 
 export const authService = new AuthService();

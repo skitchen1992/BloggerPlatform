@@ -9,7 +9,7 @@ import { ObjectId } from 'mongodb';
 
 class UserRepository {
   public async getUserById(id: string): Promise<Result<UserDTO | null>> {
-    const user = await UserModel.findById(id);
+    const user = await UserModel.findById(id).lean();
 
     return {
       data: user ? UserMapper.toUserDTO(user) : null,
@@ -22,7 +22,7 @@ class UserRepository {
 
     const query = { $or: queries };
 
-    const user = await UserModel.findOne(query);
+    const user = await UserModel.findOne(query).lean();
 
     if (user) {
       return { data: user, status: ResultStatus.Success };
@@ -33,7 +33,7 @@ class UserRepository {
 
   async getUserByConfirmationCode(code: string) {
     try {
-      const user = await UserModel.findOne({ 'emailConfirmation.confirmationCode': code });
+      const user = await UserModel.findOne({ 'emailConfirmation.confirmationCode': code }).lean();
 
       if (user && user.emailConfirmation) {
         const data: EmailConfirmationWithId = {
@@ -55,7 +55,7 @@ class UserRepository {
   public async getUsers(query: GetUsersQuery): Promise<Result<UserListDTO>> {
     const filters = searchQueryBuilder.getUsers(query);
 
-    const users = await UserModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize);
+    const users = await UserModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize).lean();
 
     const totalCount = await UserModel.countDocuments(filters.query);
 
@@ -69,7 +69,7 @@ class UserRepository {
   public async isExistsUser(login: string, email: string) {
     const user = await UserModel.findOne({
       $or: [{ login }, { email }],
-    });
+    }).lean()
 
     if (user) {
       return {
