@@ -6,7 +6,7 @@ import {
   GetBlogListRequestView,
   GetBlogResponseView,
   GetPostListResponseView,
-  ResponseErrorSchema,
+  ResponseErrorResponseView,
   UpdateBlogRequestView,
 } from '../view';
 import {
@@ -75,7 +75,7 @@ class BlogController {
     }
   }
 
-  async createBlog(req: RequestWithBody<CreateBlogRequestView>, res: Response<CreateBlogSchemaResponseView | ResponseErrorSchema>) {
+  async createBlog(req: RequestWithBody<CreateBlogRequestView>, res: Response<CreateBlogSchemaResponseView | ResponseErrorResponseView>) {
     try {
       const { data: blogId, status } = await blogService.createBlog(req.body);
 
@@ -96,7 +96,7 @@ class BlogController {
 
   async createPostForBlog(
     req: RequestWithParamsAndBody<CreatePostForBlogRequestView, { blogId: string }>,
-    res: Response<CreatePostSchemaResponseView | ResponseErrorSchema>,
+    res: Response<CreatePostSchemaResponseView | ResponseErrorResponseView>,
   ) {
     try {
       const { data: postId, status: blogStatus } = await blogService.createPostForBlog(req.body, req.params);

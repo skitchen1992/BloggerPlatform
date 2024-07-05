@@ -11,7 +11,7 @@ import {
   CreatePostSchemaResponseView,
   GetPostListResponseView,
   GetPostResponseView,
-  ResponseErrorSchema,
+  ResponseErrorResponseView,
   UpdatePostRequestView, CreateCommentRequestView, GetCommentListRequestView,
 } from '../view';
 import { HTTP_STATUSES } from '../utils/consts';
@@ -34,7 +34,7 @@ class PostController {
     }
   };
 
-  async getPostById(req: RequestWithParams<{ id: string }>, res: Response<GetPostResponseView | ResponseErrorSchema>) {
+  async getPostById(req: RequestWithParams<{ id: string }>, res: Response<GetPostResponseView | ResponseErrorResponseView>) {
     try {
       const { data, status } = await postRepository.getPostById(req.params.id);
 
@@ -49,7 +49,7 @@ class PostController {
     }
   };
 
-  async createPost(req: RequestWithBody<CreatePostViewResponseView>, res: Response<CreatePostSchemaResponseView | ResponseErrorSchema>) {
+  async createPost(req: RequestWithBody<CreatePostViewResponseView>, res: Response<CreatePostSchemaResponseView | ResponseErrorResponseView>) {
     try {
       const {
         data: postId,
@@ -115,7 +115,7 @@ class PostController {
 
   async createComment(
     req: RequestWithParamsAndBody<CreateCommentRequestView, { postId: string }>,
-    res: Response<CreateCommentSchemaResponseView | ResponseErrorSchema>,
+    res: Response<CreateCommentSchemaResponseView | ResponseErrorResponseView>,
   ) {
     try {
       const { data: commentId, status } = await postService.createComment(req.body, req.params, res.locals.user!);

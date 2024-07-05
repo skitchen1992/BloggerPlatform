@@ -1,4 +1,4 @@
-import { ErrorMessageSchema } from '../../view';
+import { ErrorMessageResponseView } from '../../view';
 
 export enum ResultStatus {
   Success = 'Success',
@@ -11,5 +11,5 @@ export enum ResultStatus {
 export type Result<T> = {
   status: ResultStatus;
   data: T;
-  errorMessage?: ErrorMessageSchema[];
+  errorMessage?: ErrorMessageResponseView[];
 };

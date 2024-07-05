@@ -4,7 +4,7 @@ import { GetUsersQuery } from '../types/users-types';
 import { userRepository } from '../repositories/user-repository';
 import { HTTP_STATUSES } from '../utils/consts';
 import { ResultStatus } from '../types/common/result';
-import { CreateUserRequestView, CreateUserSchemaResponseView, ResponseErrorSchema } from '../view';
+import { CreateUserRequestView, CreateUserSchemaResponseView, ResponseErrorResponseView } from '../view';
 import { userService } from '../services/user-service';
 
 class UserController {
@@ -37,7 +37,7 @@ class UserController {
     }
   }
 
-  async createUser(req: RequestWithBody<CreateUserRequestView>, res: Response<CreateUserSchemaResponseView | ResponseErrorSchema>) {
+  async createUser(req: RequestWithBody<CreateUserRequestView>, res: Response<CreateUserSchemaResponseView | ResponseErrorResponseView>) {
     try {
       const { status } = await userRepository.isExistsUser(req.body.login, req.body.email);
 

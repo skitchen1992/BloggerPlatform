@@ -6,7 +6,7 @@ import {
   AuthUserInfoSchemaResponseView,
   AuthUserRequestView,
   AuthUserSchemaResponseView,
-  ResponseErrorSchema,
+  ResponseErrorResponseView,
 } from '../view';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { userRepository } from '../repositories/user-repository';
@@ -22,7 +22,7 @@ import { AuthRegistrationResendingRequestView } from '../view/auth/AuthRegistrat
 import { ObjectId } from 'mongodb';
 
 class AuthController {
-  async login(req: RequestWithBody<AuthUserRequestView>, res: Response<ResponseErrorSchema | AuthUserSchemaResponseView>,
+  async login(req: RequestWithBody<AuthUserRequestView>, res: Response<ResponseErrorResponseView | AuthUserSchemaResponseView>,
   ) {
     try {
 
@@ -101,7 +101,7 @@ class AuthController {
   };
 
 
-  async refreshToken(req: RequestEmpty, res: Response<ResponseErrorSchema | AuthUserSchemaResponseView>,
+  async refreshToken(req: RequestEmpty, res: Response<ResponseErrorResponseView | AuthUserSchemaResponseView>,
   ) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
@@ -133,7 +133,7 @@ class AuthController {
     }
   };
 
-  async logoutToken(req: RequestEmpty, res: Response<ResponseErrorSchema | AuthUserSchemaResponseView>,
+  async logoutToken(req: RequestEmpty, res: Response<ResponseErrorResponseView | AuthUserSchemaResponseView>,
   ) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
@@ -177,7 +177,7 @@ class AuthController {
     }
   };
 
-  async authRegistration(req: RequestWithBody<AuthRegistrationRequestView>, res: Response<ResponseErrorSchema>) {
+  async authRegistration(req: RequestWithBody<AuthRegistrationRequestView>, res: Response<ResponseErrorResponseView>) {
     try {
       const { status, data } = await userRepository.isExistsUser(req.body.login, req.body.email);
 
@@ -234,7 +234,7 @@ class AuthController {
     }
   };
 
-  async authRegistrationConfirmation(req: RequestWithBody<AuthRegistrationConfirmationRequestView>, res: Response<ResponseErrorSchema>,
+  async authRegistrationConfirmation(req: RequestWithBody<AuthRegistrationConfirmationRequestView>, res: Response<ResponseErrorResponseView>,
   ) {
     try {
       const { status, data } = await userRepository.getUserByConfirmationCode(req.body.code);
@@ -305,7 +305,7 @@ class AuthController {
     }
   };
 
-  async authRegistrationResending(req: RequestWithBody<AuthRegistrationResendingRequestView>, res: Response<ResponseErrorSchema>,
+  async authRegistrationResending(req: RequestWithBody<AuthRegistrationResendingRequestView>, res: Response<ResponseErrorResponseView>,
   ) {
     try {
       const { status, data } = await userRepository.getUserByFields(['email'], req.body.email);
