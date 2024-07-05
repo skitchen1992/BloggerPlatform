@@ -144,7 +144,10 @@ class AuthService {
     const { userId, exp } = (jwtService.verifyToken(recoveryCode) as JwtPayload) ?? {};
 
     if (!userId || !exp) {
-      return { status: ResultStatus.BadRequest, data: null };
+      return {
+        status: ResultStatus.BadRequest,
+        data: { errorsMessages: [{ message: "Recovery Cod not correct", field: 'recoveryCode' }] },
+      };
     }
 
     if (isExpiredDate(fromUnixTimeToISO(exp), getCurrentDate())) {

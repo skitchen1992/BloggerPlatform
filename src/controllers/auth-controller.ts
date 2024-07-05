@@ -123,13 +123,13 @@ class AuthController {
   async newPassword(req: RequestWithBody<NewPassRequestView>, res: Response<ResponseErrorResponseView | null>,
   ) {
     try {
-      const { status } = await authService.newPass(req.body.newPassword, req.body.recoveryCode);
+      const { status, data } = await authService.newPass(req.body.newPassword, req.body.recoveryCode);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
       }
       if (status === ResultStatus.BadRequest) {
-        res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+        res.status(HTTP_STATUSES.BAD_REQUEST_400).json(data);
       }
     } catch (e) {
       console.log(e);
