@@ -2,18 +2,18 @@ import { CreateUserRequestView } from '../view';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { Result, ResultStatus } from '../types/common/result';
 import { add, getDateFromObjectId } from '../utils/dates/dates';
-import { UserModel } from '../models/user';
+import { IUserSchema } from '../models/user';
 import { ObjectId } from 'mongodb';
-
+import { userRepository } from '../repositories/user-repository';
 
 class UserService {
-  async createUser(body: CreateUserRequestView): Promise<Result<string | null>>  {
+  async createUser(body: CreateUserRequestView): Promise<Result<string | null>> {
     try {
       const passwordHash = await hashBuilder.hash(body.password);
 
       const id = new ObjectId();
 
-      const newUser = new UserModel({
+      const newUser: IUserSchema = {
         login: body.login,
         password: passwordHash,
         email: body.email,
@@ -24,11 +24,11 @@ class UserService {
           expirationDate: add(new Date(), { hours: 1 }),
         },
         _id: id,
-      });
+      };
 
-      const savedUser = await newUser.save();
+      const { data: userId } = await userRepository.createUser(newUser);
 
-      return { data: savedUser._id.toString(), status: ResultStatus.Success };
+      return { data: userId, status: ResultStatus.Success };
 
     } catch (error) {
       console.log(`User not created:  ${error}`);
@@ -38,12 +38,9 @@ class UserService {
 
   async deleteUserById(id: string): Promise<Result<null>> {
     try {
-      const user = await UserModel.findByIdAndDelete(id);
+      const { status } = await userRepository.deleteUserById(id);
 
-      return {
-        data: null,
-        status: user ? ResultStatus.Success : ResultStatus.NotFound,
-      };
+      return { data: null, status };
     } catch (error) {
       console.log(`User not deleted: ${error}`);
       return { data: null, status: ResultStatus.BadRequest };
@@ -51,16 +48,10 @@ class UserService {
   }
 
   async updateUserFieldById(id: string, field: string, data: unknown): Promise<Result<null>> {
-    const updateResult = await UserModel.updateOne(
-      { _id: id },
-      { $set: { [field]: data } }
-    );
+    const { status } = await userRepository.updateUserFieldById(id, field, data);
 
-    if (updateResult.modifiedCount === 1) {
-      return {data: null, status: ResultStatus.Success };
-    } else {
-      return {data: null, status: ResultStatus.NotFound };
-    }
+    return { data: null, status };
+
   };
 
 }

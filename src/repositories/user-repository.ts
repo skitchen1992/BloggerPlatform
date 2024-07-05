@@ -6,6 +6,9 @@ import { UserMapper } from '../mappers/user-mapper';
 import { UserDTO } from '../dto/user-dto';
 import { UserListDTO } from '../dto/user-list-dto';
 import { ObjectId } from 'mongodb';
+import { UpdateQuery } from 'mongoose';
+import { CommentModel, ICommentSchema } from '../models/comment';
+import { BlogModel } from '../models/blog';
 
 class UserRepository {
   public async getUserById(id: string): Promise<Result<UserDTO | null>> {
@@ -81,6 +84,66 @@ class UserRepository {
         data: null,
         status: ResultStatus.Success,
       };
+    }
+  }
+
+  async updateUserById(id: string, data: UpdateQuery<IUserSchema>): Promise<Result<null>> {
+    try {
+
+      await UserModel.updateOne({ _id: new ObjectId(id) }, data);
+
+      return { data: null, status: ResultStatus.Success };
+    } catch (e) {
+      console.log(e);
+      return { data: null, status: ResultStatus.BadRequest };
+    }
+  }
+
+  async updateUserFieldById(id: string, field: string, data: unknown): Promise<Result<null>> {
+    try {
+
+      const updateResult = await UserModel.updateOne(
+        { _id: id },
+        { $set: { [field]: data } },
+      );
+
+      if (updateResult.modifiedCount === 1) {
+        return { data: null, status: ResultStatus.Success };
+      } else {
+        return { data: null, status: ResultStatus.NotFound };
+      }
+
+    } catch (e) {
+      console.log(e);
+      return { data: null, status: ResultStatus.BadRequest };
+    }
+  }
+
+  public async createUser(obj: IUserSchema): Promise<Result<string | null>> {
+    try {
+      const data = new UserModel(obj);
+
+      await data.save();
+
+      return { data: data._id.toString(), status: ResultStatus.Success };
+    } catch (e) {
+      console.log(e);
+      return { data: null, status: ResultStatus.BadRequest };
+    }
+  }
+
+  public async deleteUserById(id: string): Promise<Result<null>> {
+    try {
+      const blog = await UserModel.findByIdAndDelete(new ObjectId(id));
+
+      if (blog) {
+        return { data: null, status: ResultStatus.Success };
+      } else {
+        return { data: null, status: ResultStatus.NotFound };
+      }
+    } catch (e) {
+      console.log(e);
+      return { data: null, status: ResultStatus.NotFound };
     }
   }
 

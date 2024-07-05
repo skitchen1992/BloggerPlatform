@@ -2,7 +2,6 @@ import { ResultStatus } from '../types/common/result';
 import { jwtService } from './jwt-service';
 import { JwtPayload } from 'jsonwebtoken';
 import { sessionRepository } from '../repositories/session-repository';
-import { SessionModel } from '../models/session';
 
 class DeviceService {
   async deleteDeviceList(refreshToken: string) {
@@ -16,9 +15,9 @@ class DeviceService {
       const { data: deviceAuthSession } = await sessionRepository.getDeviceByFields(['deviceId'], deviceId);
 
       if (deviceAuthSession) {
-        await SessionModel.deleteMany({});
+        await sessionRepository.deleteSessionList();
 
-        const newSession = new SessionModel({
+        const newSession = {
           _id: deviceAuthSession._id,
           userId: deviceAuthSession.userId,
           ip: deviceAuthSession.ip,
@@ -27,9 +26,9 @@ class DeviceService {
           tokenIssueDate: deviceAuthSession.tokenIssueDate,
           tokenExpirationDate: deviceAuthSession.tokenExpirationDate,
           deviceId: deviceAuthSession.deviceId,
-        });
+        };
 
-        await newSession.save();
+        await sessionRepository.createSession(newSession);
 
         return { status: ResultStatus.Success, data: null };
       } else {
@@ -58,13 +57,9 @@ class DeviceService {
       return { status: ResultStatus.Forbidden, data: null };
     }
 
-    const deleteResult = await SessionModel.deleteOne({ deviceId: deviceIdForDelete });
+    const { status } = await sessionRepository.deleteSessionByDeviceId(deviceIdForDelete);
 
-    if (deleteResult.deletedCount === 1) {
-      return { data: null, status: ResultStatus.Success };
-    } else {
-      return { data: null, status: ResultStatus.NotFound };
-    }
+    return { data: null, status };
   };
 }
 

@@ -1,8 +1,7 @@
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import { SETTINGS } from '../utils/settings';
-
-export interface ISessionSchema extends Document {
+export interface ISessionSchema {
   _id: ObjectId;
   userId: string;
   ip: string;

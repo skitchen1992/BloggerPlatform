@@ -1,29 +1,29 @@
 import { CreateBlogRequestView, UpdateBlogRequestView } from '../view';
-import { BlogModel } from '../models/blog';
 import { ObjectId } from 'mongodb';
 import { Result, ResultStatus } from '../types/common/result';
 import { getDateFromObjectId } from '../utils/dates/dates';
 import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
 import { blogRepository } from '../repositories/blog-repository';
-import { PostModel } from '../models/post';
+import { postRepository } from '../repositories/post-repository';
 
 class BlogService {
   async createBlog(body: CreateBlogRequestView): Promise<Result<string | null>> {
     try {
       const id = new ObjectId();
 
-      const newBlog = new BlogModel({
+      const newBlog = {
         name: body.name,
         description: body.description,
         websiteUrl: body.websiteUrl,
         createdAt: getDateFromObjectId(id),
         isMembership: false,
         _id: id,
-      });
+      };
 
-      const savedBlog = await newBlog.save();
+      const { data: blogId } = await blogRepository.createBlog(newBlog);
 
-      return { data: savedBlog._id.toString(), status: ResultStatus.Success };
+
+      return { data: blogId, status: ResultStatus.Success };
 
     } catch (error) {
       console.log(`Blog not created: ${error}`);
@@ -33,7 +33,9 @@ class BlogService {
     }
   }
 
-  async createPostForBlog(body: CreatePostForBlogRequestView, params: { blogId: string }): Promise<Result<string | null>> {
+  async createPostForBlog(body: CreatePostForBlogRequestView, params: {
+    blogId: string
+  }): Promise<Result<string | null>> {
     try {
       const { status, data } = await blogRepository.getBlogById(params.blogId);
 
@@ -43,7 +45,7 @@ class BlogService {
 
       const id = new ObjectId();
 
-      const newPost = new PostModel({
+      const newPost = {
         title: body.title,
         shortDescription: body.shortDescription,
         content: body.content,
@@ -51,11 +53,11 @@ class BlogService {
         blogId: data!.id,
         createdAt: getDateFromObjectId(id),
         _id: id,
-      });
+      };
 
-      const savedPost = await newPost.save();
+      const { data: postId } = await postRepository.createPost(newPost);
 
-      return { data: savedPost._id.toString(), status: ResultStatus.Success };
+      return { data: postId, status: ResultStatus.Success };
     } catch (error) {
       console.log(`Post not created: ${error}`);
       return {
@@ -66,14 +68,9 @@ class BlogService {
 
   async updateBlog(id: string, data: UpdateBlogRequestView): Promise<Result<null>> {
     try {
+      const { status } = await blogRepository.updateBlogById(id, data);
 
-      const updateResult = await BlogModel.updateOne({ _id: new ObjectId(id) }, data);
-
-      if (updateResult.modifiedCount === 1) {
-        return { data: null, status: ResultStatus.Success };
-      } else {
-        return { data: null, status: ResultStatus.NotFound };
-      }
+      return { data: null, status };
     } catch (error) {
       console.log(`Blog not updated: ${error}`);
       return {
@@ -84,13 +81,9 @@ class BlogService {
 
   async deleteBlog(id: string): Promise<Result<null>> {
     try {
-      const deleteResult = await BlogModel.deleteOne({ _id: new ObjectId(id) });
+      const { status } = await blogRepository.deleteBlogById(id);
 
-      if (deleteResult.deletedCount === 1) {
-        return { data: null, status: ResultStatus.Success };
-      } else {
-        return { data: null, status: ResultStatus.NotFound };
-      }
+      return { data: null, status };
     } catch (error) {
       console.log(`Blog not deleted: ${error}`);
       return {

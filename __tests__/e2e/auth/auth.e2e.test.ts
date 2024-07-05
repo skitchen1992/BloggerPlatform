@@ -5,8 +5,6 @@ import { testSeeder } from '../../test.seeder';
 import { userService } from '../../../src/services/user-service';
 import { req } from '../../jest.setup';
 
-
-
 describe(`Endpoint (POST) - ${PATH_URL.AUTH.LOGIN}`, () => {
   it(`Should get status ${HTTP_STATUSES.NO_CONTENT_204}`, async () => {
     await req

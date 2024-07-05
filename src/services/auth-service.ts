@@ -5,15 +5,13 @@ import { ObjectId } from 'mongodb';
 import { jwtService } from './jwt-service';
 import {
   ACCESS_TOKEN_EXPIRED_IN,
-  HTTP_STATUSES, RECOVERY_PASS_TOKEN_EXPIRED,
+  RECOVERY_PASS_TOKEN_EXPIRED,
   REFRESH_TOKEN_EXPIRED_IN,
 } from '../utils/consts';
-import { SessionModel } from '../models/session';
 import { sessionRepository } from '../repositories/session-repository';
 import { JwtPayload } from 'jsonwebtoken';
 import { userRepository } from '../repositories/user-repository';
 import { emailService } from './email-service';
-import { UserModel } from '../models/user';
 
 
 type Payload = {
@@ -34,7 +32,7 @@ class AuthService {
 
       const refreshToken = jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
 
-      const data = new SessionModel({
+      const data = {
         _id: objectId,
         userId,
         ip,
@@ -43,10 +41,9 @@ class AuthService {
         tokenIssueDate: getDateFromObjectId(objectId),
         tokenExpirationDate: jwtService.getTokenExpirationDate(refreshToken),
         deviceId,
-      });
+      };
 
-
-      await data.save();
+      await sessionRepository.createSession(data);
 
       return { status: ResultStatus.Success, data: { refreshToken, accessToken } };
     } catch (error) {
@@ -73,12 +70,10 @@ class AuthService {
       const newAccessToken = jwtService.generateToken({ userId }, { expiresIn: ACCESS_TOKEN_EXPIRED_IN });
       const newRefreshToken = jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
 
-
-      await SessionModel.updateOne({ _id: device._id }, {
+      await sessionRepository.updateSessionById(device._id.toString(), {
         tokenExpirationDate: jwtService.getTokenExpirationDate(newRefreshToken),
         lastActiveDate: getCurrentDate(),
       });
-
 
       return { status: ResultStatus.Success, data: { refreshToken: newRefreshToken, accessToken: newAccessToken } };
 
@@ -109,7 +104,7 @@ class AuthService {
       return { status: ResultStatus.Unauthorized, data: null };
     }
 
-    await SessionModel.findByIdAndDelete(device._id);
+    await sessionRepository.deleteSessionById(device._id.toString());
 
     return { data: null, status: ResultStatus.Success };
   };
@@ -127,7 +122,7 @@ class AuthService {
 
     const recoveryPassToken = jwtService.generateToken({ userId: user?._id.toString() }, { expiresIn: RECOVERY_PASS_TOKEN_EXPIRED });
 
-    await UserModel.updateOne({ _id: user!._id }, {
+    await userRepository.updateUserById(user!._id.toString(), {
       recoveryCode: {
         code: recoveryPassToken,
         isUsed: false,
@@ -168,7 +163,7 @@ class AuthService {
 
     const passwordHash = await hashBuilder.hash(newPassword);
 
-    await UserModel.updateOne({ _id: userId }, {
+    await userRepository.updateUserById(user!._id.toString(), {
       password: passwordHash,
       recoveryCode: {
         isUsed: true,

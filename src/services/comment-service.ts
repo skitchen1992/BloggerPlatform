@@ -1,20 +1,14 @@
-import { ObjectId } from 'mongodb';
 import { ResultStatus } from '../types/common/result';
-import { CommentModel } from '../models/comment';
 import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
+import { commentRepository } from '../repositories/comment-repository';
 
 class CommentService {
 
   async updateComment(id: string, data: UpdateCommentRequestView) {
     try {
-      const updateResult = await CommentModel.updateOne({ _id: new ObjectId(id) }, data);
+      const { status } = await commentRepository.updateCommentById(id, data);
 
-      if (updateResult.modifiedCount === 1) {
-        return { data: null, status: ResultStatus.Success };
-      } else {
-        return { data: null, status: ResultStatus.NotFound };
-      }
-
+      return { data: null, status: status };
     } catch (error) {
       console.log(`Comment not updated: ${error}`);
       return {
@@ -25,13 +19,8 @@ class CommentService {
 
   async deleteComment(id: string) {
     try {
-      const deleteResult = await CommentModel.deleteOne({ _id: new ObjectId(id) });
-
-      if (deleteResult.deletedCount === 1) {
-        return { data: null, status: ResultStatus.Success };
-      } else {
-        return { data: null, status: ResultStatus.NotFound };
-      }
+      const { status } = await commentRepository.deleteCommentById(id);
+      return { data: null, status: status };
 
     } catch (error) {
       console.log(`Comment not deleted: ${error}`);
@@ -40,7 +29,6 @@ class CommentService {
       };
     }
   };
-
 }
 
 export const commentService = new CommentService();
