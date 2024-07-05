@@ -12,6 +12,9 @@ export const validateAuthPostPasswordRecoverySchema = () => {
         errorMessage: 'Not a string',
       },
       trim: {},
+      isEmail: {
+        errorMessage: 'Email is not correct',
+      },
     },
   });
 };
