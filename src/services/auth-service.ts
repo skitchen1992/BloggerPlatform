@@ -146,18 +146,24 @@ class AuthService {
     if (!userId || !exp) {
       return {
         status: ResultStatus.BadRequest,
-        data: { errorsMessages: [{ message: "Recovery Cod not correct", field: 'recoveryCode' }] },
+        data: { errorsMessages: [{ message: 'Recovery Cod not correct', field: 'recoveryCode' }] },
       };
     }
 
     if (isExpiredDate(fromUnixTimeToISO(exp), getCurrentDate())) {
-      return { status: ResultStatus.BadRequest, data: null };
+      return {
+        status: ResultStatus.BadRequest,
+        data: { errorsMessages: [{ message: 'Recovery Cod not correct', field: 'recoveryCode' }] },
+      };
     }
 
     const { data: user, status } = await userRepository.getUserByFields(['_id'], userId);
 
     if (user?.recoveryCode?.isUsed || user?.recoveryCode?.code !== recoveryCode) {
-      return { status: ResultStatus.BadRequest, data: null };
+      return {
+        status: ResultStatus.BadRequest,
+        data: { errorsMessages: [{ message: 'Recovery Cod not correct', field: 'recoveryCode' }] },
+      };
     }
 
     const passwordHash = await hashBuilder.hash(newPassword);
