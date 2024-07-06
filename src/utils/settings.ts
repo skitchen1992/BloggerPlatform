@@ -13,7 +13,7 @@ export const SETTINGS = {
 
   DB: {
     NAME: {
-      PORTAL: 'portal',
+      PORTAL: 'bloggerPlatform',
     },
     COLLECTION: {
       BLOGS: 'blogs',
@@ -21,7 +21,7 @@ export const SETTINGS = {
       USERS: 'users',
       COMMENTS: 'comments',
       DEVICE_AUTH_SESSIONS: 'deviceAuthSessions',
-      DOCUMENTS: 'documents',
+      VISITS: 'visits',
     },
   },
 };

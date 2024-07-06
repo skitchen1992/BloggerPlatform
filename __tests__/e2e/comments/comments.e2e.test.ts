@@ -1,59 +1,23 @@
 import { createAuthorizationHeader, createBearerAuthorizationHeader } from '../../test-helpers';
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
-import * as data from './datasets';
-import { SETTINGS } from '../../../src/utils/settings';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { agent, Test } from 'supertest';
-import TestAgent from 'supertest/lib/agent';
-import { app } from '../../../src/app';
-import { blogsCollection, commentsCollection, connectToDb, postsCollection } from '../../../src/db/collection';
-import { BlogDbType } from '../../../src/types/blog-types';
-import { PostDbType } from '../../../src/types/post-types';
-import { mongoDBRepository } from '../../../src/repositories/db-repository';
-import { CommentDbType } from '../../../src/types/comments-types';
+import { SETTINGS } from '../../../src/utils/settings';;
 import { ID } from './datasets';
-import { getCurrentDate } from '../../../src/utils/dates/dates';
+import { BlogModel } from '../../../src/models/blog';
+import { testSeeder } from '../../test.seeder';
+import { CommentModel } from '../../../src/models/comment';
+import { CommentMapper } from '../../../src/mappers/comment-mapper';
+import { PostModel } from '../../../src/models/post';
+import { req } from '../../jest.setup';
+
 
 describe(`Endpoint (GET) - ${PATH_URL.COMMENTS}`, () => {
-  let req: TestAgent<Test>;
-
-  beforeEach(async () => {
-    const server = await MongoMemoryServer.create();
-    await connectToDb(server.getUri());
-
-    req = agent(app);
-
-    await blogsCollection.deleteMany();
-    await postsCollection.deleteMany();
-    await commentsCollection.deleteMany();
-  });
-
   it('Should get comment', async () => {
-    const createdAt = getCurrentDate();
+    const commentList = await CommentModel.insertMany(testSeeder.createCommentListDto(1));
+    const commentId = commentList[0]._id.toString();
 
-    const newComment: CommentDbType = {
-      content: 'Content Content Content',
-      commentatorInfo: {
-        userId: ID,
-        userLogin: 'login',
-      },
-      postId: ID,
-      createdAt,
-    };
+    const res = await req.get(`${PATH_URL.COMMENTS}/${commentId}`).expect(HTTP_STATUSES.OK_200);
 
-    const { insertedId } = await mongoDBRepository.add<CommentDbType>(commentsCollection, newComment);
-
-    const res = await req.get(`${PATH_URL.COMMENTS}/${insertedId.toString()}`).expect(HTTP_STATUSES.OK_200);
-
-    expect(res.body).toEqual({
-      id: insertedId.toString(),
-      content: 'Content Content Content',
-      commentatorInfo: {
-        userId: ID,
-        userLogin: 'login',
-      },
-      createdAt,
-    });
+    expect(res.body).toEqual(CommentMapper.toCommentDTO(commentList[0]));
   });
 
   it(`Should get ${HTTP_STATUSES.NOT_FOUND_404}`, async () => {
@@ -62,18 +26,6 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENTS}`, () => {
 });
 
 describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
-  let req: TestAgent<Test>;
-
-  beforeEach(async () => {
-    const server = await MongoMemoryServer.create();
-    await connectToDb(server.getUri());
-
-    req = agent(app);
-
-    await blogsCollection.deleteMany();
-    await postsCollection.deleteMany();
-    await commentsCollection.deleteMany();
-  });
 
   it('Should update comment', async () => {
     const login = 'testLogin';
@@ -94,25 +46,14 @@ describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     const comment = await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -132,7 +73,7 @@ describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         content: 'content content content content',
-      })
+      }),
     );
   });
 
@@ -155,25 +96,14 @@ describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     const comment = await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -217,25 +147,14 @@ describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     const comment = await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -269,25 +188,14 @@ describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -340,25 +248,14 @@ describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
       password: password2,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     const comment = await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -376,18 +273,6 @@ describe(`Endpoint (PUT) - ${PATH_URL.COMMENTS}`, () => {
 });
 
 describe(`Endpoint (DELETE) - ${PATH_URL.COMMENTS}`, () => {
-  let req: TestAgent<Test>;
-
-  beforeEach(async () => {
-    const server = await MongoMemoryServer.create();
-    await connectToDb(server.getUri());
-
-    req = agent(app);
-
-    await blogsCollection.deleteMany();
-    await postsCollection.deleteMany();
-    await commentsCollection.deleteMany();
-  });
 
   it('Should delete comment', async () => {
     const login = 'testLogin';
@@ -408,25 +293,14 @@ describe(`Endpoint (DELETE) - ${PATH_URL.COMMENTS}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     const comment = await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -466,25 +340,14 @@ describe(`Endpoint (DELETE) - ${PATH_URL.COMMENTS}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     const comment = await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -513,25 +376,14 @@ describe(`Endpoint (DELETE) - ${PATH_URL.COMMENTS}`, () => {
       password,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -584,25 +436,14 @@ describe(`Endpoint (DELETE) - ${PATH_URL.COMMENTS}`, () => {
       password: password2,
     });
 
-    const insertOneResultBlog = await mongoDBRepository.add<BlogDbType>(blogsCollection, data.dataSetNewBlog);
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
 
-    const { insertedId: blogId } = insertOneResultBlog;
-
-    const blog = await mongoDBRepository.getById<BlogDbType>(blogsCollection, blogId.toString());
-
-    const createdAt = getCurrentDate();
-
-    const insertOneResultPost = await mongoDBRepository.add<PostDbType>(postsCollection, {
-      ...data.dataSetNewPost,
-      blogId: blogId.toString(),
-      blogName: blog!.name,
-      createdAt,
-    });
-
-    const { insertedId: postId } = insertOneResultPost;
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
 
     const comment = await req
-      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .post(`${PATH_URL.POSTS}/${postId}${PATH_URL.COMMENTS}`)
       .set(createBearerAuthorizationHeader(token.body.accessToken))
       .send({
         content: 'content content content',
@@ -618,3 +459,4 @@ describe(`Endpoint (DELETE) - ${PATH_URL.COMMENTS}`, () => {
       .expect(HTTP_STATUSES.FORBIDDEN_403);
   });
 });
+

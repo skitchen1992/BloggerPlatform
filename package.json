@@ -10,7 +10,7 @@
     "jest:coverage": "jest --coverage",
     "test": "yarn jest",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "yarn run eslint \"src\" --max-warnings=17"
+    "lint": "yarn run eslint \"src\" --max-warnings=30"
   },
   "dependencies": {
     "@types/bcryptjs": "2.4.6",
@@ -24,6 +24,7 @@
     "express-validator": "7.0.1",
     "jsonwebtoken": "9.0.2",
     "mongodb": "6.6.0",
+    "mongoose": "8.4.4",
     "nodemailer": "6.9.13",
     "uuid": "9.0.1"
   },

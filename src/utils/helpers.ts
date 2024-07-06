@@ -5,6 +5,7 @@ import { GetUsersQuery } from '../types/users-types';
 import { compare, genSalt, hash } from 'bcryptjs';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
+import { SortOrder } from 'mongoose';
 
 export const getPageCount = (totalCount: number, pageSize: number) => {
   return Math.ceil(totalCount / pageSize);
@@ -18,12 +19,14 @@ export const isValidObjectId = (id: string): boolean => {
   return ObjectId.isValid(id);
 };
 
-type Filters = Record<string, string>;
+type Filters = string | { [key: string]: SortOrder | { $meta: any; }; } | [string, SortOrder][] | null | undefined
+type Query = Record<string, unknown>
+
 export const searchQueryBuilder = {
   getBlogs: (queryParams: GetBlogsQuery) => {
     const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = queryParams;
 
-    const query: Record<string, unknown> = {};
+    const query: Query = {};
     if (searchNameTerm) {
       query.name = { $regex: new RegExp(`.*${searchNameTerm}.*`, 'i') };
     }
@@ -46,7 +49,7 @@ export const searchQueryBuilder = {
   getPosts: (queryParams: GetPostsQuery, params?: { blogId: string }) => {
     const { sortBy, sortDirection, pageNumber, pageSize } = queryParams;
 
-    const query: Filters = {};
+    const query: Query = {};
     if (params?.blogId) {
       query.blogId = params.blogId;
     }
@@ -69,7 +72,7 @@ export const searchQueryBuilder = {
   getComments: (queryParams: GetPostsQuery, params?: { postId: string }) => {
     const { sortBy, sortDirection, pageNumber, pageSize } = queryParams;
 
-    const query: Filters = {};
+    const query: Query = {};
     if (params?.postId) {
       query.postId = params.postId;
     }
@@ -92,7 +95,7 @@ export const searchQueryBuilder = {
   getUsers: (queryParams: GetUsersQuery) => {
     const { sortBy, sortDirection, pageNumber, pageSize, searchLoginTerm, searchEmailTerm } = queryParams;
 
-    const query: Record<string, unknown> = {};
+    const query: Query = {};
     if (searchLoginTerm && searchEmailTerm) {
       query.$or = [
         { login: { $regex: new RegExp(`.*${searchLoginTerm}.*`, 'i') } },

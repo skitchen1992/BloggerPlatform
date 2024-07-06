@@ -30,8 +30,8 @@ app.use(PATH_URL.USERS, usersRouter);
 
 app.use(PATH_URL.COMMENTS, commentsRouter);
 
-app.use(PATH_URL.TESTING.ROOT, testingRouter);
-
 app.use(PATH_URL.AUTH.ROOT, authRouter);
 
 app.use(PATH_URL.SECURITY.ROOT, securityRouter);
+
+app.use(PATH_URL.TESTING.ROOT, testingRouter);

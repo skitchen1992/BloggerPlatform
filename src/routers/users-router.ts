@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { getUsersQueryParams, PATH_URL } from '../utils/consts';
-import * as controllers from '../controllers';
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
-import { CreateUserSchema } from '../models';
+import { CreateUserRequestView } from '../view';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { validateUserPostSchema } from '../middlewares/users';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
+import { userController } from '../controllers/user-controller';
 
 export const usersRouter = Router();
 
@@ -14,8 +14,8 @@ usersRouter.get(
   PATH_URL.ROOT,
   basicAuthMiddleware,
   sanitizerQueryMiddleware(getUsersQueryParams),
-  errorHandlingMiddleware<CreateUserSchema>,
-  controllers.getUsersController
+  errorHandlingMiddleware<CreateUserRequestView>,
+  userController.getUsers
 );
 
 usersRouter.post(
@@ -23,8 +23,8 @@ usersRouter.post(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateUserPostSchema),
-  errorHandlingMiddleware<CreateUserSchema>,
-  controllers.createUserController
+  errorHandlingMiddleware<CreateUserRequestView>,
+  userController.createUser
 );
 
 usersRouter.delete(
@@ -32,5 +32,5 @@ usersRouter.delete(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  controllers.deleteUserController
+  userController.deleteUser
 );

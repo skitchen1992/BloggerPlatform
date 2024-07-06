@@ -1,16 +1,16 @@
 import { body, oneOf } from 'express-validator';
 import { param } from 'express-validator/src/middlewares/validation-chain-builders';
-import { queryRepository } from '../repositories/queryRepository';
 import { ResultStatus } from '../types/common/result';
+import { userRepository } from '../repositories/user-repository';
 
 export const checkUserExistsMiddleware = {
   body: (fields?: string | string[]) => {
     return oneOf(
       [
         body(fields).custom(async (input, meta) => {
-          const { status } = await queryRepository.isExistsUser(input, meta.path);
+          const { status } = await userRepository.isExistsUser(input, meta.path);
 
-          if (status === ResultStatus.BagRequest) {
+          if (status === ResultStatus.BadRequest) {
             throw new Error();
           }
         }),
@@ -22,9 +22,9 @@ export const checkUserExistsMiddleware = {
     return oneOf(
       [
         param(fields).custom(async (input, meta) => {
-          const { status } = await queryRepository.isExistsUser(input, meta.path);
+          const { status } = await userRepository.isExistsUser(input, meta.path);
 
-          if (status === ResultStatus.BagRequest) {
+          if (status === ResultStatus.BadRequest) {
             throw new Error();
           }
         }),

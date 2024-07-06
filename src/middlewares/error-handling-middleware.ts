@@ -1,15 +1,14 @@
 import { RequestWithBody } from '../types/request-types';
-import { ResponseErrorSchema } from '../models';
+import { ResponseErrorResponseView, ErrorMessageResponseView } from '../view';
 import { NextFunction, Response } from 'express';
 import { Result, validationResult } from 'express-validator';
 import { HTTP_STATUSES } from '../utils/consts';
-import { ErrorMessageSchema } from '../models/errors/ErrorMessageSchema';
 import { FieldValidationError } from 'express-validator/src/base';
 
 export const errorHandlingMiddleware = <T>(
   req: RequestWithBody<T>,
-  res: Response<ResponseErrorSchema>,
-  next: NextFunction
+  res: Response<ResponseErrorResponseView>,
+  next: NextFunction,
 ) => {
   const errorsResult = validationResult(req) as Result<FieldValidationError>;
 
@@ -17,7 +16,7 @@ export const errorHandlingMiddleware = <T>(
     next();
   } else {
     let locationsIsParams = false;
-    const errorsMessages: ErrorMessageSchema[] = errorsResult.array().map((error) => {
+    const errorsMessages: ErrorMessageResponseView[] = errorsResult.array().map((error) => {
       if (error.location === 'params') {
         locationsIsParams = true;
       }

@@ -1,13 +1,13 @@
 import { body } from 'express-validator';
 import { param } from 'express-validator/src/middlewares/validation-chain-builders';
-import { queryRepository } from '../repositories/queryRepository';
 import { ResultStatus } from '../types/common/result';
+import { blogRepository } from '../repositories/blog-repository';
 
 export const checkBlogExistsMiddleware = {
   body: (fields?: string | string[]) => {
     return body(fields).custom(async (input, meta) => {
       if (meta.path === 'blogId') {
-        const { status } = await queryRepository.getBlogById(input);
+        const { status } = await blogRepository.getBlogById(input);
 
         if (status !== ResultStatus.Success) {
           throw new Error('Blog is not founded');
@@ -18,7 +18,7 @@ export const checkBlogExistsMiddleware = {
   urlParams: (fields?: string | string[]) => {
     return param(fields).custom(async (input, meta) => {
       if (meta.path === 'blogId') {
-        const { status } = await queryRepository.getBlogById(input);
+        const { status } = await blogRepository.getBlogById(input);
 
         if (status !== ResultStatus.Success) {
           throw new Error('Blog is not founded');

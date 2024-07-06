@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { PATH_URL } from '../utils/consts';
-import * as controllers from '../controllers';
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
-import { UpdateCommentSchema } from '../models/comments/UpdateCommentSchema';
+import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
 import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-middleware';
 import { validateCommentsPutSchema } from '../middlewares/comments';
+import { commentController } from '../controllers/comment-controller';
 
 export const commentsRouter = Router();
 
@@ -14,7 +14,7 @@ commentsRouter.get(
   PATH_URL.COMMENT_ID,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  controllers.getCommentByIdController
+  commentController.getCommentById
 );
 
 commentsRouter.put(
@@ -22,8 +22,8 @@ commentsRouter.put(
   bearerTokenAuthMiddleware,
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateCommentsPutSchema),
-  errorHandlingMiddleware<UpdateCommentSchema>,
-  controllers.updateCommentController
+  errorHandlingMiddleware<UpdateCommentRequestView>,
+  commentController.updateComment
 );
 
 commentsRouter.delete(
@@ -31,5 +31,5 @@ commentsRouter.delete(
   bearerTokenAuthMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  controllers.deleteCommentController
+  commentController.deleteComment
 );
