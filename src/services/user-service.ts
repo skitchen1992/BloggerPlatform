@@ -1,11 +1,13 @@
 import { CreateUserRequestView } from '../view';
-import { getUniqueId, hashBuilder } from '../utils/helpers';
+import { hashBuilder } from '../utils/helpers';
 import { Result, ResultStatus } from '../types/common/result';
-import { add } from '../utils/dates/dates';
-import { userRepository } from '../repositories/user-repository';
 import { User } from '../dto/new-user-dto';
+import { UserRepository } from '../repositories/user-repository';
 
-class UserService {
+export class UserService {
+  constructor(protected userRepository: UserRepository) {
+  }
+
   async createUser(body: CreateUserRequestView): Promise<Result<string | null>> {
     try {
       const passwordHash = await hashBuilder.hash(body.password);
@@ -14,14 +16,9 @@ class UserService {
         body.login,
         passwordHash,
         body.email,
-        {
-          isConfirmed: false,
-          confirmationCode: getUniqueId(),
-          expirationDate: add(new Date(), { hours: 1 }),
-        },
       );
 
-      const { data: userId } = await userRepository.createUser(user);
+      const { data: userId } = await this.userRepository.createUser(user);
 
       return { data: userId, status: ResultStatus.Success };
 
@@ -33,7 +30,7 @@ class UserService {
 
   async deleteUserById(id: string): Promise<Result<null>> {
     try {
-      const { status } = await userRepository.deleteUserById(id);
+      const { status } = await this.userRepository.deleteUserById(id);
 
       return { data: null, status };
     } catch (error) {
@@ -43,13 +40,10 @@ class UserService {
   }
 
   async updateUserFieldById(id: string, field: string, data: unknown): Promise<Result<null>> {
-    const { status } = await userRepository.updateUserFieldById(id, field, data);
+    const { status } = await this.userRepository.updateUserFieldById(id, field, data);
 
     return { data: null, status };
 
   };
 
 }
-
-export const userService = new UserService();
-

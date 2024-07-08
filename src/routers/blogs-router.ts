@@ -9,7 +9,7 @@ import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogReq
 import {
   validateCreatePostForBlogSchema,
 } from '../middlewares/blogs/validate-schemas/validate-create-post-for-blog-schema';
-import { blogController } from '../controllers/blog-controller';
+import { blogController } from '../compositions/composition-root';
 
 export const blogsRouter = Router();
 
@@ -17,21 +17,21 @@ blogsRouter.get(
   PATH_URL.ROOT,
   sanitizerQueryMiddleware(getBlogsQueryParams),
   errorHandlingMiddleware,
-  blogController.getBlogs,
+  blogController.getBlogs.bind(blogController),
 );
 
 blogsRouter.get(
   PATH_URL.ID,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  blogController.getBlogById,
+  blogController.getBlogById.bind(blogController),
 );
 
 blogsRouter.get(
   PATH_URL.POSTS_FOR_BLOG,
   sanitizerQueryMiddleware(getPostsQueryParams),
   errorHandlingMiddleware,
-  blogController.getPostsForBlog,
+  blogController.getPostsForBlog.bind(blogController),
 );
 
 blogsRouter.post(
@@ -42,7 +42,7 @@ blogsRouter.post(
   //checkExactMiddleware(validateUserPostSchema),
   validateBlogPostSchema(),
   errorHandlingMiddleware<CreateBlogRequestView>,
-  blogController.createBlog,
+  blogController.createBlog.bind(blogController),
 );
 
 blogsRouter.post(
@@ -51,7 +51,7 @@ blogsRouter.post(
   sanitizerQueryMiddleware(),
   validateCreatePostForBlogSchema(),
   errorHandlingMiddleware<CreatePostForBlogRequestView>,
-  blogController.createPostForBlog,
+  blogController.createPostForBlog.bind(blogController),
 );
 
 blogsRouter.put(
@@ -60,7 +60,7 @@ blogsRouter.put(
   sanitizerQueryMiddleware(),
   validateBlogPutSchema(),
   errorHandlingMiddleware<UpdateBlogRequestView>,
-  blogController.updateBlog,
+  blogController.updateBlog.bind(blogController),
 );
 
 blogsRouter.delete(
@@ -68,5 +68,5 @@ blogsRouter.delete(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  blogController.deleteBlog,
+  blogController.deleteBlog.bind(blogController),
 );

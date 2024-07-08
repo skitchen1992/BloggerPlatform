@@ -1,12 +1,8 @@
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
-import { agent, Test } from 'supertest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { app } from '../../../src/app';
-import TestAgent from 'supertest/lib/agent';
 import { testSeeder } from '../../test.seeder';
 import { ID } from './datasets';
-import { userService } from '../../../src/services/user-service';
 import { req } from '../../jest.setup';
+import { userService } from '../../../src/compositions/composition-root';
 
 
 describe(`Endpoint (GET) - ${PATH_URL.SECURITY.DEVICES}`, () => {

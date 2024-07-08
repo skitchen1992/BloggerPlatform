@@ -38,4 +38,3 @@ export class MailerService {
   }
 }
 
-export const mailerService = new MailerService();

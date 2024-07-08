@@ -8,8 +8,8 @@ import { UserListDTO } from '../dto/user-list-dto';
 import { ObjectId } from 'mongodb';
 import { UpdateQuery } from 'mongoose';
 
+export class UserRepository {
 
-class UserRepository {
   public async getUserById(id: string): Promise<Result<UserDTO | null>> {
     const user = await UserModel.findById(id).lean();
 
@@ -71,7 +71,7 @@ class UserRepository {
   public async isExistsUser(login: string, email: string) {
     const user = await UserModel.findOne({
       $or: [{ login }, { email }],
-    }).lean()
+    }).lean();
 
     if (user) {
       return {
@@ -145,7 +145,4 @@ class UserRepository {
       return { data: null, status: ResultStatus.NotFound };
     }
   }
-
 }
-
-export const userRepository = new UserRepository();

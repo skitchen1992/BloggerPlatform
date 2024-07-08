@@ -5,7 +5,7 @@ import { SessionMapper } from '../mappers/session-mapper';
 import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-class SessionRepository {
+export class SessionRepository {
   public async getDeviceByFields(fields: (keyof ISessionSchema)[], input: string): Promise<Result<ISessionSchema | null>> {
     const queries = fields.map(field => ({ [field]: input }));
 
@@ -96,5 +96,3 @@ class SessionRepository {
     }
   }
 }
-
-export const sessionRepository = new SessionRepository();

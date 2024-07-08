@@ -21,15 +21,25 @@ import { HTTP_STATUSES } from '../utils/consts';
 import { GetPostsQuery } from '../types/post-types';
 import { ResultStatus } from '../types/common/result';
 import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
-import { blogRepository } from '../repositories/blog-repository';
-import { postRepository } from '../repositories/post-repository';
-import { blogService } from '../services/blog-service';
-import { postService } from '../services/post-service';
+import { BlogRepository } from '../repositories/blog-repository';
+import { BlogService } from '../services/blog-service';
+import { PostRepository } from '../repositories/post-repository';
+import { PostService } from '../services/post-service';
 
-class BlogController {
+
+export class BlogController {
+
+  constructor(
+    protected blogRepository: BlogRepository,
+    protected blogService: BlogService,
+    protected postRepository: PostRepository,
+    protected postService: PostService,
+
+  ) {
+  }
   async getBlogs(req: RequestWithQuery<GetBlogsQuery>, res: Response<GetBlogListRequestView>) {
     try {
-      const { data } = await blogRepository.getBlogs(req.query);
+      const { data } = await this.blogRepository.getBlogs(req.query);
       res.status(HTTP_STATUSES.OK_200).json(data);
     } catch (e) {
       console.log(e);
@@ -39,7 +49,7 @@ class BlogController {
 
   async getBlogById(req: RequestWithParams<{ id: string }>, res: Response<GetBlogResponseView | null>) {
     try {
-      const { data, status } = await blogRepository.getBlogById(req.params.id);
+      const { data, status } = await this.blogRepository.getBlogById(req.params.id);
 
       if (status === ResultStatus.Success) {
         res.status(HTTP_STATUSES.OK_200).json(data);
@@ -61,14 +71,14 @@ class BlogController {
     res: Response<GetPostListResponseView>,
   ) {
     try {
-      const { status } = await blogRepository.getBlogById(req.params.blogId);
+      const { status } = await this.blogRepository.getBlogById(req.params.blogId);
 
       if (status !== ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         return;
       }
 
-      const { data } = await postRepository.getPosts(req.query, req.params);
+      const { data } = await this.postRepository.getPosts(req.query, req.params);
       res.status(HTTP_STATUSES.OK_200).json(data);
     } catch (e) {
       console.log(e);
@@ -78,10 +88,10 @@ class BlogController {
 
   async createBlog(req: RequestWithBody<CreateBlogRequestView>, res: Response<CreateBlogSchemaResponseView | ResponseErrorResponseView>) {
     try {
-      const { data: blogId, status } = await blogService.createBlog(req.body);
+      const { data: blogId, status } = await this.blogService.createBlog(req.body);
 
       if (status === ResultStatus.Success && blogId) {
-        const { data, status } = await blogRepository.getBlogById(blogId.toString());
+        const { data, status } = await this.blogRepository.getBlogById(blogId.toString());
 
         res.status(HTTP_STATUSES.CREATED_201).json(data!);
       }
@@ -100,14 +110,14 @@ class BlogController {
     res: Response<CreatePostSchemaResponseView | ResponseErrorResponseView>,
   ) {
     try {
-      const { data: postId, status: blogStatus } = await postService.createPostForBlog(req.body, req.params);
+      const { data: postId, status: blogStatus } = await this.postService.createPostForBlog(req.body, req.params);
 
       if (blogStatus === ResultStatus.NotFound) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         return;
       }
 
-      const { data: post, status: postStatus } = await postRepository.getPostById(postId!);
+      const { data: post, status: postStatus } = await this.postRepository.getPostById(postId!);
 
       if (postStatus === ResultStatus.Success) {
         res.status(HTTP_STATUSES.CREATED_201).json(post!);
@@ -120,7 +130,7 @@ class BlogController {
 
   async updateBlog(req: RequestWithParamsAndBody<UpdateBlogRequestView, { id: string }>, res: Response) {
     try {
-      const { status } = await blogService.updateBlog(req.params.id, req.body);
+      const { status } = await this.blogService.updateBlog(req.params.id, req.body);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -138,7 +148,7 @@ class BlogController {
 
   async deleteBlog(req: RequestWithParams<{ id: string }>, res: Response) {
     try {
-      const { status } = await blogService.deleteBlog(req.params.id);
+      const { status } = await this.blogService.deleteBlog(req.params.id);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -154,6 +164,3 @@ class BlogController {
     }
   }
 }
-
-export const blogController = new BlogController();
-

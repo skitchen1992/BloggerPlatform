@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
-import { getDateFromObjectId } from '../utils/dates/dates';
-
+import { add, getDateFromObjectId } from '../utils/dates/dates';
+import { getUniqueId } from '../utils/helpers';
 
 interface IEmailConfirmation {
   isConfirmed: boolean,
@@ -11,14 +11,19 @@ interface IEmailConfirmation {
 export class User {
   _id: ObjectId;
   createdAt: string;
+  emailConfirmation: IEmailConfirmation
 
   constructor(
     public login: string,
     public password: string,
     public email: string,
-    public emailConfirmation: IEmailConfirmation
   ) {
     this._id = new ObjectId();
     this.createdAt = getDateFromObjectId(this._id);
+    this.emailConfirmation = {
+      isConfirmed: false,
+      confirmationCode: getUniqueId(),
+      expirationDate: add(new Date(), { hours: 1 }),
+    };
   }
 }

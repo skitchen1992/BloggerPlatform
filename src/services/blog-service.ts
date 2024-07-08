@@ -1,9 +1,13 @@
 import { CreateBlogRequestView, UpdateBlogRequestView } from '../view';
 import { Result, ResultStatus } from '../types/common/result';
-import { blogRepository } from '../repositories/blog-repository';
 import { Blog } from '../dto/new-blog-dto';
+import { BlogRepository } from '../repositories/blog-repository';
 
-class BlogService {
+export class BlogService {
+
+  constructor(protected blogRepository: BlogRepository) {
+  }
+
   async createBlog(body: CreateBlogRequestView): Promise<Result<string | null>> {
     try {
       const blog = new Blog(
@@ -13,7 +17,7 @@ class BlogService {
         false,
       );
 
-      const { data: blogId } = await blogRepository.createBlog(blog);
+      const { data: blogId } = await this.blogRepository.createBlog(blog);
 
       return { data: blogId, status: ResultStatus.Success };
 
@@ -27,7 +31,7 @@ class BlogService {
 
   async updateBlog(id: string, data: UpdateBlogRequestView): Promise<Result<null>> {
     try {
-      const { status } = await blogRepository.updateBlogById(id, data);
+      const { status } = await this.blogRepository.updateBlogById(id, data);
 
       return { data: null, status };
     } catch (error) {
@@ -40,7 +44,7 @@ class BlogService {
 
   async deleteBlog(id: string): Promise<Result<null>> {
     try {
-      const { status } = await blogRepository.deleteBlogById(id);
+      const { status } = await this.blogRepository.deleteBlogById(id);
 
       return { data: null, status };
     } catch (error) {
@@ -51,5 +55,3 @@ class BlogService {
     }
   }
 }
-
-export const blogService = new BlogService();

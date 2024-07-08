@@ -1,7 +1,7 @@
 import jwt, { Jwt, JwtPayload, Secret, SignOptions, VerifyOptions } from 'jsonwebtoken';
 import { SETTINGS } from '../utils/settings';
 
-class JwtService {
+export class JwtService {
   private readonly secret: Secret;
 
   constructor(secret: Secret) {
@@ -31,4 +31,4 @@ class JwtService {
   }
 }
 
-export const jwtService = new JwtService(SETTINGS.JWT_SECRET_KEY!);
+//export const jwtService = new JwtService(SETTINGS.JWT_SECRET_KEY!);

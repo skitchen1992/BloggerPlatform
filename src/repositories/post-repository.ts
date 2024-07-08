@@ -8,7 +8,7 @@ import { PostDTO } from '../dto/post-dto';
 import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-class PostRepository {
+export class PostRepository {
   public async getPostById(id: string): Promise<Result<PostDTO | null>> {
     const post = await PostModel.findById(id);
 
@@ -78,4 +78,4 @@ class PostRepository {
   }
 }
 
-export const postRepository = new PostRepository();
+

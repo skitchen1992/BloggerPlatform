@@ -1,15 +1,21 @@
 import { Result, ResultStatus } from '../types/common/result';
 import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
-import { blogRepository } from '../repositories/blog-repository';
 import { UpdatePostRequestView } from '../view';
-import { postRepository } from '../repositories/post-repository';
 import { Post } from '../dto/new-post-dto';
+import { BlogRepository } from '../repositories/blog-repository';
+import { PostRepository } from '../repositories/post-repository';
 
-class PostService {
+export class PostService {
+
+  constructor(protected blogRepository: BlogRepository,
+              protected postRepository: PostRepository,
+  ) {
+  }
+
   async createPost(body: CreatePostForBlogRequestView, params: { blogId: string }): Promise<Result<string | null>> {
     try {
 
-      const { status, data } = await blogRepository.getBlogById(params.blogId);
+      const { status, data } = await this.blogRepository.getBlogById(params.blogId);
 
       if (status === ResultStatus.NotFound) {
         return { data: null, status: ResultStatus.NotFound };
@@ -22,7 +28,7 @@ class PostService {
         data!.name,
         data!.id);
 
-      const { data: postId } = await postRepository.createPost(post);
+      const { data: postId } = await this.postRepository.createPost(post);
 
       return { data: postId, status: ResultStatus.Success };
     } catch (error) {
@@ -37,7 +43,7 @@ class PostService {
     blogId: string
   }): Promise<Result<string | null>> {
     try {
-      const { status, data } = await blogRepository.getBlogById(params.blogId);
+      const { status, data } = await this.blogRepository.getBlogById(params.blogId);
 
       if (status === ResultStatus.NotFound) {
         return { data: null, status: ResultStatus.NotFound };
@@ -48,10 +54,10 @@ class PostService {
         body.shortDescription,
         body.content,
         data!.name,
-        data!.id
+        data!.id,
       );
 
-      const { data: postId } = await postRepository.createPost(post);
+      const { data: postId } = await this.postRepository.createPost(post);
 
       return { data: postId, status: ResultStatus.Success };
     } catch (error) {
@@ -64,7 +70,7 @@ class PostService {
 
   async updatePost(id: string, data: UpdatePostRequestView) {
     try {
-      const { status } = await postRepository.updatePostById(id, data);
+      const { status } = await this.postRepository.updatePostById(id, data);
 
       return { data: null, status };
     } catch (error) {
@@ -77,7 +83,7 @@ class PostService {
 
   async deletePost(id: string) {
     try {
-      const { status } = await postRepository.deletePostById(id);
+      const { status } = await this.postRepository.deletePostById(id);
 
       return { data: null, status };
 
@@ -89,5 +95,3 @@ class PostService {
     }
   };
 }
-
-export const postService = new PostService();

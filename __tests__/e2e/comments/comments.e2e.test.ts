@@ -1,6 +1,6 @@
 import { createAuthorizationHeader, createBearerAuthorizationHeader } from '../../test-helpers';
 import { HTTP_STATUSES, PATH_URL } from '../../../src/utils/consts';
-import { SETTINGS } from '../../../src/utils/settings';;
+import { SETTINGS } from '../../../src/utils/settings';
 import { ID } from './datasets';
 import { BlogModel } from '../../../src/models/blog';
 import { testSeeder } from '../../test.seeder';

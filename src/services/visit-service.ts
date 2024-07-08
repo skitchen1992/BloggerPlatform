@@ -1,13 +1,15 @@
-import { ObjectId } from 'mongodb';
 import { Result, ResultStatus } from '../types/common/result';
 import { subtractSeconds } from '../utils/dates/dates';
-import { visitRepository } from '../repositories/visit-repository';
 import { Visit } from '../dto/new-visit-dto';
+import { VisitRepository } from '../repositories/visit-repository';
 
-class VisitService {
+export class VisitService {
+
+  constructor(protected visitRepository: VisitRepository) {
+  }
   async calculateVisit(ip: string, url: string): Promise<Result<string | null>> {
     try {
-      const totalCount: number = await visitRepository.getDocumentsCount(ip, url, subtractSeconds(new Date(), 10));
+      const totalCount: number = await this.visitRepository.getDocumentsCount(ip, url, subtractSeconds(new Date(), 10));
 
       if (totalCount > 4) {
         return { status: ResultStatus.BadRequest, data: null };
@@ -15,7 +17,7 @@ class VisitService {
 
       const visit = new Visit(ip, url);
 
-      const { data: visitId } = await visitRepository.createVisit(visit);
+      const { data: visitId } = await this.visitRepository.createVisit(visit);
 
       return { data: visitId, status: ResultStatus.Success };
 
@@ -27,5 +29,3 @@ class VisitService {
     }
   }
 }
-
-export const visitService = new VisitService();

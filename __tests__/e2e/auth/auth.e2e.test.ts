@@ -2,12 +2,10 @@ import { HTTP_STATUSES, PATH_URL, RECOVERY_PASS_TOKEN_EXPIRED } from '../../../s
 import { createAuthorizationHeader } from '../../test-helpers';
 import { SETTINGS } from '../../../src/utils/settings';
 import { testSeeder } from '../../test.seeder';
-import { userService } from '../../../src/services/user-service';
 import { req } from '../../jest.setup';
-import { authService } from '../../../src/services/auth-service';
-import { userRepository } from '../../../src/repositories/user-repository';
 import { ResultStatus } from '../../../src/types/common/result';
-import { jwtService } from '../../../src/services/jwt-service';
+import { authService, jwtService, userRepository, userService } from '../../../src/compositions/composition-root';
+
 
 describe(`Endpoint (POST) - ${PATH_URL.AUTH.LOGIN}`, () => {
   it(`Should get status ${HTTP_STATUSES.NO_CONTENT_204}`, async () => {

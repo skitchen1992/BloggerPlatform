@@ -6,7 +6,7 @@ import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
 import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-middleware';
 import { validateCommentsPutSchema } from '../middlewares/comments';
-import { commentController } from '../controllers/comment-controller';
+import { commentController } from '../compositions/composition-root';
 
 export const commentsRouter = Router();
 
@@ -14,7 +14,7 @@ commentsRouter.get(
   PATH_URL.COMMENT_ID,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  commentController.getCommentById
+  commentController.getCommentById.bind(commentController)
 );
 
 commentsRouter.put(
@@ -23,7 +23,7 @@ commentsRouter.put(
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateCommentsPutSchema),
   errorHandlingMiddleware<UpdateCommentRequestView>,
-  commentController.updateComment
+  commentController.updateComment.bind(commentController)
 );
 
 commentsRouter.delete(
@@ -31,5 +31,5 @@ commentsRouter.delete(
   bearerTokenAuthMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  commentController.deleteComment
+  commentController.deleteComment.bind(commentController)
 );

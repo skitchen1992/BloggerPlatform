@@ -6,7 +6,7 @@ import { CreateUserRequestView } from '../view';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { validateUserPostSchema } from '../middlewares/users';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
-import { userController } from '../controllers/user-controller';
+import { userController } from '../compositions/composition-root';
 
 export const usersRouter = Router();
 
@@ -15,7 +15,7 @@ usersRouter.get(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(getUsersQueryParams),
   errorHandlingMiddleware<CreateUserRequestView>,
-  userController.getUsers
+  userController.getUsers.bind(userController),
 );
 
 usersRouter.post(
@@ -24,7 +24,7 @@ usersRouter.post(
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateUserPostSchema),
   errorHandlingMiddleware<CreateUserRequestView>,
-  userController.createUser
+  userController.createUser.bind(userController),
 );
 
 usersRouter.delete(
@@ -32,5 +32,5 @@ usersRouter.delete(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  userController.deleteUser
+  userController.deleteUser.bind(userController),
 );

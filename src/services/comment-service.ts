@@ -1,13 +1,13 @@
 import { ResultStatus } from '../types/common/result';
 import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
-import { commentRepository } from '../repositories/comment-repository';
 import { CreateCommentRequestView, GetUserResponseView } from '../view';
-import { ObjectId } from 'mongodb';
-import { ICommentSchema } from '../models/comment';
-import { getDateFromObjectId } from '../utils/dates/dates';
 import { Comment } from '../dto/new-comment-dto';
+import { CommentRepository } from '../repositories/comment-repository';
 
-class CommentService {
+export class CommentService {
+
+  constructor(protected commentRepository: CommentRepository) {
+  }
 
   async createComment(
     body: CreateCommentRequestView,
@@ -21,7 +21,7 @@ class CommentService {
         params.postId,
       );
 
-      const { data: commentId } = await commentRepository.createComment(comment);
+      const { data: commentId } = await this.commentRepository.createComment(comment);
 
       return { data: commentId, status: ResultStatus.Success };
 
@@ -35,7 +35,7 @@ class CommentService {
 
   async updateComment(id: string, data: UpdateCommentRequestView) {
     try {
-      const { status } = await commentRepository.updateCommentById(id, data);
+      const { status } = await this.commentRepository.updateCommentById(id, data);
 
       return { data: null, status: status };
     } catch (error) {
@@ -48,7 +48,7 @@ class CommentService {
 
   async deleteComment(id: string) {
     try {
-      const { status } = await commentRepository.deleteCommentById(id);
+      const { status } = await this.commentRepository.deleteCommentById(id);
       return { data: null, status: status };
 
     } catch (error) {
@@ -59,5 +59,3 @@ class CommentService {
     }
   };
 }
-
-export const commentService = new CommentService();

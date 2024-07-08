@@ -16,17 +16,25 @@ import {
 } from '../view';
 import { HTTP_STATUSES } from '../utils/consts';
 import { Response } from 'express';
-import { postRepository } from '../repositories/post-repository';
 import { ResultStatus } from '../types/common/result';
-import { postService } from '../services/post-service';
 import { CreateCommentSchemaResponseView } from '../view/comments/CreateCommentSchemaResponseView';
-import { commentRepository } from '../repositories/comment-repository';
-import { commentService } from '../services/comment-service';
+import { CommentRepository } from '../repositories/comment-repository';
+import { CommentService } from '../services/comment-service';
+import { PostRepository } from '../repositories/post-repository';
+import { PostService } from '../services/post-service';
 
-class PostController {
+export class PostController {
+  constructor(
+    protected postRepository: PostRepository,
+    protected postService: PostService,
+    protected commentRepository: CommentRepository,
+    protected commentService: CommentService,
+  ) {
+  }
+
   async getPosts(req: RequestWithQuery<GetPostsQuery>, res: Response<GetPostListResponseView>) {
     try {
-      const { data } = await postRepository.getPosts(req.query);
+      const { data } = await this.postRepository.getPosts(req.query);
 
       res.status(HTTP_STATUSES.OK_200).json(data);
     } catch (e) {
@@ -35,9 +43,11 @@ class PostController {
     }
   };
 
-  async getPostById(req: RequestWithParams<{ id: string }>, res: Response<GetPostResponseView | ResponseErrorResponseView>) {
+  async getPostById(req: RequestWithParams<{
+    id: string
+  }>, res: Response<GetPostResponseView | ResponseErrorResponseView>) {
     try {
-      const { data, status } = await postRepository.getPostById(req.params.id);
+      const { data, status } = await this.postRepository.getPostById(req.params.id);
 
       if (status === ResultStatus.Success && data) {
         res.status(HTTP_STATUSES.OK_200).json(data);
@@ -55,10 +65,10 @@ class PostController {
       const {
         data: postId,
         status: postStatus,
-      } = await postService.createPost(req.body, { blogId: req.body.blogId });
+      } = await this.postService.createPost(req.body, { blogId: req.body.blogId });
 
       if (postStatus === ResultStatus.Success && postId) {
-        const { data, status } = await postRepository.getPostById(postId);
+        const { data, status } = await this.postRepository.getPostById(postId);
 
         if (status === ResultStatus.Success) {
           res.status(HTTP_STATUSES.CREATED_201).json(data!);
@@ -80,7 +90,7 @@ class PostController {
 
   async updatePost(req: RequestWithParamsAndBody<UpdatePostRequestView, { id: string }>, res: Response) {
     try {
-      const { status } = await postService.updatePost(req.params.id, req.body);
+      const { status } = await this.postService.updatePost(req.params.id, req.body);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -98,7 +108,7 @@ class PostController {
 
   async deletePost(req: RequestWithParams<{ id: string }>, res: Response) {
     try {
-      const { status } = await postService.deletePost(req.params.id);
+      const { status } = await this.postService.deletePost(req.params.id);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -119,10 +129,13 @@ class PostController {
     res: Response<CreateCommentSchemaResponseView | ResponseErrorResponseView>,
   ) {
     try {
-      const { data: commentId, status } = await commentService.createComment(req.body, req.params, res.locals.user!);
+      const {
+        data: commentId,
+        status,
+      } = await this.commentService.createComment(req.body, req.params, res.locals.user!);
 
       if (status === ResultStatus.Success && commentId) {
-        const { data, status } = await commentRepository.getCommentById(commentId);
+        const { data, status } = await this.commentRepository.getCommentById(commentId);
 
         if (status === ResultStatus.Success) {
           res.status(HTTP_STATUSES.CREATED_201).json(data!);
@@ -151,7 +164,7 @@ class PostController {
     res: Response<GetCommentListRequestView>,
   ) {
     try {
-      const { data: comments } = await commentRepository.getComments(req.query, { postId: req.params.postId });
+      const { data: comments } = await this.commentRepository.getComments(req.query, { postId: req.params.postId });
 
       res.status(HTTP_STATUSES.OK_200).json(comments);
     } catch (e) {
@@ -160,5 +173,3 @@ class PostController {
     }
   };
 }
-
-export const postController = new PostController();

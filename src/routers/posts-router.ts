@@ -10,7 +10,7 @@ import { validateCreateCommentSchema } from '../middlewares/posts/validate-schem
 import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-middleware';
 import { checkBlogExistsMiddleware } from '../middlewares/check-blog-exists-middleware';
 import { checkPostExistsMiddleware } from '../middlewares/check-post-exists-middleware';
-import { postController } from '../controllers/post-controller';
+import { postController } from '../compositions/composition-root';
 
 export const postsRouter = Router();
 
@@ -18,14 +18,14 @@ postsRouter.get(
   PATH_URL.ROOT,
   sanitizerQueryMiddleware(getPostsQueryParams),
   errorHandlingMiddleware,
-  postController.getPosts,
+  postController.getPosts.bind(postController),
 );
 
 postsRouter.get(
   PATH_URL.ID,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  postController.getPostById,
+  postController.getPostById.bind(postController),
 );
 
 postsRouter.post(
@@ -35,7 +35,7 @@ postsRouter.post(
   checkExactMiddleware(validateCreatePostSchema),
   checkBlogExistsMiddleware.body('blogId'),
   errorHandlingMiddleware<CreatePostViewResponseView>,
-  postController.createPost,
+  postController.createPost.bind(postController),
 );
 
 postsRouter.put(
@@ -45,7 +45,7 @@ postsRouter.put(
   checkExactMiddleware(validateUpdatePostSchema),
   checkBlogExistsMiddleware.body('blogId'),
   errorHandlingMiddleware<UpdatePostRequestView>,
-  postController.updatePost,
+  postController.updatePost.bind(postController),
 );
 
 postsRouter.delete(
@@ -53,7 +53,7 @@ postsRouter.delete(
   basicAuthMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
-  postController.deletePost,
+  postController.deletePost.bind(postController),
 );
 
 postsRouter.post(
@@ -63,7 +63,7 @@ postsRouter.post(
   checkExactMiddleware(validateCreateCommentSchema),
   checkPostExistsMiddleware.urlParams('postId'),
   errorHandlingMiddleware<CreateCommentRequestView>,
-  postController.createComment,
+  postController.createComment.bind(postController),
 );
 
 postsRouter.get(
@@ -71,5 +71,5 @@ postsRouter.get(
   sanitizerQueryMiddleware(getPostsQueryParams),
   checkPostExistsMiddleware.urlParams('postId'),
   errorHandlingMiddleware,
-  postController.getCommentsForPost,
+  postController.getCommentsForPost.bind(postController),
 );

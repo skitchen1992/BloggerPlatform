@@ -7,7 +7,7 @@ import { CommentListDTO } from '../dto/comment-list-dto';
 import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-class CommentRepository {
+export class CommentRepository {
   public async getCommentById(id: string) {
     const comment = await CommentModel.findById(id).lean();
 
@@ -78,5 +78,3 @@ class CommentRepository {
     }
   }
 }
-
-export const commentRepository = new CommentRepository();
