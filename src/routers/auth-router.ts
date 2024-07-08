@@ -5,7 +5,7 @@ import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middlew
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { validateAuthPostSchema } from '../middlewares/auth';
 import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-middleware';
-import { AuthUserRequestView } from '../view';
+import { AuthUserRequestView } from '../view-model';
 import { validateAuthRegistrationSchema } from '../middlewares/auth/validate-schemas/validate-auth-registration-schema';
 import { validateAuthRegistrationConfirmationSchema } from '../middlewares/auth/validate-schemas/validate-auth-registration-confirmation-schema';
 import { validateAuthRegistrationResendingSchema } from '../middlewares/auth/validate-schemas/validate-auth-registration-resending-schema';

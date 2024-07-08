@@ -7,18 +7,18 @@ import {
   AuthUserRequestView,
   AuthUserSchemaResponseView,
   ResponseErrorResponseView,
-} from '../view';
+} from '../view-model';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { UserRepository } from '../repositories/user-repository';
 import { AuthService } from '../services/auth-service';
 import { JwtPayload } from 'jsonwebtoken';
-import { AuthRegistrationRequestView } from '../view/auth/AuthRegistrationRequestView';
-import { AuthRegistrationConfirmationRequestView } from '../view/auth/AuthRegistrationConfirmationRequestView';
+import { AuthRegistrationRequestView } from '../view-model/auth/AuthRegistrationRequestView';
+import { AuthRegistrationConfirmationRequestView } from '../view-model/auth/AuthRegistrationConfirmationRequestView';
 import { getCurrentDate, isExpiredDate } from '../utils/dates/dates';
-import { AuthRegistrationResendingRequestView } from '../view/auth/AuthRegistrationResendingRequestView';
+import { AuthRegistrationResendingRequestView } from '../view-model/auth/AuthRegistrationResendingRequestView';
 import { ObjectId } from 'mongodb';
-import { RecoveryPassRequestView } from '../view/auth/RecoveryPassRequestView';
-import { NewPassRequestView } from '../view/auth/NewPassRequestView';
+import { RecoveryPassRequestView } from '../view-model/auth/RecoveryPassRequestView';
+import { NewPassRequestView } from '../view-model/auth/NewPassRequestView';
 import { EmailService } from '../services/email-service';
 import { UserService } from '../services/user-service';
 import { JwtService } from '../services/jwt-service';

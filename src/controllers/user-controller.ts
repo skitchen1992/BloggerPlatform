@@ -4,7 +4,7 @@ import { GetUsersQuery } from '../types/users-types';
 import { UserRepository } from '../repositories/user-repository';
 import { HTTP_STATUSES } from '../utils/consts';
 import { ResultStatus } from '../types/common/result';
-import { CreateUserRequestView, CreateUserSchemaResponseView, ResponseErrorResponseView } from '../view';
+import { CreateUserRequestView, CreateUserSchemaResponseView, ResponseErrorResponseView } from '../view-model';
 import { UserService } from '../services/user-service';
 
 export class UserController {

@@ -21,6 +21,8 @@ import { CommentController } from '../controllers/comment-controller';
 import { PostController } from '../controllers/post-controller';
 import { SecurityController } from '../controllers/device-controller';
 import { UserController } from '../controllers/user-controller';
+import { LikeService } from '../services/like-service';
+import { LikeRepository } from '../repositories/like-repository';
 
 export const mailerService = new MailerService();
 export const emailService = new EmailService(mailerService);
@@ -33,6 +35,7 @@ export const commentRepository = new CommentRepository();
 export const postRepository = new PostRepository();
 export const sessionRepository = new SessionRepository();
 export const visitRepository = new VisitRepository();
+export const likeRepository = new LikeRepository();
 
 
 export const authService = new AuthService(
@@ -46,6 +49,7 @@ export const commentService = new CommentService(commentRepository);
 export const deviseService = new DeviceService(jwtService, sessionRepository);
 export const postService = new PostService(blogRepository, postRepository);
 export const visitService = new VisitService(visitRepository);
+export const likeService = new LikeService(likeRepository);
 
 export const authController = new AuthController(
   authService,
@@ -65,6 +69,7 @@ export const blogController = new BlogController(
 export const commentController = new CommentController(
   commentService,
   commentRepository,
+  likeService,
 );
 
 export const postController = new PostController(

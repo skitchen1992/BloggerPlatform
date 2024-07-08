@@ -22,6 +22,7 @@ export const SETTINGS = {
       COMMENTS: 'comments',
       DEVICE_AUTH_SESSIONS: 'deviceAuthSessions',
       VISITS: 'visits',
+      LIKES: 'likes',
     },
   },
 };

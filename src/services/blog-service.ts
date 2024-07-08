@@ -1,4 +1,4 @@
-import { CreateBlogRequestView, UpdateBlogRequestView } from '../view';
+import { CreateBlogRequestView, UpdateBlogRequestView } from '../view-model';
 import { Result, ResultStatus } from '../types/common/result';
 import { Blog } from '../dto/new-blog-dto';
 import { BlogRepository } from '../repositories/blog-repository';

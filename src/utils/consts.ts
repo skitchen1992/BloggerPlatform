@@ -25,6 +25,7 @@ export const PATH_URL = {
   BLOGS: '/blogs',
   POSTS_FOR_BLOG: '/:blogId/posts',
   COMMENT_FOR_POST: '/:postId/comments',
+  LIKE_STATUS: '/:commentId/like-status',
   COMMENTS: '/comments',
   POSTS: '/posts',
   USERS: '/users',
@@ -55,7 +56,7 @@ export const COOKIE_KEY = {
   REFRESH_TOKEN: 'refreshToken',
 };
 
-export const ACCESS_TOKEN_EXPIRED_IN = 10;
+export const ACCESS_TOKEN_EXPIRED_IN = "1h";
 export const REFRESH_TOKEN_EXPIRED_IN = 20;
 export const RECOVERY_PASS_TOKEN_EXPIRED = "1h";
 

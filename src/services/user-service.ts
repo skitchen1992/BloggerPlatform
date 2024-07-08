@@ -1,4 +1,4 @@
-import { CreateUserRequestView } from '../view';
+import { CreateUserRequestView } from '../view-model';
 import { hashBuilder } from '../utils/helpers';
 import { Result, ResultStatus } from '../types/common/result';
 import { User } from '../dto/new-user-dto';

@@ -1,6 +1,6 @@
 import { ResultStatus } from '../types/common/result';
-import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
-import { CreateCommentRequestView, GetUserResponseView } from '../view';
+import { UpdateCommentRequestView } from '../view-model/comments/UpdateCommentRequestView';
+import { CreateCommentRequestView, GetUserResponseView } from '../view-model';
 import { Comment } from '../dto/new-comment-dto';
 import { CommentRepository } from '../repositories/comment-repository';
 

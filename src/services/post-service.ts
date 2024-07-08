@@ -1,6 +1,6 @@
 import { Result, ResultStatus } from '../types/common/result';
-import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
-import { UpdatePostRequestView } from '../view';
+import { CreatePostForBlogRequestView } from '../view-model/posts/CreatePostForBlogRequestView';
+import { UpdatePostRequestView } from '../view-model';
 import { Post } from '../dto/new-post-dto';
 import { BlogRepository } from '../repositories/blog-repository';
 import { PostRepository } from '../repositories/post-repository';

@@ -1,5 +1,5 @@
 import { RequestWithBody } from '../types/request-types';
-import { ResponseErrorResponseView, ErrorMessageResponseView } from '../view';
+import { ResponseErrorResponseView, ErrorMessageResponseView } from '../view-model';
 import { NextFunction, Response } from 'express';
 import { Result, validationResult } from 'express-validator';
 import { HTTP_STATUSES } from '../utils/consts';

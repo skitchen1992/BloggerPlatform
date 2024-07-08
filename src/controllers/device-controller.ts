@@ -1,6 +1,6 @@
 import { RequestEmpty, RequestWithParams } from '../types/request-types';
 import { Response } from 'express';
-import { GetDeviceResponseView } from '../view';
+import { GetDeviceResponseView } from '../view-model';
 import { COOKIE_KEY, HTTP_STATUSES } from '../utils/consts';
 import { JwtPayload } from 'jsonwebtoken';
 import { ResultStatus } from '../types/common/result';

@@ -13,11 +13,11 @@ import {
   GetPostResponseView,
   ResponseErrorResponseView,
   UpdatePostRequestView, CreateCommentRequestView, GetCommentListRequestView,
-} from '../view';
+} from '../view-model';
 import { HTTP_STATUSES } from '../utils/consts';
 import { Response } from 'express';
 import { ResultStatus } from '../types/common/result';
-import { CreateCommentSchemaResponseView } from '../view/comments/CreateCommentSchemaResponseView';
+import { CreateCommentSchemaResponseView } from '../view-model/comments/CreateCommentSchemaResponseView';
 import { CommentRepository } from '../repositories/comment-repository';
 import { CommentService } from '../services/comment-service';
 import { PostRepository } from '../repositories/post-repository';

@@ -3,7 +3,7 @@ import { PATH_URL } from '../utils/consts';
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
-import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
+import { UpdateCommentRequestView } from '../view-model/comments/UpdateCommentRequestView';
 import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-middleware';
 import { validateCommentsPutSchema } from '../middlewares/comments';
 import { commentController } from '../compositions/composition-root';
@@ -32,4 +32,12 @@ commentsRouter.delete(
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   commentController.deleteComment.bind(commentController)
+);
+
+commentsRouter.put(
+  PATH_URL.LIKE_STATUS,
+  bearerTokenAuthMiddleware,
+  sanitizerQueryMiddleware(),
+  errorHandlingMiddleware,
+  commentController.createLikeForComment.bind(commentController)
 );

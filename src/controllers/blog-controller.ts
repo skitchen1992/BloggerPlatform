@@ -8,7 +8,7 @@ import {
   GetPostListResponseView,
   ResponseErrorResponseView,
   UpdateBlogRequestView,
-} from '../view';
+} from '../view-model';
 import {
   RequestWithBody,
   RequestWithParams,
@@ -20,7 +20,7 @@ import { GetBlogsQuery } from '../types/blog-types';
 import { HTTP_STATUSES } from '../utils/consts';
 import { GetPostsQuery } from '../types/post-types';
 import { ResultStatus } from '../types/common/result';
-import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
+import { CreatePostForBlogRequestView } from '../view-model/posts/CreatePostForBlogRequestView';
 import { BlogRepository } from '../repositories/blog-repository';
 import { BlogService } from '../services/blog-service';
 import { PostRepository } from '../repositories/post-repository';

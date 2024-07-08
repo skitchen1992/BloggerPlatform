@@ -1,17 +1,22 @@
 import { RequestWithParams, RequestWithParamsAndBody } from '../types/request-types';
-import { GetCommentResponseView } from '../view';
+import { GetCommentResponseView } from '../view-model';
 import { HTTP_STATUSES } from '../utils/consts';
 import { Response } from 'express';
 import { ResultStatus } from '../types/common/result';
-import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
+import { UpdateCommentRequestView } from '../view-model/comments/UpdateCommentRequestView';
 import { CommentService } from '../services/comment-service';
 import { CommentRepository } from '../repositories/comment-repository';
+import { LikeService } from '../services/like-service';
+import { CreateLikeRequestView } from '../view-model/likes/CreateLikeRequestView';
+import { ParentType } from '../models/like';
 
 export class CommentController {
 
   constructor(
     protected commentService: CommentService,
-    protected commentRepository: CommentRepository) {
+    protected commentRepository: CommentRepository,
+    protected likeService: LikeService,
+  ) {
   }
 
   async getCommentById(
@@ -71,6 +76,34 @@ export class CommentController {
       res.sendStatus(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
     }
   };
+
+  async createLikeForComment(req: RequestWithParamsAndBody<CreateLikeRequestView, {
+    commentId: string
+  }>, res: Response) {
+    try {
+      const currentUserId = res.locals.user?.id.toString();
+
+      const {
+        data,
+        status,
+      } = await this.likeService.createLike(req.body.likeStatus, currentUserId!, req.params.commentId, ParentType.COMMENT);
+
+      if (status === ResultStatus.Success) {
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+        return;
+      }
+
+      if (status === ResultStatus.NotFound) {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+        return;
+      }
+
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
+    }
+  };
+
 
   async deleteComment(req: RequestWithParams<{ commentId: string }>, res: Response) {
     try {

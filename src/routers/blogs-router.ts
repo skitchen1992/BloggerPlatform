@@ -4,8 +4,8 @@ import { validateBlogPostSchema, validateBlogPutSchema } from '../middlewares/bl
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
-import { CreateBlogRequestView, UpdateBlogRequestView } from '../view';
-import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
+import { CreateBlogRequestView, UpdateBlogRequestView } from '../view-model';
+import { CreatePostForBlogRequestView } from '../view-model/posts/CreatePostForBlogRequestView';
 import {
   validateCreatePostForBlogSchema,
 } from '../middlewares/blogs/validate-schemas/validate-create-post-for-blog-schema';

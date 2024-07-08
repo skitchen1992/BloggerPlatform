@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getUsersQueryParams, PATH_URL } from '../utils/consts';
 import { errorHandlingMiddleware } from '../middlewares/error-handling-middleware';
 import { sanitizerQueryMiddleware } from '../middlewares/sanitizer-query-middleware';
-import { CreateUserRequestView } from '../view';
+import { CreateUserRequestView } from '../view-model';
 import { checkExactMiddleware } from '../middlewares/check-exact-middleware';
 import { validateUserPostSchema } from '../middlewares/users';
 import { basicAuthMiddleware } from '../middlewares/basic-auth-middleware';
