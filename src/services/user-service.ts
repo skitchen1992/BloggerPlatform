@@ -1,32 +1,27 @@
 import { CreateUserRequestView } from '../view';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { Result, ResultStatus } from '../types/common/result';
-import { add, getDateFromObjectId } from '../utils/dates/dates';
-import { IUserSchema } from '../models/user';
-import { ObjectId } from 'mongodb';
+import { add } from '../utils/dates/dates';
 import { userRepository } from '../repositories/user-repository';
+import { User } from '../dto/new-user-dto';
 
 class UserService {
   async createUser(body: CreateUserRequestView): Promise<Result<string | null>> {
     try {
       const passwordHash = await hashBuilder.hash(body.password);
 
-      const id = new ObjectId();
-
-      const newUser: IUserSchema = {
-        login: body.login,
-        password: passwordHash,
-        email: body.email,
-        createdAt: getDateFromObjectId(id),
-        emailConfirmation: {
+      const user = new User(
+        body.login,
+        passwordHash,
+        body.email,
+        {
           isConfirmed: false,
           confirmationCode: getUniqueId(),
           expirationDate: add(new Date(), { hours: 1 }),
         },
-        _id: id,
-      };
+      );
 
-      const { data: userId } = await userRepository.createUser(newUser);
+      const { data: userId } = await userRepository.createUser(user);
 
       return { data: userId, status: ResultStatus.Success };
 

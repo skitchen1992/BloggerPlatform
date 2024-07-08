@@ -7,8 +7,7 @@ import { UserDTO } from '../dto/user-dto';
 import { UserListDTO } from '../dto/user-list-dto';
 import { ObjectId } from 'mongodb';
 import { UpdateQuery } from 'mongoose';
-import { CommentModel, ICommentSchema } from '../models/comment';
-import { BlogModel } from '../models/blog';
+
 
 class UserRepository {
   public async getUserById(id: string): Promise<Result<UserDTO | null>> {

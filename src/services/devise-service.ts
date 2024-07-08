@@ -2,6 +2,7 @@ import { ResultStatus } from '../types/common/result';
 import { jwtService } from './jwt-service';
 import { JwtPayload } from 'jsonwebtoken';
 import { sessionRepository } from '../repositories/session-repository';
+import { Session } from '../dto/new-session-dto';
 
 class DeviceService {
   async deleteDeviceList(refreshToken: string) {
@@ -17,18 +18,18 @@ class DeviceService {
       if (deviceAuthSession) {
         await sessionRepository.deleteSessionList();
 
-        const newSession = {
-          _id: deviceAuthSession._id,
-          userId: deviceAuthSession.userId,
-          ip: deviceAuthSession.ip,
-          title: deviceAuthSession.title,
-          lastActiveDate: deviceAuthSession.lastActiveDate,
-          tokenIssueDate: deviceAuthSession.tokenIssueDate,
-          tokenExpirationDate: deviceAuthSession.tokenExpirationDate,
-          deviceId: deviceAuthSession.deviceId,
-        };
+        const session = new Session(
+          deviceAuthSession._id,
+          deviceAuthSession.userId,
+          deviceAuthSession.ip,
+          deviceAuthSession.title,
+          deviceAuthSession.lastActiveDate,
+          deviceAuthSession.tokenIssueDate,
+          deviceAuthSession.tokenExpirationDate,
+          deviceAuthSession.deviceId,
+        );
 
-        await sessionRepository.createSession(newSession);
+        await sessionRepository.createSession(session);
 
         return { status: ResultStatus.Success, data: null };
       } else {

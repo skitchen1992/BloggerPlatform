@@ -12,6 +12,7 @@ import { sessionRepository } from '../repositories/session-repository';
 import { JwtPayload } from 'jsonwebtoken';
 import { userRepository } from '../repositories/user-repository';
 import { emailService } from './email-service';
+import { Session } from '../dto/new-session-dto';
 
 
 type Payload = {
@@ -32,18 +33,17 @@ class AuthService {
 
       const refreshToken = jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
 
-      const data = {
-        _id: objectId,
+      const session = new Session(
+        objectId,
         userId,
         ip,
         title,
-        lastActiveDate: getDateFromObjectId(objectId),
-        tokenIssueDate: getDateFromObjectId(objectId),
-        tokenExpirationDate: jwtService.getTokenExpirationDate(refreshToken),
-        deviceId,
-      };
+        getDateFromObjectId(objectId),
+        getDateFromObjectId(objectId),
+        jwtService.getTokenExpirationDate(refreshToken),
+        deviceId);
 
-      await sessionRepository.createSession(data);
+      await sessionRepository.createSession(session);
 
       return { status: ResultStatus.Success, data: { refreshToken, accessToken } };
     } catch (error) {

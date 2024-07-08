@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { Result, ResultStatus } from '../types/common/result';
-import { getDateFromObjectId, subtractSeconds } from '../utils/dates/dates';
+import { subtractSeconds } from '../utils/dates/dates';
 import { visitRepository } from '../repositories/visit-repository';
-import { VisitModel } from '../models/visit';
+import { Visit } from '../dto/new-visit-dto';
 
 class VisitService {
   async calculateVisit(ip: string, url: string): Promise<Result<string | null>> {
@@ -13,19 +13,11 @@ class VisitService {
         return { status: ResultStatus.BadRequest, data: null };
       }
 
-      const objectId = new ObjectId();
+      const visit = new Visit(ip, url);
 
-      const newVisit = new VisitModel({
-        ip,
-        url,
-        date: getDateFromObjectId(objectId),
-        _id: objectId,
-      });
+      const { data: visitId } = await visitRepository.createVisit(visit);
 
-
-      const savedVisit = await newVisit.save();
-
-      return { data: savedVisit._id.toString(), status: ResultStatus.Success };
+      return { data: visitId, status: ResultStatus.Success };
 
     } catch (error) {
       console.log(`Visit not created: ${error}`);

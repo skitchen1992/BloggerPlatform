@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import { SETTINGS } from '../utils/settings';
 
-export interface IVisitSchema extends Document {
+export interface IVisitSchema {
   _id: ObjectId;
   ip: string;
   url: string;

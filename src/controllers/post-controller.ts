@@ -21,6 +21,7 @@ import { ResultStatus } from '../types/common/result';
 import { postService } from '../services/post-service';
 import { CreateCommentSchemaResponseView } from '../view/comments/CreateCommentSchemaResponseView';
 import { commentRepository } from '../repositories/comment-repository';
+import { commentService } from '../services/comment-service';
 
 class PostController {
   async getPosts(req: RequestWithQuery<GetPostsQuery>, res: Response<GetPostListResponseView>) {
@@ -118,7 +119,7 @@ class PostController {
     res: Response<CreateCommentSchemaResponseView | ResponseErrorResponseView>,
   ) {
     try {
-      const { data: commentId, status } = await postService.createComment(req.body, req.params, res.locals.user!);
+      const { data: commentId, status } = await commentService.createComment(req.body, req.params, res.locals.user!);
 
       if (status === ResultStatus.Success && commentId) {
         const { data, status } = await commentRepository.getCommentById(commentId);

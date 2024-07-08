@@ -24,6 +24,7 @@ import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogReq
 import { blogRepository } from '../repositories/blog-repository';
 import { postRepository } from '../repositories/post-repository';
 import { blogService } from '../services/blog-service';
+import { postService } from '../services/post-service';
 
 class BlogController {
   async getBlogs(req: RequestWithQuery<GetBlogsQuery>, res: Response<GetBlogListRequestView>) {
@@ -99,7 +100,7 @@ class BlogController {
     res: Response<CreatePostSchemaResponseView | ResponseErrorResponseView>,
   ) {
     try {
-      const { data: postId, status: blogStatus } = await blogService.createPostForBlog(req.body, req.params);
+      const { data: postId, status: blogStatus } = await postService.createPostForBlog(req.body, req.params);
 
       if (blogStatus === ResultStatus.NotFound) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
