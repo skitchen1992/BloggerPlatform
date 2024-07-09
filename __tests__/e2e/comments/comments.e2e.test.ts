@@ -5,9 +5,9 @@ import { ID } from './datasets';
 import { BlogModel } from '../../../src/models/blog';
 import { testSeeder } from '../../test.seeder';
 import { CommentModel } from '../../../src/models/comment';
-import { CommentMapper } from '../../../src/mappers/comment-mapper';
 import { PostModel } from '../../../src/models/post';
 import { req } from '../../jest.setup';
+import { LikeStatus } from '../../../src/models/like';
 
 
 describe(`Endpoint (GET) - ${PATH_URL.COMMENTS}`, () => {
@@ -17,7 +17,22 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENTS}`, () => {
 
     const res = await req.get(`${PATH_URL.COMMENTS}/${commentId}`).expect(HTTP_STATUSES.OK_200);
 
-    expect(res.body).toEqual(CommentMapper.toCommentDTO(commentList[0]));
+    const comment = {
+      commentatorInfo: {
+        userId: commentList[0].commentatorInfo.userId,
+        userLogin: commentList[0].commentatorInfo.userLogin ,
+      },
+      content: commentList[0].content,
+      createdAt: commentList[0].createdAt,
+      id: commentList[0]._id.toString(),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: LikeStatus.NONE,
+      },
+    };
+
+    expect(res.body).toEqual(comment);
   });
 
   it(`Should get ${HTTP_STATUSES.NOT_FOUND_404}`, async () => {

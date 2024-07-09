@@ -23,6 +23,8 @@ import { SecurityController } from '../controllers/device-controller';
 import { UserController } from '../controllers/user-controller';
 import { LikeService } from '../services/like-service';
 import { LikeRepository } from '../repositories/like-repository';
+import { CommentModel } from '../models/comment';
+import { LikeModel } from '../models/like';
 
 export const mailerService = new MailerService();
 export const emailService = new EmailService(mailerService);
@@ -31,7 +33,7 @@ export const jwtService = new JwtService(SETTINGS.JWT_SECRET_KEY!);
 
 export const userRepository = new UserRepository();
 export const blogRepository = new BlogRepository();
-export const commentRepository = new CommentRepository();
+export const commentRepository = new CommentRepository(CommentModel, LikeModel);
 export const postRepository = new PostRepository();
 export const sessionRepository = new SessionRepository();
 export const visitRepository = new VisitRepository();

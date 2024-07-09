@@ -13,6 +13,7 @@ export const commentsRouter = Router();
 
 commentsRouter.get(
   PATH_URL.COMMENT_ID,
+  checkCommentExistsMiddleware.urlParams('commentId'),
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   commentController.getCommentById.bind(commentController)
@@ -21,6 +22,7 @@ commentsRouter.get(
 commentsRouter.put(
   PATH_URL.COMMENT_ID,
   bearerTokenAuthMiddleware,
+  checkCommentExistsMiddleware.urlParams('commentId'),
   sanitizerQueryMiddleware(),
   checkExactMiddleware(validateCommentsPutSchema),
   errorHandlingMiddleware<UpdateCommentRequestView>,
@@ -30,6 +32,7 @@ commentsRouter.put(
 commentsRouter.delete(
   PATH_URL.COMMENT_ID,
   bearerTokenAuthMiddleware,
+  checkCommentExistsMiddleware.urlParams('commentId'),
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   commentController.deleteComment.bind(commentController)

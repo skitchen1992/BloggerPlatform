@@ -45,7 +45,10 @@ export class CommentController {
     try {
       const currentUserId = res.locals.user?.id.toString();
 
-      const { status, data: comment } = await this.commentRepository.getCommentById(req.params.commentId);
+      const {
+        status,
+        data: comment,
+      } = await this.commentRepository.getCommentById(req.params.commentId);
 
       if (status === ResultStatus.NotFound) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
