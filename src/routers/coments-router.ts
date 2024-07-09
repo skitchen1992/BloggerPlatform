@@ -7,6 +7,7 @@ import { UpdateCommentRequestView } from '../view-model/comments/UpdateCommentRe
 import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-middleware';
 import { validateCommentsPutSchema } from '../middlewares/comments';
 import { commentController } from '../compositions/composition-root';
+import { checkCommentExistsMiddleware } from '../middlewares/check-comment-exists-middleware';
 
 export const commentsRouter = Router();
 
@@ -37,6 +38,7 @@ commentsRouter.delete(
 commentsRouter.put(
   PATH_URL.LIKE_STATUS,
   bearerTokenAuthMiddleware,
+  checkCommentExistsMiddleware.urlParams('commentId'),
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   commentController.createLikeForComment.bind(commentController)

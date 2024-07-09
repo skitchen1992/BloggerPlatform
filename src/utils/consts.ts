@@ -56,7 +56,7 @@ export const COOKIE_KEY = {
   REFRESH_TOKEN: 'refreshToken',
 };
 
-export const ACCESS_TOKEN_EXPIRED_IN = "1h";
+export const ACCESS_TOKEN_EXPIRED_IN = "1d";
 export const REFRESH_TOKEN_EXPIRED_IN = 20;
 export const RECOVERY_PASS_TOKEN_EXPIRED = "1h";
 
