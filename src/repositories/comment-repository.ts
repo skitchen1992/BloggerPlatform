@@ -60,7 +60,11 @@ export class CommentRepository {
       authorId: userId,
     });
 
-    return userStatusDoc!.status;
+    if (!userStatusDoc) {
+      return LikeStatus.NONE;
+    }
+
+    return userStatusDoc.status;
   }
 
   public async getCommentAuthUserById(commentId: string, userId: string) {
