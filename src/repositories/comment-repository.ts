@@ -60,11 +60,7 @@ export class CommentRepository {
       authorId: userId,
     });
 
-    if (!userStatusDoc) {
-      return LikeStatus.NONE;
-    }
-
-    return userStatusDoc.status === LikeStatus.LIKE ? LikeStatus.LIKE : LikeStatus.DISLIKE;
+    return userStatusDoc!.status;
   }
 
   public async getCommentAuthUserById(commentId: string, userId: string) {
