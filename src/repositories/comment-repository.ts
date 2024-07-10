@@ -33,7 +33,8 @@ export class CommentRepository {
     return {
       likesCount: likeDislikeCounts.likesCount,
       dislikesCount: likeDislikeCounts.dislikesCount,
-      myStatus: LikeStatus.NONE,
+      //@ts-ignore
+      myStatus: "TEST LIKE",
     };
   }
 
@@ -63,15 +64,7 @@ export class CommentRepository {
     if (!user) {
       return LikeStatus.NONE;
     }
-    //
-    // return user.status === LikeStatus.LIKE ? LikeStatus.LIKE : LikeStatus.DISLIKE;
-    // if (!userStatusDoc) {
-    //   return LikeStatus.NONE;
-    // }
-    //
-    // return userStatusDoc.status;
 
-    console.log("getUserLikeStatus", user);
     return user.status;
   }
 
