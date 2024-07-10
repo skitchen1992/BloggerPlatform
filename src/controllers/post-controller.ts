@@ -135,7 +135,9 @@ export class PostController {
       } = await this.commentService.createComment(req.body, req.params, res.locals.user!);
 
       if (status === ResultStatus.Success && commentId) {
-        const { data, status } = await this.commentRepository.getCommentById(commentId);
+        const currentUserId = res.locals.user?.id.toString();
+
+        const { data, status } = await this.commentRepository.getCommentAuthUserById(commentId, currentUserId!);
 
         if (status === ResultStatus.Success) {
           res.status(HTTP_STATUSES.CREATED_201).json(data!);
