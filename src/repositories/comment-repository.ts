@@ -54,22 +54,25 @@ export class CommentRepository {
   }
 
   private async getUserLikeStatus(commentId: string, userId: string): Promise<LikeStatus> {
-    const userStatusDoc = await this.likeModel.findOne({
+    const user = await this.likeModel.findOne({
       parentId: commentId,
       parentType: ParentType.COMMENT,
       authorId: userId,
-    });
+    }).lean();
 
-    if (!userStatusDoc) {
-      return LikeStatus.NONE;
-    }
-
-    return userStatusDoc.status === LikeStatus.LIKE ? LikeStatus.LIKE : LikeStatus.DISLIKE;
+    // if (!user) {
+    //   return LikeStatus.NONE;
+    // }
+    //
+    // return user.status === LikeStatus.LIKE ? LikeStatus.LIKE : LikeStatus.DISLIKE;
     // if (!userStatusDoc) {
     //   return LikeStatus.NONE;
     // }
     //
     // return userStatusDoc.status;
+
+    console.log("getUserLikeStatus", user);
+    return user!.status;
   }
 
   public async getCommentAuthUserById(commentId: string, userId: string) {
