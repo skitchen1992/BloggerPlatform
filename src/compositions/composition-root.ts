@@ -79,6 +79,7 @@ export const postController = new PostController(
   postService,
   commentRepository,
   commentService,
+  likeService
 );
 
 export const securityController = new SecurityController(

@@ -22,6 +22,8 @@ import { CommentRepository } from '../repositories/comment-repository';
 import { CommentService } from '../services/comment-service';
 import { PostRepository } from '../repositories/post-repository';
 import { PostService } from '../services/post-service';
+import { LikeStatus, ParentType } from '../models/like';
+import { LikeService } from '../services/like-service';
 
 export class PostController {
   constructor(
@@ -29,6 +31,7 @@ export class PostController {
     protected postService: PostService,
     protected commentRepository: CommentRepository,
     protected commentService: CommentService,
+    protected likeService: LikeService,
   ) {
   }
 
@@ -136,6 +139,8 @@ export class PostController {
 
       if (status === ResultStatus.Success && commentId) {
         const currentUserId = res.locals.user?.id.toString();
+
+        await this.likeService.createLike(LikeStatus.NONE, currentUserId!, commentId, ParentType.COMMENT);
 
         const { data, status } = await this.commentRepository.getCommentForAuthUserById(commentId, currentUserId!);
 
