@@ -97,7 +97,7 @@ debugger
 
   public async getComments(
     query: GetCommentsQuery,
-    params: { postId: string, userId?: string },
+    params: { postId: string },
   ) {
     const filters = searchQueryBuilder.getComments(query, params);
 
@@ -106,13 +106,8 @@ debugger
     const totalCount = await this.commentModel.countDocuments(filters.query);
 
     const commentList = await Promise.all(comments.map(async (comment) => {
-      if (params.userId) {
-        const like = await this.getLikesInfoForAuthUser(comment._id.toString(), params.userId);
-        return CommentMapper.toCommentDTO(comment, like);
-      } else {
-        const like = await this.getLikesInfoForNotAuthUser(comment._id.toString());
-        return CommentMapper.toCommentDTO(comment, like);
-      }
+      const like = await this.getLikesInfoForAuthUser(comment._id.toString(), comment.commentatorInfo.userId);
+      return CommentMapper.toCommentDTO(comment, like);
     }));
 
     const result = new CommentListDTO(commentList, totalCount, filters.pageSize, filters.page);
