@@ -68,7 +68,7 @@ export class CommentRepository {
       authorId: userId,
     }).lean();
 
-    return user!.status;
+    return user?.status || LikeStatus.NONE;
   }
 
   public async getCommentForAuthUserById(commentId: string, userId: string) {
