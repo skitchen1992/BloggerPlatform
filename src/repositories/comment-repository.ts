@@ -29,19 +29,12 @@ export class CommentRepository {
   private async getLikesInfoForNotAuthUser(commentId: string): Promise<ILikesInfo> {
 
     const likeDislikeCounts = await this.getLikeDislikeCounts(commentId);
+    const likeStatus = await this.getUserLikeStatus(commentId, '');
 
     return {
       likesCount: likeDislikeCounts.likesCount,
       dislikesCount: likeDislikeCounts.dislikesCount,
-      myStatus: LikeStatus.NONE,
-    };
-  }
-
-  private async getLikesInfoForNewEntity(): Promise<ILikesInfo> {
-    return {
-      likesCount: 0,
-      dislikesCount: 0,
-      myStatus: LikeStatus.NONE,
+      myStatus: likeStatus,
     };
   }
 
