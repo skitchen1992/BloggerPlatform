@@ -8,6 +8,9 @@ import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-midd
 import { validateCommentsPutSchema } from '../middlewares/comments';
 import { commentController } from '../compositions/composition-root';
 import { checkCommentExistsMiddleware } from '../middlewares/check-comment-exists-middleware';
+import {
+  validateCommentsPutLikeStatusSchema
+} from '../middlewares/comments/validate-schemas/validate-comments-put-like-status-schema';
 
 export const commentsRouter = Router();
 
@@ -43,6 +46,7 @@ commentsRouter.put(
   bearerTokenAuthMiddleware,
   checkCommentExistsMiddleware.urlParams('commentId'),
   sanitizerQueryMiddleware(),
+  checkExactMiddleware(validateCommentsPutLikeStatusSchema),
   errorHandlingMiddleware,
   commentController.createLikeForComment.bind(commentController)
 );
