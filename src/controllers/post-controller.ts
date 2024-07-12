@@ -137,7 +137,7 @@ export class PostController {
       if (status === ResultStatus.Success && commentId) {
         const currentUserId = res.locals.user?.id.toString();
 
-        const { data, status } = await this.commentRepository.getCommentAuthUserById(commentId, currentUserId!);
+        const { data, status } = await this.commentRepository.getCommentForAuthUserById(commentId, currentUserId!);
 
         if (status === ResultStatus.Success) {
           res.status(HTTP_STATUSES.CREATED_201).json(data!);

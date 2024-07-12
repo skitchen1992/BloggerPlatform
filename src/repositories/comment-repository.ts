@@ -14,7 +14,7 @@ export class CommentRepository {
   constructor(protected commentModel: typeof CommentModel, protected likeModel: typeof LikeModel) {
   }
 
-  private async getLikesInfoAuthUser(commentId: string, userId: string): Promise<ILikesInfo> {
+  private async getLikesInfoForAuthUser(commentId: string, userId: string): Promise<ILikesInfo> {
 
     const likeDislikeCounts = await this.getLikeDislikeCounts(commentId);
     const likeStatus = await this.getUserLikeStatus(commentId, userId);
@@ -26,15 +26,22 @@ export class CommentRepository {
     };
   }
 
-  private async getLikesInfoNotAuthUser(commentId: string): Promise<ILikesInfo> {
+  private async getLikesInfoForNotAuthUser(commentId: string): Promise<ILikesInfo> {
 
     const likeDislikeCounts = await this.getLikeDislikeCounts(commentId);
 
     return {
       likesCount: likeDislikeCounts.likesCount,
       dislikesCount: likeDislikeCounts.dislikesCount,
-      //@ts-ignore
-      myStatus: "TEST LIKE",
+      myStatus: LikeStatus.NONE,
+    };
+  }
+
+  private async getLikesInfoForNewEntity(): Promise<ILikesInfo> {
+    return {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: LikeStatus.NONE,
     };
   }
 
@@ -61,17 +68,13 @@ export class CommentRepository {
       authorId: userId,
     }).lean();
 
-    if (!user) {
-      return LikeStatus.NONE;
-    }
-
-    return user.status;
+    return user!.status;
   }
 
-  public async getCommentAuthUserById(commentId: string, userId: string) {
+  public async getCommentForAuthUserById(commentId: string, userId: string) {
     const comment = await this.commentModel.findById(commentId).lean();
 
-    const like = await this.getLikesInfoAuthUser(commentId, userId);
+    const like = await this.getLikesInfoForAuthUser(commentId, userId);
 
     return {
       data: comment ? CommentMapper.toCommentDTO(comment, like) : null,
@@ -79,10 +82,10 @@ export class CommentRepository {
     };
   }
 
-  public async getCommentNotAuthUserById(commentId: string) {
+  public async getCommentForNotAuthUserById(commentId: string) {
     const comment = await this.commentModel.findById(commentId).lean();
 
-    const like = await this.getLikesInfoNotAuthUser(commentId);
+    const like = await this.getLikesInfoForNotAuthUser(commentId);
 
     return {
       data: comment ? CommentMapper.toCommentDTO(comment, like) : null,
@@ -101,7 +104,7 @@ export class CommentRepository {
 
   public async getComments(
     query: GetCommentsQuery,
-    params: { postId: string },
+    params: { postId: string, userId?: string },
   ) {
     const filters = searchQueryBuilder.getComments(query, params);
 
@@ -110,9 +113,13 @@ export class CommentRepository {
     const totalCount = await this.commentModel.countDocuments(filters.query);
 
     const commentList = await Promise.all(comments.map(async (comment) => {
-      const like = await this.getLikesInfoAuthUser(comment._id.toString(), comment.commentatorInfo.userId);
-
-      return CommentMapper.toCommentDTO(comment, like);
+      if (params.userId) {
+        const like = await this.getLikesInfoForAuthUser(comment._id.toString(), params.userId);
+        return CommentMapper.toCommentDTO(comment, like);
+      } else {
+        const like = await this.getLikesInfoForNotAuthUser(comment._id.toString());
+        return CommentMapper.toCommentDTO(comment, like);
+      }
     }));
 
     const result = new CommentListDTO(commentList, totalCount, filters.pageSize, filters.page);

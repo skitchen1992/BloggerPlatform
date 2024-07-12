@@ -24,7 +24,7 @@ export class CommentController {
     res: Response<GetCommentResponseView | null>,
   ) {
     try {
-      const { data, status } = await this.commentRepository.getCommentNotAuthUserById(req.params.commentId);
+      const { data, status } = await this.commentRepository.getCommentForNotAuthUserById(req.params.commentId);
 
       if (status === ResultStatus.Success && data) {
         res.status(HTTP_STATUSES.OK_200).json(data);
@@ -48,7 +48,7 @@ export class CommentController {
       const {
         status,
         data: comment,
-      } = await this.commentRepository.getCommentAuthUserById(req.params.commentId, currentUserId!);
+      } = await this.commentRepository.getCommentForAuthUserById(req.params.commentId, currentUserId!);
 
       if (status === ResultStatus.NotFound) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
@@ -111,7 +111,7 @@ export class CommentController {
     try {
       const currentUserId = res.locals.user?.id.toString();
 
-      const { status, data: comment } = await this.commentRepository.getCommentAuthUserById(req.params.commentId, currentUserId!);
+      const { status, data: comment } = await this.commentRepository.getCommentForAuthUserById(req.params.commentId, currentUserId!);
 
       if (status === ResultStatus.NotFound) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
