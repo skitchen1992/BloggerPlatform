@@ -11,11 +11,14 @@ import { checkCommentExistsMiddleware } from '../middlewares/check-comment-exist
 import {
   validateCommentsPutLikeStatusSchema
 } from '../middlewares/comments/validate-schemas/validate-comments-put-like-status-schema';
+import { bearerTokenUserInterceptorMiddleware } from '../middlewares/bearer-token-user_interceptor-middleware';
 
 export const commentsRouter = Router();
 
 commentsRouter.get(
   PATH_URL.COMMENT_ID,
+  //!!!!!!!
+  bearerTokenUserInterceptorMiddleware,
   checkCommentExistsMiddleware.urlParams('commentId'),
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,

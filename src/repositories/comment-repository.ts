@@ -60,7 +60,7 @@ export class CommentRepository {
       parentType: ParentType.COMMENT,
       authorId: userId,
     }).lean();
-debugger
+    debugger
     return user?.status || LikeStatus.NONE;
   }
 
@@ -84,6 +84,25 @@ debugger
       data: comment ? CommentMapper.toCommentDTO(comment, likeInfo) : null,
       status: comment ? ResultStatus.Success : ResultStatus.NotFound,
     };
+  }
+/////////
+  public async getCommentById(commentId: string, userId?: string) {
+    const comment = await this.commentModel.findById(commentId).lean();
+
+    if (userId) {
+      const likeInfo = await this.getLikesInfoForAuthUser(commentId, userId);
+      return {
+        data: comment ? CommentMapper.toCommentDTO(comment, likeInfo) : null,
+        status: comment ? ResultStatus.Success : ResultStatus.NotFound,
+      };
+    } else {
+      const likeInfo = await this.getLikesInfoForNotAuthUser(commentId);
+
+      return {
+        data: comment ? CommentMapper.toCommentDTO(comment, likeInfo) : null,
+        status: comment ? ResultStatus.Success : ResultStatus.NotFound,
+      };
+    }
   }
 
   public async isExistComment(commentId: string) {
