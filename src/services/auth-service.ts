@@ -2,16 +2,17 @@ import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { ResultStatus } from '../types/common/result';
 import { fromUnixTimeToISO, getCurrentDate, getDateFromObjectId, isExpiredDate } from '../utils/dates/dates';
 import { ObjectId } from 'mongodb';
-import { jwtService } from './jwt-service';
 import {
   ACCESS_TOKEN_EXPIRED_IN,
   RECOVERY_PASS_TOKEN_EXPIRED,
   REFRESH_TOKEN_EXPIRED_IN,
 } from '../utils/consts';
-import { sessionRepository } from '../repositories/session-repository';
 import { JwtPayload } from 'jsonwebtoken';
-import { userRepository } from '../repositories/user-repository';
-import { emailService } from './email-service';
+import { Session } from '../dto/new-session-dto';
+import { UserRepository } from '../repositories/user-repository';
+import { JwtService } from './jwt-service';
+import { EmailService } from './email-service';
+import { SessionRepository } from '../repositories/session-repository';
 
 
 type Payload = {
@@ -20,7 +21,15 @@ type Payload = {
   title: string;
 };
 
-class AuthService {
+export class AuthService {
+
+  constructor(protected userRepository: UserRepository,
+              protected jwtService: JwtService,
+              protected emailService: EmailService,
+              protected sessionRepository: SessionRepository,
+  ) {
+  }
+
   async addTokenToUser(payload: Payload) {
     try {
       const { userId, ip, title } = payload;
@@ -28,22 +37,21 @@ class AuthService {
       const objectId = new ObjectId();
       const deviceId = getUniqueId();
 
-      const accessToken = jwtService.generateToken({ userId }, { expiresIn: ACCESS_TOKEN_EXPIRED_IN });
+      const accessToken = this.jwtService.generateToken({ userId }, { expiresIn: ACCESS_TOKEN_EXPIRED_IN });
 
-      const refreshToken = jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
+      const refreshToken = this.jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
 
-      const data = {
-        _id: objectId,
+      const session = new Session(
+        objectId,
         userId,
         ip,
         title,
-        lastActiveDate: getDateFromObjectId(objectId),
-        tokenIssueDate: getDateFromObjectId(objectId),
-        tokenExpirationDate: jwtService.getTokenExpirationDate(refreshToken),
-        deviceId,
-      };
+        getDateFromObjectId(objectId),
+        getDateFromObjectId(objectId),
+        this.jwtService.getTokenExpirationDate(refreshToken),
+        deviceId);
 
-      await sessionRepository.createSession(data);
+      await this.sessionRepository.createSession(session);
 
       return { status: ResultStatus.Success, data: { refreshToken, accessToken } };
     } catch (error) {
@@ -54,7 +62,7 @@ class AuthService {
 
   async refreshToken(userId: string, deviceId: string, exp: number) {
     try {
-      const { data: device } = await sessionRepository.getDeviceByFields(
+      const { data: device } = await this.sessionRepository.getDeviceByFields(
         ['deviceId'],
         deviceId,
       );
@@ -67,11 +75,14 @@ class AuthService {
         return { status: ResultStatus.Unauthorized, data: null };
       }
 
-      const newAccessToken = jwtService.generateToken({ userId }, { expiresIn: ACCESS_TOKEN_EXPIRED_IN });
-      const newRefreshToken = jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
+      const newAccessToken = this.jwtService.generateToken({ userId }, { expiresIn: ACCESS_TOKEN_EXPIRED_IN });
+      const newRefreshToken = this.jwtService.generateToken({
+        userId,
+        deviceId,
+      }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
 
-      await sessionRepository.updateSessionById(device._id.toString(), {
-        tokenExpirationDate: jwtService.getTokenExpirationDate(newRefreshToken),
+      await this.sessionRepository.updateSessionById(device._id.toString(), {
+        tokenExpirationDate: this.jwtService.getTokenExpirationDate(newRefreshToken),
         lastActiveDate: getCurrentDate(),
       });
 
@@ -85,13 +96,13 @@ class AuthService {
   }
 
   async logout(refreshToken: string) {
-    const { userId, deviceId, exp } = (jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
+    const { userId, deviceId, exp } = (this.jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
 
     if (!userId || !deviceId || !exp) {
       return { status: ResultStatus.Unauthorized, data: null };
     }
 
-    const { data: device } = await sessionRepository.getDeviceByFields(
+    const { data: device } = await this.sessionRepository.getDeviceByFields(
       ['deviceId'],
       deviceId,
     );
@@ -104,39 +115,39 @@ class AuthService {
       return { status: ResultStatus.Unauthorized, data: null };
     }
 
-    await sessionRepository.deleteSessionById(device._id.toString());
+    await this.sessionRepository.deleteSessionById(device._id.toString());
 
     return { data: null, status: ResultStatus.Success };
   };
 
   async recoveryPass(email: string) {
-    const { data: user, status } = await userRepository.getUserByFields(['email'], email);
+    const { data: user, status } = await this.userRepository.getUserByFields(['email'], email);
 
     if (status === ResultStatus.NotFound) {
-      const recoveryPassToken = jwtService.generateToken({ userId: null }, { expiresIn: RECOVERY_PASS_TOKEN_EXPIRED });
+      const recoveryPassToken = this.jwtService.generateToken({ userId: null }, { expiresIn: RECOVERY_PASS_TOKEN_EXPIRED });
 
-      await emailService.sendRecoveryPassEmail(email, recoveryPassToken);
+      await this.emailService.sendRecoveryPassEmail(email, recoveryPassToken);
 
       return { status: ResultStatus.Success, data: null };
     }
 
-    const recoveryPassToken = jwtService.generateToken({ userId: user?._id.toString() }, { expiresIn: RECOVERY_PASS_TOKEN_EXPIRED });
+    const recoveryPassToken = this.jwtService.generateToken({ userId: user?._id.toString() }, { expiresIn: RECOVERY_PASS_TOKEN_EXPIRED });
 
-    await userRepository.updateUserById(user!._id.toString(), {
+    await this.userRepository.updateUserById(user!._id.toString(), {
       recoveryCode: {
         code: recoveryPassToken,
         isUsed: false,
       },
     });
 
-    await emailService.sendRecoveryPassEmail(email, recoveryPassToken);
+    await this.emailService.sendRecoveryPassEmail(email, recoveryPassToken);
 
     return { data: null, status: ResultStatus.Success };
   };
 
   async newPass(newPassword: string, recoveryCode: string) {
 
-    const { userId, exp } = (jwtService.verifyToken(recoveryCode) as JwtPayload) ?? {};
+    const { userId, exp } = (this.jwtService.verifyToken(recoveryCode) as JwtPayload) ?? {};
 
     if (!userId || !exp) {
       return {
@@ -152,7 +163,7 @@ class AuthService {
       };
     }
 
-    const { data: user, status } = await userRepository.getUserByFields(['_id'], userId);
+    const { data: user, status } = await this.userRepository.getUserByFields(['_id'], userId);
 
     if (user?.recoveryCode?.isUsed || user?.recoveryCode?.code !== recoveryCode) {
       return {
@@ -163,7 +174,7 @@ class AuthService {
 
     const passwordHash = await hashBuilder.hash(newPassword);
 
-    await userRepository.updateUserById(user!._id.toString(), {
+    await this.userRepository.updateUserById(user!._id.toString(), {
       password: passwordHash,
       recoveryCode: {
         isUsed: true,
@@ -173,6 +184,3 @@ class AuthService {
     return { data: null, status: ResultStatus.Success };
   };
 }
-
-export const authService = new AuthService();
-

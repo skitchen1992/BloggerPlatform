@@ -1,7 +1,7 @@
 import { body, oneOf } from 'express-validator';
 import { param } from 'express-validator/src/middlewares/validation-chain-builders';
 import { ResultStatus } from '../types/common/result';
-import { userRepository } from '../repositories/user-repository';
+import { userRepository } from '../compositions/composition-root';
 
 export const checkUserExistsMiddleware = {
   body: (fields?: string | string[]) => {
@@ -15,7 +15,7 @@ export const checkUserExistsMiddleware = {
           }
         }),
       ],
-      { message: 'Email and login should be unique' }
+      { message: 'Email and login should be unique' },
     );
   },
   urlParams: (fields?: string | string[]) => {
@@ -29,7 +29,7 @@ export const checkUserExistsMiddleware = {
           }
         }),
       ],
-      { message: 'Email and login should be unique' }
+      { message: 'Email and login should be unique' },
     );
   },
 };

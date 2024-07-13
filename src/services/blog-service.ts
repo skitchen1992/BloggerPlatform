@@ -1,27 +1,23 @@
-import { CreateBlogRequestView, UpdateBlogRequestView } from '../view';
-import { ObjectId } from 'mongodb';
+import { CreateBlogRequestView, UpdateBlogRequestView } from '../view-model';
 import { Result, ResultStatus } from '../types/common/result';
-import { getDateFromObjectId } from '../utils/dates/dates';
-import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
-import { blogRepository } from '../repositories/blog-repository';
-import { postRepository } from '../repositories/post-repository';
+import { Blog } from '../dto/new-blog-dto';
+import { BlogRepository } from '../repositories/blog-repository';
 
-class BlogService {
+export class BlogService {
+
+  constructor(protected blogRepository: BlogRepository) {
+  }
+
   async createBlog(body: CreateBlogRequestView): Promise<Result<string | null>> {
     try {
-      const id = new ObjectId();
+      const blog = new Blog(
+        body.name,
+        body.description,
+        body.websiteUrl,
+        false,
+      );
 
-      const newBlog = {
-        name: body.name,
-        description: body.description,
-        websiteUrl: body.websiteUrl,
-        createdAt: getDateFromObjectId(id),
-        isMembership: false,
-        _id: id,
-      };
-
-      const { data: blogId } = await blogRepository.createBlog(newBlog);
-
+      const { data: blogId } = await this.blogRepository.createBlog(blog);
 
       return { data: blogId, status: ResultStatus.Success };
 
@@ -33,42 +29,9 @@ class BlogService {
     }
   }
 
-  async createPostForBlog(body: CreatePostForBlogRequestView, params: {
-    blogId: string
-  }): Promise<Result<string | null>> {
-    try {
-      const { status, data } = await blogRepository.getBlogById(params.blogId);
-
-      if (status === ResultStatus.NotFound) {
-        return { data: null, status: ResultStatus.NotFound };
-      }
-
-      const id = new ObjectId();
-
-      const newPost = {
-        title: body.title,
-        shortDescription: body.shortDescription,
-        content: body.content,
-        blogName: data!.name,
-        blogId: data!.id,
-        createdAt: getDateFromObjectId(id),
-        _id: id,
-      };
-
-      const { data: postId } = await postRepository.createPost(newPost);
-
-      return { data: postId, status: ResultStatus.Success };
-    } catch (error) {
-      console.log(`Post not created: ${error}`);
-      return {
-        data: null, status: ResultStatus.BadRequest,
-      };
-    }
-  };
-
   async updateBlog(id: string, data: UpdateBlogRequestView): Promise<Result<null>> {
     try {
-      const { status } = await blogRepository.updateBlogById(id, data);
+      const { status } = await this.blogRepository.updateBlogById(id, data);
 
       return { data: null, status };
     } catch (error) {
@@ -81,7 +44,7 @@ class BlogService {
 
   async deleteBlog(id: string): Promise<Result<null>> {
     try {
-      const { status } = await blogRepository.deleteBlogById(id);
+      const { status } = await this.blogRepository.deleteBlogById(id);
 
       return { data: null, status };
     } catch (error) {
@@ -92,5 +55,3 @@ class BlogService {
     }
   }
 }
-
-export const blogService = new BlogService();

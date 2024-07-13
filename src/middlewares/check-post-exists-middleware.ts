@@ -1,7 +1,7 @@
 import { body } from 'express-validator';
 import { param } from 'express-validator/src/middlewares/validation-chain-builders';
 import { ResultStatus } from '../types/common/result';
-import { postRepository } from '../repositories/post-repository';
+import { postRepository } from '../compositions/composition-root';
 
 export const checkPostExistsMiddleware = {
   body: (fields?: string | string[]) => {

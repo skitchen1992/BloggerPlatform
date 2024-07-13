@@ -436,7 +436,6 @@ describe(`Endpoint (PUT) - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
 });
 
 describe(`Endpoint (DELETE) - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
-
   it('Should delete post', async () => {
     const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
     const blogId = blogList[0]._id.toString();
@@ -472,7 +471,6 @@ describe(`Endpoint (DELETE) - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
-
   it('Should get created comment', async () => {
     const login = 'testLogin';
     const password = 'string';
@@ -510,6 +508,7 @@ describe(`Endpoint (POST) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
       expect.objectContaining({
         content: 'content content content',
         commentatorInfo: expect.objectContaining({ userLogin: login }),
+        likesInfo: { likesCount: 0, dislikesCount: 0, myStatus: 'None' },
       }),
     );
   });
@@ -611,7 +610,6 @@ describe(`Endpoint (POST) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
 });
 
 describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
-
   it('Should get empty array comment', async () => {
     const login = 'testLogin';
     const password = 'string';
@@ -701,6 +699,71 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
         expect.objectContaining({
           content: 'content content content',
           commentatorInfo: expect.objectContaining({ userLogin: login }),
+          likesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+            myStatus: 'None',
+          },
+        }),
+      ],
+    });
+  });
+
+  it('Should get comments with likes', async () => {
+    const login = 'testLogin';
+    const password = 'string';
+
+    await req
+      .post(PATH_URL.USERS)
+      .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
+      .send({
+        login,
+        password,
+        email: 'example@example.com',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const token = await req.post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`).send({
+      loginOrEmail: login,
+      password,
+    });
+
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
+
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
+
+    await req
+      .post(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        content: 'content content content',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const res = await req
+      .get(`${PATH_URL.POSTS}/${postId.toString()}${PATH_URL.COMMENTS}`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        content: 'content content content',
+      })
+      .expect(HTTP_STATUSES.OK_200);
+
+    expect(res.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        expect.objectContaining({
+          content: 'content content content',
+          commentatorInfo: expect.objectContaining({ userLogin: login }),
+          likesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+            myStatus: 'None',
+          },
         }),
       ],
     });

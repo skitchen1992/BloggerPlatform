@@ -2,7 +2,6 @@ import { SETTINGS } from './utils/settings';
 import { app } from './app';
 import { db } from './db/connection';
 
-
 const startApp = async () => {
 
   if (await db.connect(SETTINGS.MONGO_DB_URL)) {

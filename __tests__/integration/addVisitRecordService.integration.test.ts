@@ -1,7 +1,7 @@
 import { testSeeder } from '../test.seeder';
 import { ResultStatus } from '../../src/types/common/result';
-import { visitService } from '../../src/services/visit-service';
 import { VisitModel } from '../../src/models/visit';
+import { visitService } from '../../src/compositions/composition-root';
 
 describe('addVisitRecordService', () => {
 

@@ -1,36 +1,63 @@
-import { ObjectId } from 'mongodb';
 import { Result, ResultStatus } from '../types/common/result';
-import { getDateFromObjectId } from '../utils/dates/dates';
-import { CreatePostForBlogRequestView } from '../view/posts/CreatePostForBlogRequestView';
-import { blogRepository } from '../repositories/blog-repository';
-import { CreateCommentRequestView, GetUserResponseView, UpdatePostRequestView } from '../view';
-import { ICommentSchema } from '../models/comment';
-import { postRepository } from '../repositories/post-repository';
-import { commentRepository } from '../repositories/comment-repository';
+import { CreatePostForBlogRequestView } from '../view-model/posts/CreatePostForBlogRequestView';
+import { UpdatePostRequestView } from '../view-model';
+import { Post } from '../dto/new-post-dto';
+import { BlogRepository } from '../repositories/blog-repository';
+import { PostRepository } from '../repositories/post-repository';
 
-class PostService {
+export class PostService {
+
+  constructor(protected blogRepository: BlogRepository,
+              protected postRepository: PostRepository,
+  ) {
+  }
+
   async createPost(body: CreatePostForBlogRequestView, params: { blogId: string }): Promise<Result<string | null>> {
     try {
 
-      const { status, data } = await blogRepository.getBlogById(params.blogId);
+      const { status, data } = await this.blogRepository.getBlogById(params.blogId);
 
       if (status === ResultStatus.NotFound) {
         return { data: null, status: ResultStatus.NotFound };
       }
 
-      const id = new ObjectId();
+      const post = new Post(
+        body.title,
+        body.shortDescription,
+        body.content,
+        data!.name,
+        data!.id);
 
-      const newPost = {
-        title: body.title,
-        shortDescription: body.shortDescription,
-        content: body.content,
-        blogName: data!.name,
-        blogId: data!.id,
-        createdAt: getDateFromObjectId(id),
-        _id: id,
+      const { data: postId } = await this.postRepository.createPost(post);
+
+      return { data: postId, status: ResultStatus.Success };
+    } catch (error) {
+      console.log(`Post not created: ${error}`);
+      return {
+        data: null, status: ResultStatus.BadRequest,
       };
+    }
+  };
 
-      const { data: postId } = await postRepository.createPost(newPost);
+  async createPostForBlog(body: CreatePostForBlogRequestView, params: {
+    blogId: string
+  }): Promise<Result<string | null>> {
+    try {
+      const { status, data } = await this.blogRepository.getBlogById(params.blogId);
+
+      if (status === ResultStatus.NotFound) {
+        return { data: null, status: ResultStatus.NotFound };
+      }
+
+      const post = new Post(
+        body.title,
+        body.shortDescription,
+        body.content,
+        data!.name,
+        data!.id,
+      );
+
+      const { data: postId } = await this.postRepository.createPost(post);
 
       return { data: postId, status: ResultStatus.Success };
     } catch (error) {
@@ -43,7 +70,7 @@ class PostService {
 
   async updatePost(id: string, data: UpdatePostRequestView) {
     try {
-      const { status } = await postRepository.updatePostById(id, data);
+      const { status } = await this.postRepository.updatePostById(id, data);
 
       return { data: null, status };
     } catch (error) {
@@ -56,7 +83,7 @@ class PostService {
 
   async deletePost(id: string) {
     try {
-      const { status } = await postRepository.deletePostById(id);
+      const { status } = await this.postRepository.deletePostById(id);
 
       return { data: null, status };
 
@@ -67,38 +94,4 @@ class PostService {
       };
     }
   };
-
-  async createComment(
-    body: CreateCommentRequestView,
-    params: { postId: string },
-    user: GetUserResponseView,
-  ) {
-    try {
-
-      const id = new ObjectId();
-
-      const newComment: ICommentSchema = {
-        content: body.content,
-        commentatorInfo: {
-          userId: user.id,
-          userLogin: user.login,
-        },
-        postId: params.postId,
-        createdAt: getDateFromObjectId(id),
-        _id: id,
-      };
-
-      const { data: commentId } = await commentRepository.createComment(newComment);
-
-      return { data: commentId, status: ResultStatus.Success };
-
-    } catch (error) {
-      console.log(`Comment not created: ${error}`);
-      return {
-        data: null, status: ResultStatus.BadRequest,
-      };
-    }
-  };
 }
-
-export const postService = new PostService();

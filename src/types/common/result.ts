@@ -1,4 +1,4 @@
-import { ErrorMessageResponseView } from '../../view';
+import { ErrorMessageResponseView } from '../../view-model';
 
 export enum ResultStatus {
   Success = 'Success',

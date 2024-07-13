@@ -1,29 +1,34 @@
 import { body } from 'express-validator';
 import { param } from 'express-validator/src/middlewares/validation-chain-builders';
 import { ResultStatus } from '../types/common/result';
-import { blogRepository } from '../compositions/composition-root';
+import { commentRepository } from '../compositions/composition-root';
 
-export const checkBlogExistsMiddleware = {
+export const checkCommentExistsMiddleware = {
   body: (fields?: string | string[]) => {
     return body(fields).custom(async (input, meta) => {
-      if (meta.path === 'blogId') {
-        const { status } = await blogRepository.getBlogById(input);
+      if (meta.path === 'commentId') {
+        const { status } = await commentRepository.isExistComment(input);
+
 
         if (status !== ResultStatus.Success) {
-          throw new Error('Blog is not founded');
+          throw new Error('Comment is not founded');
         }
       }
     });
   },
   urlParams: (fields?: string | string[]) => {
     return param(fields).custom(async (input, meta) => {
-      if (meta.path === 'blogId') {
-        const { status } = await blogRepository.getBlogById(input);
+      if (meta.path === 'commentId') {
+        const { status } = await commentRepository.isExistComment(input);
 
         if (status !== ResultStatus.Success) {
-          throw new Error('Blog is not founded');
+          throw new Error('Comment is not founded');
         }
       }
     });
   },
 };
+
+
+
+

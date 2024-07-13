@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { HTTP_STATUSES } from '../utils/consts';
 import { ResultStatus } from '../types/common/result';
-import { visitService } from '../services/visit-service';
+import { visitService } from '../compositions/composition-root';
 
 export const guardVisitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const { status } = await visitService.calculateVisit(req.ip!, req.originalUrl);

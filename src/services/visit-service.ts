@@ -1,31 +1,25 @@
-import { ObjectId } from 'mongodb';
 import { Result, ResultStatus } from '../types/common/result';
-import { getDateFromObjectId, subtractSeconds } from '../utils/dates/dates';
-import { visitRepository } from '../repositories/visit-repository';
-import { VisitModel } from '../models/visit';
+import { subtractSeconds } from '../utils/dates/dates';
+import { Visit } from '../dto/new-visit-dto';
+import { VisitRepository } from '../repositories/visit-repository';
 
-class VisitService {
+export class VisitService {
+
+  constructor(protected visitRepository: VisitRepository) {
+  }
   async calculateVisit(ip: string, url: string): Promise<Result<string | null>> {
     try {
-      const totalCount: number = await visitRepository.getDocumentsCount(ip, url, subtractSeconds(new Date(), 10));
+      const totalCount: number = await this.visitRepository.getDocumentsCount(ip, url, subtractSeconds(new Date(), 10));
 
       if (totalCount > 4) {
         return { status: ResultStatus.BadRequest, data: null };
       }
 
-      const objectId = new ObjectId();
+      const visit = new Visit(ip, url);
 
-      const newVisit = new VisitModel({
-        ip,
-        url,
-        date: getDateFromObjectId(objectId),
-        _id: objectId,
-      });
+      const { data: visitId } = await this.visitRepository.createVisit(visit);
 
-
-      const savedVisit = await newVisit.save();
-
-      return { data: savedVisit._id.toString(), status: ResultStatus.Success };
+      return { data: visitId, status: ResultStatus.Success };
 
     } catch (error) {
       console.log(`Visit not created: ${error}`);
@@ -35,5 +29,3 @@ class VisitService {
     }
   }
 }
-
-export const visitService = new VisitService();

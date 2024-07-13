@@ -8,7 +8,7 @@ import { BlogDTO } from '../dto/blog-dto';
 import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-class BlogRepository {
+export class BlogRepository {
   public async getBlogById(id: string): Promise<Result<BlogDTO | null>> {
     try {
       const blog = await BlogModel.findById(id);
@@ -82,5 +82,3 @@ class BlogRepository {
     }
   }
 }
-
-export const blogRepository = new BlogRepository();

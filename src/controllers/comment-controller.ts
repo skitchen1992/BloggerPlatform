@@ -1,19 +1,32 @@
 import { RequestWithParams, RequestWithParamsAndBody } from '../types/request-types';
-import { GetCommentResponseView } from '../view';
+import { GetCommentResponseView } from '../view-model';
 import { HTTP_STATUSES } from '../utils/consts';
 import { Response } from 'express';
 import { ResultStatus } from '../types/common/result';
-import { commentRepository } from '../repositories/comment-repository';
-import { UpdateCommentRequestView } from '../view/comments/UpdateCommentRequestView';
-import { commentService } from '../services/comment-service';
+import { UpdateCommentRequestView } from '../view-model/comments/UpdateCommentRequestView';
+import { CommentService } from '../services/comment-service';
+import { CommentRepository } from '../repositories/comment-repository';
+import { LikeService } from '../services/like-service';
+import { CreateLikeRequestView } from '../view-model/likes/CreateLikeRequestView';
+import { ParentType } from '../models/like';
 
-class CommentController {
+export class CommentController {
+
+  constructor(
+    protected commentService: CommentService,
+    protected commentRepository: CommentRepository,
+    protected likeService: LikeService,
+  ) {
+  }
+
   async getCommentById(
     req: RequestWithParams<{ commentId: string }>,
     res: Response<GetCommentResponseView | null>,
   ) {
     try {
-      const { data, status } = await commentRepository.getCommentById(req.params.commentId);
+      const currentUserId = res.locals.user?.id.toString();
+
+      const { data, status } = await this.commentRepository.getCommentById(req.params.commentId, currentUserId);
 
       if (status === ResultStatus.Success && data) {
         res.status(HTTP_STATUSES.OK_200).json(data);
@@ -34,7 +47,10 @@ class CommentController {
     try {
       const currentUserId = res.locals.user?.id.toString();
 
-      const { status, data: comment } = await commentRepository.getCommentById(req.params.commentId);
+      const {
+        status,
+        data: comment,
+      } = await this.commentRepository.getCommentForAuthUserById(req.params.commentId, currentUserId!);
 
       if (status === ResultStatus.NotFound) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
@@ -46,7 +62,7 @@ class CommentController {
         return;
       }
 
-      const { status: updateStatus } = await commentService.updateComment(req.params.commentId, req.body);
+      const { status: updateStatus } = await this.commentService.updateComment(req.params.commentId, req.body);
 
       if (updateStatus === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -66,11 +82,38 @@ class CommentController {
     }
   };
 
+  async createLikeForComment(req: RequestWithParamsAndBody<CreateLikeRequestView, {
+    commentId: string
+  }>, res: Response) {
+    try {
+      const currentUserId = res.locals.user?.id.toString();
+
+      const { status } = await this.likeService.createLike(req.body.likeStatus, currentUserId!, req.params.commentId, ParentType.COMMENT);
+
+      if (status === ResultStatus.Success) {
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+        return;
+      }
+
+      if (status === ResultStatus.NotFound) {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+        return;
+      }
+
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
+    }
+  };
+
   async deleteComment(req: RequestWithParams<{ commentId: string }>, res: Response) {
     try {
       const currentUserId = res.locals.user?.id.toString();
 
-      const { status, data: comment } = await commentRepository.getCommentById(req.params.commentId);
+      const {
+        status,
+        data: comment,
+      } = await this.commentRepository.getCommentForAuthUserById(req.params.commentId, currentUserId!);
 
       if (status === ResultStatus.NotFound) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
@@ -82,7 +125,7 @@ class CommentController {
         return;
       }
 
-      const { status: deleteStatus } = await commentService.deleteComment(req.params.commentId);
+      const { status: deleteStatus } = await this.commentService.deleteComment(req.params.commentId);
 
       if (deleteStatus === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -102,5 +145,3 @@ class CommentController {
     }
   };
 }
-
-export const commentController = new CommentController();

@@ -1,4 +1,4 @@
-import { GetUserResponseView } from '../../view';
+import { GetUserResponseView } from '../../view-model';
 import { CookieOptions } from 'express';
 
 declare global {

@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { HTTP_STATUSES } from '../utils/consts';
-import { jwtService } from '../services/jwt-service';
 import { JwtPayload } from 'jsonwebtoken';
-import { userRepository } from '../repositories/user-repository';
+import { jwtService, userRepository } from '../compositions/composition-root';
 
 export const bearerTokenAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;

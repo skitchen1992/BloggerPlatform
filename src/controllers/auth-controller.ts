@@ -7,28 +7,39 @@ import {
   AuthUserRequestView,
   AuthUserSchemaResponseView,
   ResponseErrorResponseView,
-} from '../view';
+} from '../view-model';
 import { getUniqueId, hashBuilder } from '../utils/helpers';
-import { userRepository } from '../repositories/user-repository';
-import { authService } from '../services/auth-service';
-import { jwtService } from '../services/jwt-service';
+import { UserRepository } from '../repositories/user-repository';
+import { AuthService } from '../services/auth-service';
 import { JwtPayload } from 'jsonwebtoken';
-import { AuthRegistrationRequestView } from '../view/auth/AuthRegistrationRequestView';
-import { emailService } from '../services/email-service';
-import { userService } from '../services/user-service';
-import { AuthRegistrationConfirmationRequestView } from '../view/auth/AuthRegistrationConfirmationRequestView';
+import { AuthRegistrationRequestView } from '../view-model/auth/AuthRegistrationRequestView';
+import { AuthRegistrationConfirmationRequestView } from '../view-model/auth/AuthRegistrationConfirmationRequestView';
 import { getCurrentDate, isExpiredDate } from '../utils/dates/dates';
-import { AuthRegistrationResendingRequestView } from '../view/auth/AuthRegistrationResendingRequestView';
+import { AuthRegistrationResendingRequestView } from '../view-model/auth/AuthRegistrationResendingRequestView';
 import { ObjectId } from 'mongodb';
-import { RecoveryPassRequestView } from '../view/auth/RecoveryPassRequestView';
-import { NewPassRequestView } from '../view/auth/NewPassRequestView';
+import { RecoveryPassRequestView } from '../view-model/auth/RecoveryPassRequestView';
+import { NewPassRequestView } from '../view-model/auth/NewPassRequestView';
+import { EmailService } from '../services/email-service';
+import { UserService } from '../services/user-service';
+import { JwtService } from '../services/jwt-service';
 
-class AuthController {
+export class AuthController {
+  constructor(protected authService: AuthService,
+              protected userRepository: UserRepository,
+              protected userService: UserService,
+              protected emailService: EmailService,
+              protected jwtService: JwtService,
+  ) {
+  }
+
   async login(req: RequestWithBody<AuthUserRequestView>, res: Response<ResponseErrorResponseView | AuthUserSchemaResponseView>,
   ) {
     try {
 
-      const { data: user, status } = await userRepository.getUserByFields(['login', 'email'], req.body.loginOrEmail);
+      const {
+        data: user,
+        status,
+      } = await this.userRepository.getUserByFields(['login', 'email'], req.body.loginOrEmail);
 
       if (status !== ResultStatus.Success) {
         res.status(HTTP_STATUSES.UNAUTHORIZED_401).json({
@@ -61,7 +72,7 @@ class AuthController {
       // const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
       //
       // if (refreshToken) {
-      //   const { deviceId } = (jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
+      //   const { deviceId } = (this.jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
       //
       //   if (deviceId) {
       //     res.sendStatus(HTTP_STATUSES.FORBIDDEN_403);
@@ -72,7 +83,7 @@ class AuthController {
 
       const userAgentHeader = req.headers['user-agent'];
 
-      const { data, status: tokenStatus } = await authService.addTokenToUser({
+      const { data, status: tokenStatus } = await this.authService.addTokenToUser({
         userId: user!._id.toString(),
         ip: req.ip!,
         title: userAgentHeader || 'user agent',
@@ -105,7 +116,7 @@ class AuthController {
   async passwordRecovery(req: RequestWithBody<RecoveryPassRequestView>, res: Response<ResponseErrorResponseView | null>,
   ) {
     try {
-      const { status } = await authService.recoveryPass(req.body.email);
+      const { status } = await this.authService.recoveryPass(req.body.email);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -123,7 +134,7 @@ class AuthController {
   async newPassword(req: RequestWithBody<NewPassRequestView>, res: Response<ResponseErrorResponseView | null>,
   ) {
     try {
-      const { status, data } = await authService.newPass(req.body.newPassword, req.body.recoveryCode);
+      const { status, data } = await this.authService.newPass(req.body.newPassword, req.body.recoveryCode);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -148,14 +159,14 @@ class AuthController {
         return;
       }
 
-      const { userId, deviceId, exp } = (jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
+      const { userId, deviceId, exp } = (this.jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
 
       if (!userId || !deviceId || !exp) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
         return;
       }
 
-      const { data, status } = await authService.refreshToken(userId, deviceId, exp);
+      const { data, status } = await this.authService.refreshToken(userId, deviceId, exp);
 
       if (status === ResultStatus.Success && data) {
         req.setCookie(COOKIE_KEY.REFRESH_TOKEN, data.refreshToken);
@@ -180,14 +191,14 @@ class AuthController {
         return;
       }
 
-      const { userId } = (jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
+      const { userId } = (this.jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
 
       if (!userId) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
         return;
       }
 
-      const { status } = await authService.logout(refreshToken);
+      const { status } = await this.authService.logout(refreshToken);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -216,7 +227,7 @@ class AuthController {
 
   async authRegistration(req: RequestWithBody<AuthRegistrationRequestView>, res: Response<ResponseErrorResponseView>) {
     try {
-      const { status, data } = await userRepository.isExistsUser(req.body.login, req.body.email);
+      const { status, data } = await this.userRepository.isExistsUser(req.body.login, req.body.email);
 
       if (status === ResultStatus.BadRequest) {
         res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
@@ -230,20 +241,20 @@ class AuthController {
         return;
       }
 
-      const { data: userId, status: userStatus } = await userService.createUser(req.body);
+      const { data: userId, status: userStatus } = await this.userService.createUser(req.body);
 
       if (userStatus === ResultStatus.Success && userId) {
-        const { data, status } = await userRepository.getUserByFields(['_id'], new ObjectId(userId));
+        const { data, status } = await this.userRepository.getUserByFields(['_id'], new ObjectId(userId));
 
         if (status === ResultStatus.Success) {
           try {
-            await emailService.sendRegisterEmail(req.body.email, data!.emailConfirmation.confirmationCode);
+            await this.emailService.sendRegisterEmail(req.body.email, data!.emailConfirmation.confirmationCode);
 
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 
             return;
           } catch (e) {
-            await userService.deleteUserById(userId!);
+            await this.userService.deleteUserById(userId!);
           }
         }
 
@@ -274,7 +285,7 @@ class AuthController {
   async authRegistrationConfirmation(req: RequestWithBody<AuthRegistrationConfirmationRequestView>, res: Response<ResponseErrorResponseView>,
   ) {
     try {
-      const { status, data } = await userRepository.getUserByConfirmationCode(req.body.code);
+      const { status, data } = await this.userRepository.getUserByConfirmationCode(req.body.code);
 
       if (status === ResultStatus.BadRequest) {
         res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
@@ -312,7 +323,7 @@ class AuthController {
         return;
       }
 
-      const { status: updateStatus } = await userService.updateUserFieldById(
+      const { status: updateStatus } = await this.userService.updateUserFieldById(
         data!.id,
         'emailConfirmation.isConfirmed',
         true,
@@ -345,7 +356,7 @@ class AuthController {
   async authRegistrationResending(req: RequestWithBody<AuthRegistrationResendingRequestView>, res: Response<ResponseErrorResponseView>,
   ) {
     try {
-      const { status, data } = await userRepository.getUserByFields(['email'], req.body.email);
+      const { status, data } = await this.userRepository.getUserByFields(['email'], req.body.email);
 
       if (status === ResultStatus.BadRequest) {
         res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
@@ -384,17 +395,16 @@ class AuthController {
       }
 
       try {
-        await userService.updateUserFieldById(data!._id.toString(), 'emailConfirmation.confirmationCode', getUniqueId());
+        await this.userService.updateUserFieldById(data!._id.toString(), 'emailConfirmation.confirmationCode', getUniqueId());
 
+        const { data: updatedUser } = await this.userRepository.getUserByFields(['email'], req.body.email);
 
-        const { data: updatedUser } = await userRepository.getUserByFields(['email'], req.body.email);
-
-        await emailService.sendRegisterEmail(req.body.email, updatedUser!.emailConfirmation.confirmationCode);
+        await this.emailService.sendRegisterEmail(req.body.email, updatedUser!.emailConfirmation.confirmationCode);
 
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
         return;
       } catch (e) {
-        await userService.deleteUserById(data!._id.toString());
+        await this.userService.deleteUserById(data!._id.toString());
       }
     } catch (e) {
       res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
@@ -409,4 +419,4 @@ class AuthController {
   };
 }
 
-export const authController = new AuthController();
+// export const authController = new AuthController();

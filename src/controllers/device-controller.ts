@@ -1,14 +1,21 @@
 import { RequestEmpty, RequestWithParams } from '../types/request-types';
 import { Response } from 'express';
-import { GetDeviceResponseView } from '../view';
+import { GetDeviceResponseView } from '../view-model';
 import { COOKIE_KEY, HTTP_STATUSES } from '../utils/consts';
-import { jwtService } from '../services/jwt-service';
 import { JwtPayload } from 'jsonwebtoken';
 import { ResultStatus } from '../types/common/result';
-import { sessionRepository } from '../repositories/session-repository';
-import { deviseService } from '../services/devise-service';
+import { DeviceService } from '../services/devise-service';
+import { SessionRepository } from '../repositories/session-repository';
+import { JwtService } from '../services/jwt-service';
 
-class SecurityController {
+export class SecurityController {
+  constructor(
+    protected jwtService: JwtService,
+    protected sessionRepository: SessionRepository,
+    protected deviseService: DeviceService,
+  ) {
+  }
+
   async getDevices(req: RequestEmpty, res: Response<GetDeviceResponseView[]>) {
     try {
       const refreshToken = req.getCookie(COOKIE_KEY.REFRESH_TOKEN);
@@ -18,14 +25,14 @@ class SecurityController {
         return;
       }
 
-      const { userId, deviceId } = (jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
+      const { userId, deviceId } = (this.jwtService.verifyToken(refreshToken) as JwtPayload) ?? {};
 
       if (!userId || !deviceId) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
         return;
       }
 
-      const { data, status } = await sessionRepository.getDeviceListByUserId(userId);
+      const { data, status } = await this.sessionRepository.getDeviceListByUserId(userId);
 
       if (status === ResultStatus.Success) {
         res.status(HTTP_STATUSES.OK_200).json(data);
@@ -47,7 +54,7 @@ class SecurityController {
         return;
       }
 
-      const { status } = await deviseService.deleteDeviceList(refreshToken);
+      const { status } = await this.deviseService.deleteDeviceList(refreshToken);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -74,7 +81,7 @@ class SecurityController {
         return;
       }
 
-      const { status } = await deviseService.deleteDevice(refreshToken, req.params.deviceId);
+      const { status } = await this.deviseService.deleteDevice(refreshToken, req.params.deviceId);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
@@ -98,5 +105,3 @@ class SecurityController {
     }
   };
 }
-
-export const securityController = new SecurityController();
