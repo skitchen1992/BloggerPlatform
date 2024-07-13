@@ -69,7 +69,6 @@ postsRouter.post(
 
 postsRouter.get(
   PATH_URL.COMMENT_FOR_POST,
-  //!!!!!!!
   bearerTokenUserInterceptorMiddleware,
   sanitizerQueryMiddleware(getPostsQueryParams),
   checkPostExistsMiddleware.urlParams('postId'),

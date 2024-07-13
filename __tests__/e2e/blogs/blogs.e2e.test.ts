@@ -274,7 +274,6 @@ describe(`Endpoint (POST) - ${PATH_URL.BLOGS}`, () => {
 });
 
 describe(`Endpoint (POST) - ${PATH_URL.POSTS_FOR_BLOG}`, () => {
-
   it('Should add post for blog', async () => {
     const result = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
 

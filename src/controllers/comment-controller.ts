@@ -28,9 +28,6 @@ export class CommentController {
 
       const { data, status } = await this.commentRepository.getCommentById(req.params.commentId, currentUserId);
 
-
-      //const { data, status } = await this.commentRepository.getCommentForNotAuthUserById(req.params.commentId);
-
       if (status === ResultStatus.Success && data) {
         res.status(HTTP_STATUSES.OK_200).json(data);
         return;
@@ -91,10 +88,7 @@ export class CommentController {
     try {
       const currentUserId = res.locals.user?.id.toString();
 
-      const {
-        data,
-        status,
-      } = await this.likeService.createLike(req.body.likeStatus, currentUserId!, req.params.commentId, ParentType.COMMENT);
+      const { status } = await this.likeService.createLike(req.body.likeStatus, currentUserId!, req.params.commentId, ParentType.COMMENT);
 
       if (status === ResultStatus.Success) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);

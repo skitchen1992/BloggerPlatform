@@ -17,7 +17,6 @@ export const commentsRouter = Router();
 
 commentsRouter.get(
   PATH_URL.COMMENT_ID,
-  //!!!!!!!
   bearerTokenUserInterceptorMiddleware,
   checkCommentExistsMiddleware.urlParams('commentId'),
   sanitizerQueryMiddleware(),

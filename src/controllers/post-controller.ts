@@ -171,7 +171,6 @@ export class PostController {
     res: Response<GetCommentListRequestView>,
   ) {
     try {
-      ///////////
       const currentUserId = res.locals.user?.id.toString();
 
       const { data: comments } = await this.commentRepository.getComments(

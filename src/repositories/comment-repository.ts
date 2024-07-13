@@ -86,7 +86,6 @@ export class CommentRepository {
     };
   }
 
-/////////
   public async getCommentById(commentId: string, userId?: string) {
     const comment = await this.commentModel.findById(commentId).lean();
 
@@ -125,7 +124,7 @@ export class CommentRepository {
     const comments = await this.commentModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize).lean();
 
     const totalCount = await this.commentModel.countDocuments(filters.query);
-//////
+
     const commentList = await Promise.all(comments.map(async (comment) => {
       if (userId) {
         const like = await this.getLikesInfoForAuthUser(comment._id.toString(), userId);
