@@ -11,6 +11,7 @@ import { bearerTokenAuthMiddleware } from '../middlewares/bearer-token-auth-midd
 import { checkBlogExistsMiddleware } from '../middlewares/check-blog-exists-middleware';
 import { checkPostExistsMiddleware } from '../middlewares/check-post-exists-middleware';
 import { postController } from '../compositions/composition-root';
+import { bearerTokenUserInterceptorMiddleware } from '../middlewares/bearer-token-user_interceptor-middleware';
 
 export const postsRouter = Router();
 
@@ -68,6 +69,8 @@ postsRouter.post(
 
 postsRouter.get(
   PATH_URL.COMMENT_FOR_POST,
+  //!!!!!!!
+  bearerTokenUserInterceptorMiddleware,
   sanitizerQueryMiddleware(getPostsQueryParams),
   checkPostExistsMiddleware.urlParams('postId'),
   errorHandlingMiddleware,

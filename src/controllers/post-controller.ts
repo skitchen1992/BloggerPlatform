@@ -171,7 +171,13 @@ export class PostController {
     res: Response<GetCommentListRequestView>,
   ) {
     try {
-      const { data: comments } = await this.commentRepository.getComments(req.query, { postId: req.params.postId });
+      ///////////
+      const currentUserId = res.locals.user?.id.toString();
+
+      const { data: comments } = await this.commentRepository.getComments(
+        req.query,
+        { postId: req.params.postId },
+        currentUserId);
 
       res.status(HTTP_STATUSES.OK_200).json(comments);
     } catch (e) {

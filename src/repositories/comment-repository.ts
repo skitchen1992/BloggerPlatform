@@ -85,6 +85,7 @@ export class CommentRepository {
       status: comment ? ResultStatus.Success : ResultStatus.NotFound,
     };
   }
+
 /////////
   public async getCommentById(commentId: string, userId?: string) {
     const comment = await this.commentModel.findById(commentId).lean();
@@ -117,16 +118,22 @@ export class CommentRepository {
   public async getComments(
     query: GetCommentsQuery,
     params: { postId: string },
+    userId?: string,
   ) {
     const filters = searchQueryBuilder.getComments(query, params);
 
     const comments = await this.commentModel.find(filters.query).sort(filters.sort).skip(filters.skip).limit(filters.pageSize).lean();
 
     const totalCount = await this.commentModel.countDocuments(filters.query);
-
+//////
     const commentList = await Promise.all(comments.map(async (comment) => {
-      const like = await this.getLikesInfoForAuthUser(comment._id.toString(), comment.commentatorInfo.userId);
-      return CommentMapper.toCommentDTO(comment, like);
+      if (userId) {
+        const like = await this.getLikesInfoForAuthUser(comment._id.toString(), userId);
+        return CommentMapper.toCommentDTO(comment, like);
+      } else {
+        const like = await this.getLikesInfoForNotAuthUser(comment._id.toString());
+        return CommentMapper.toCommentDTO(comment, like);
+      }
     }));
 
     const result = new CommentListDTO(commentList, totalCount, filters.pageSize, filters.page);
