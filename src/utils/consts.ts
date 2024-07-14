@@ -59,6 +59,7 @@ export const COOKIE_KEY = {
 export const ACCESS_TOKEN_EXPIRED_IN = "1d";
 export const REFRESH_TOKEN_EXPIRED_IN = 20;
 export const RECOVERY_PASS_TOKEN_EXPIRED = "1h";
+export const NEWEST_LIKES_COUNT = 3;
 
 export const getBlogsQueryParams: (keyof Required<GetBlogsQuery>)[] = [
   'searchNameTerm',

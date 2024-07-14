@@ -46,7 +46,7 @@ export const searchQueryBuilder = {
     return { query, sort, skip, pageSize: defaultPageSize, page: defaultPageNumber };
   },
 
-  getPosts: (queryParams: GetPostsQuery, params?: { blogId: string }) => {
+  getPosts: (queryParams: GetPostsQuery, params?: { blogId?: string }) => {
     const { sortBy, sortDirection, pageNumber, pageSize } = queryParams;
 
     const query: Query = {};

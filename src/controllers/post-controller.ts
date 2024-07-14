@@ -37,7 +37,9 @@ export class PostController {
 
   async getPosts(req: RequestWithQuery<GetPostsQuery>, res: Response<GetPostListResponseView>) {
     try {
-      const { data } = await this.postRepository.getPosts(req.query);
+      const currentUserId = res.locals.user?.id.toString();
+
+      const { data } = await this.postRepository.getPosts(req.query,{}, currentUserId);
 
       res.status(HTTP_STATUSES.OK_200).json(data);
     } catch (e) {

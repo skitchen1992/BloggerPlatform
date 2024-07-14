@@ -17,6 +17,7 @@ export const postsRouter = Router();
 
 postsRouter.get(
   PATH_URL.ROOT,
+  bearerTokenUserInterceptorMiddleware,
   sanitizerQueryMiddleware(getPostsQueryParams),
   errorHandlingMiddleware,
   postController.getPosts.bind(postController),

@@ -60,7 +60,7 @@ export class CommentRepository {
       parentType: ParentType.COMMENT,
       authorId: userId,
     }).lean();
-    debugger
+
     return user?.status || LikeStatus.NONE;
   }
 

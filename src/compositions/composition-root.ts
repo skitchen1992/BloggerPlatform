@@ -25,6 +25,8 @@ import { LikeService } from '../services/like-service';
 import { LikeRepository } from '../repositories/like-repository';
 import { CommentModel } from '../models/comment';
 import { LikeModel } from '../models/like';
+import { PostModel } from '../models/post';
+import { UserModel } from '../models/user';
 
 export const mailerService = new MailerService();
 export const emailService = new EmailService(mailerService);
@@ -34,7 +36,7 @@ export const jwtService = new JwtService(SETTINGS.JWT_SECRET_KEY!);
 export const userRepository = new UserRepository();
 export const blogRepository = new BlogRepository();
 export const commentRepository = new CommentRepository(CommentModel, LikeModel);
-export const postRepository = new PostRepository();
+export const postRepository = new PostRepository(PostModel, LikeModel, UserModel);
 export const sessionRepository = new SessionRepository();
 export const visitRepository = new VisitRepository();
 export const likeRepository = new LikeRepository();
@@ -79,7 +81,7 @@ export const postController = new PostController(
   postService,
   commentRepository,
   commentService,
-  likeService
+  likeService,
 );
 
 export const securityController = new SecurityController(
