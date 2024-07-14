@@ -136,3 +136,5 @@ export const hashBuilder = {
     return await compare(input, hashedInput);
   },
 };
+
+console.log("test");
