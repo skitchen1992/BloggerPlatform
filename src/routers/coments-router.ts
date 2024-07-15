@@ -44,7 +44,7 @@ commentsRouter.delete(
 );
 
 commentsRouter.put(
-  PATH_URL.LIKE_STATUS,
+  PATH_URL.COMMENT_LIKE_STATUS,
   bearerTokenAuthMiddleware,
   checkCommentExistsMiddleware.urlParams('commentId'),
   sanitizerQueryMiddleware(),

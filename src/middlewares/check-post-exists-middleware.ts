@@ -7,7 +7,7 @@ export const checkPostExistsMiddleware = {
   body: (fields?: string | string[]) => {
     return body(fields).custom(async (input, meta) => {
       if (meta.path === 'postId') {
-        const { status } = await postRepository.getPostById(input);
+        const { status } = await postRepository.isExistPost(input);
 
         if (status !== ResultStatus.Success) {
           throw new Error('Post is not founded');
@@ -18,7 +18,7 @@ export const checkPostExistsMiddleware = {
   urlParams: (fields?: string | string[]) => {
     return param(fields).custom(async (input, meta) => {
       if (meta.path === 'postId') {
-        const { status } = await postRepository.getPostById(input);
+        const { status } = await postRepository.isExistPost(input);
 
         if (status !== ResultStatus.Success) {
           throw new Error('Post is not founded');

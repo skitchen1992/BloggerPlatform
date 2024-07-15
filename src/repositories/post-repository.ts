@@ -173,6 +173,15 @@ export class PostRepository {
       return { data: null, status: ResultStatus.NotFound };
     }
   }
+
+  public async isExistPost(commentId: string) {
+    const post = await this.postModel.findById(commentId).lean();
+
+    return {
+      data: null,
+      status: post ? ResultStatus.Success : ResultStatus.NotFound,
+    };
+  }
 }
 
 
