@@ -11,6 +11,7 @@ import { req } from '../../jest.setup';
 import { LikeModel, LikeStatus, ParentType } from '../../../src/models/like';
 import { ExtendedLikesInfo } from '../../../src/view-model/posts/ExtendedLikesInfoView';
 import { ObjectId } from 'mongodb';
+import { CommentModel } from '../../../src/models/comment';
 
 
 describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
@@ -870,3 +871,336 @@ describe(`Endpoint (GET) - ${PATH_URL.COMMENT_FOR_POST}`, () => {
   });
 });
 
+describe(`Endpoint (PUT) - ${PATH_URL.POST_LIKE_STATUS}`, () => {
+
+  it('Should create like', async () => {
+    const login = 'testLogin';
+    const password = 'string';
+
+    await req
+      .post(PATH_URL.USERS)
+      .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
+      .send({
+        login,
+        password,
+        email: 'example@example.com',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const token = await req.post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`).send({
+      loginOrEmail: login,
+      password,
+    });
+
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
+
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
+
+
+    await req
+      .put(`${PATH_URL.POSTS}/${postId}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: LikeStatus.LIKE,
+      })
+      .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+    const res = await req
+      .get(`${PATH_URL.POSTS}/${postId}`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .expect(HTTP_STATUSES.OK_200);
+
+    expect(res.body).toEqual(expect.objectContaining({
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 1,
+        myStatus: 'Like',
+        newestLikes: [
+          expect.objectContaining({
+            login: 'testLogin',
+          }),
+        ],
+      },
+    }));
+  });
+
+
+  it('Should change Like to Dislike', async () => {
+    const login = 'testLogin';
+    const password = 'string';
+
+    await req
+      .post(PATH_URL.USERS)
+      .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
+      .send({
+        login,
+        password,
+        email: 'example@example.com',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const token = await req.post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`).send({
+      loginOrEmail: login,
+      password,
+    });
+
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
+
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
+
+
+    await req
+      .put(`${PATH_URL.POSTS}/${postId}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: LikeStatus.LIKE,
+      })
+      .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+    await req
+      .put(`${PATH_URL.POSTS}/${postId}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: LikeStatus.DISLIKE,
+      })
+      .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+    const res = await req
+      .get(`${PATH_URL.POSTS}/${postId}`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .expect(HTTP_STATUSES.OK_200);
+
+    expect(res.body).toEqual(expect.objectContaining({
+      extendedLikesInfo: {
+        dislikesCount: 1,
+        likesCount: 0,
+        myStatus: 'Dislike',
+        newestLikes: [],
+      },
+    }));
+  });
+
+  it('Should change Like to None', async () => {
+    const login = 'testLogin';
+    const password = 'string';
+
+    await req
+      .post(PATH_URL.USERS)
+      .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
+      .send({
+        login,
+        password,
+        email: 'example@example.com',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const token = await req.post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`).send({
+      loginOrEmail: login,
+      password,
+    });
+
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
+
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
+
+
+    await req
+      .put(`${PATH_URL.POSTS}/${postId}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: LikeStatus.LIKE,
+      })
+      .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+    await req
+      .put(`${PATH_URL.POSTS}/${postId}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: LikeStatus.NONE,
+      })
+      .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+    const res = await req
+      .get(`${PATH_URL.POSTS}/${postId}`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .expect(HTTP_STATUSES.OK_200);
+
+    expect(res.body).toEqual(expect.objectContaining({
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: LikeStatus.NONE,
+        newestLikes:[]
+      },
+    }));
+  });
+
+  it('Should change Like to Like', async () => {
+    const login = 'testLogin';
+    const password = 'string';
+
+    await req
+      .post(PATH_URL.USERS)
+      .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
+      .send({
+        login,
+        password,
+        email: 'example@example.com',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const token = await req.post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`).send({
+      loginOrEmail: login,
+      password,
+    });
+
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
+
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
+
+    const commentList = await CommentModel.insertMany(testSeeder.createCommentListDto(1, postId));
+    const commentId = commentList[0]._id.toString();
+
+    await req
+      .put(`${PATH_URL.COMMENTS}/${commentId}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: LikeStatus.LIKE,
+      })
+      .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+    await req
+      .put(`${PATH_URL.COMMENTS}/${commentId}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: LikeStatus.LIKE,
+      })
+      .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+    const res = await req
+      .get(`${PATH_URL.COMMENTS}/${commentId}`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .expect(HTTP_STATUSES.OK_200);
+
+    expect(res.body).toEqual(expect.objectContaining({
+      likesInfo: {
+        dislikesCount: 0,
+        likesCount: 1,
+        myStatus: LikeStatus.LIKE,
+      },
+    }));
+  });
+
+  it(`Should get ${HTTP_STATUSES.BAD_REQUEST_400}`, async () => {
+    const login = 'testLogin';
+    const password = 'string';
+
+    await req
+      .post(PATH_URL.USERS)
+      .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
+      .send({
+        login,
+        password,
+        email: 'example@example.com',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const token = await req.post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`).send({
+      loginOrEmail: login,
+      password,
+    });
+
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
+
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
+
+    const commentList = await CommentModel.insertMany(testSeeder.createCommentListDto(1, postId));
+    const commentId = commentList[0]._id.toString();
+
+    await req
+      .put(`${PATH_URL.COMMENTS}/${commentId}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: '',
+      })
+      .expect(HTTP_STATUSES.BAD_REQUEST_400);
+  });
+
+  it(`Should get ${HTTP_STATUSES.UNAUTHORIZED_401}`, async () => {
+    const login = 'testLogin';
+    const password = 'string';
+
+    await req
+      .post(PATH_URL.USERS)
+      .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
+      .send({
+        login,
+        password,
+        email: 'example@example.com',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
+
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
+
+    const commentList = await CommentModel.insertMany(testSeeder.createCommentListDto(1, postId));
+    const commentId = commentList[0]._id.toString();
+
+    await req
+      .put(`${PATH_URL.COMMENTS}/${commentId}/like-status`)
+      .set(createBearerAuthorizationHeader(''))
+      .send({
+        likeStatus: '',
+      })
+      .expect(HTTP_STATUSES.UNAUTHORIZED_401);
+  });
+
+  it(`Should get ${HTTP_STATUSES.NOT_FOUND_404}`, async () => {
+    const login = 'testLogin';
+    const password = 'string';
+
+    await req
+      .post(PATH_URL.USERS)
+      .set(createAuthorizationHeader(SETTINGS.ADMIN_AUTH_USERNAME, SETTINGS.ADMIN_AUTH_PASSWORD))
+      .send({
+        login,
+        password,
+        email: 'example@example.com',
+      })
+      .expect(HTTP_STATUSES.CREATED_201);
+
+    const token = await req.post(`${PATH_URL.AUTH.ROOT}${PATH_URL.AUTH.LOGIN}`).send({
+      loginOrEmail: login,
+      password,
+    });
+
+    const blogList = await BlogModel.insertMany(testSeeder.createBlogListDto(1));
+    const blogId = blogList[0]._id.toString();
+
+    const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
+    const postId = postList[0]._id.toString();
+
+    await CommentModel.insertMany(testSeeder.createCommentListDto(1, postId));
+
+    await req
+      .put(`${PATH_URL.COMMENTS}/${ID}/like-status`)
+      .set(createBearerAuthorizationHeader(token.body.accessToken))
+      .send({
+        likeStatus: LikeStatus.LIKE,
+      })
+      .expect(HTTP_STATUSES.NOT_FOUND_404);
+  });
+});
