@@ -8,6 +8,9 @@ import { testSeeder } from '../../test.seeder';
 import { PostModel } from '../../../src/models/post';
 import { PostMapper } from '../../../src/mappers/post-mapper';
 import { req } from '../../jest.setup';
+import { LikeModel, LikeStatus, ParentType } from '../../../src/models/like';
+import { ExtendedLikesInfo } from '../../../src/view-model/posts/ExtendedLikesInfoView';
+import { ObjectId } from 'mongodb';
 
 
 describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
@@ -25,6 +28,29 @@ describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
 
     const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
 
+    const authorId = new ObjectId().toString();
+    const likesList = await LikeModel.insertMany(testSeeder.createPostLikeListDto(
+      1,
+      postList[0]._id.toString(),
+      LikeStatus.LIKE,
+      ParentType.POST,
+      authorId,
+    ));
+
+    const extendedLikesInfo = {
+      dislikesCount: 0,
+      likesCount: 1,
+      myStatus: LikeStatus.NONE,
+      newestLikes: [
+        {
+          addedAt: likesList[0].createdAt,
+          login: '',
+          userId: authorId,
+        },
+      ],
+
+    };
+
     const res = await req.get(PATH_URL.POSTS).expect(HTTP_STATUSES.OK_200);
 
     expect(res.body.items.length).toBe(1);
@@ -34,7 +60,7 @@ describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
       page: 1,
       pageSize: 10,
       totalCount: 1,
-      items: postList.map((post) => (PostMapper.toPostDTO(post))),
+      items: postList.map((post) => (PostMapper.toPostDTO(post, extendedLikesInfo))),
     });
   });
 
@@ -45,6 +71,23 @@ describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
 
     const postList = await PostModel.insertMany(testSeeder.createPostListDto(3, blogId));
 
+    const authorId = new ObjectId().toString();
+
+    await LikeModel.insertMany(testSeeder.createPostLikeListDto(
+      1,
+      postList[0]._id.toString(),
+      LikeStatus.LIKE,
+      ParentType.POST,
+      authorId,
+    ));
+
+    const extendedLikesInfo = {
+      dislikesCount: 0,
+      likesCount: 0,
+      myStatus: LikeStatus.NONE,
+      newestLikes: [],
+    };
+
     const res = await req.get(`${PATH_URL.POSTS}/?pageNumber=2&pageSize=2`).expect(HTTP_STATUSES.OK_200);
 
     expect(res.body.items.length).toBe(1);
@@ -54,7 +97,7 @@ describe(`Endpoint (GET) - ${PATH_URL.POSTS}`, () => {
       page: 2,
       pageSize: 2,
       totalCount: 3,
-      items: [PostMapper.toPostDTO(postList[2])],
+      items: [PostMapper.toPostDTO(postList[2], extendedLikesInfo)],
     });
   });
 });
@@ -67,10 +110,31 @@ describe(`Endpoint (GET) by ID - ${PATH_URL.POSTS}${PATH_URL.ID}`, () => {
 
     const postList = await PostModel.insertMany(testSeeder.createPostListDto(1, blogId));
     const postId = postList[0]._id.toString();
+    const authorId = new ObjectId().toString();
+    const likesList = await LikeModel.insertMany(testSeeder.createPostLikeListDto(
+      1,
+      postList[0]._id.toString(),
+      LikeStatus.LIKE,
+      ParentType.POST,
+      authorId,
+    ));
 
+    const extendedLikesInfo = {
+      dislikesCount: 0,
+      likesCount: 1,
+      myStatus: LikeStatus.NONE,
+      newestLikes: [
+        {
+          addedAt: likesList[0].createdAt,
+          login: '',
+          userId: authorId,
+        },
+      ],
+
+    };
     const res = await req.get(`${PATH_URL.POSTS}/${postId}`).expect(HTTP_STATUSES.OK_200);
 
-    expect(res.body).toEqual(PostMapper.toPostDTO(postList[0]));
+    expect(res.body).toEqual(PostMapper.toPostDTO(postList[0], extendedLikesInfo));
   });
 
   it(`Should get status ${HTTP_STATUSES.NOT_FOUND_404}`, async () => {

@@ -5,6 +5,8 @@ import { IPostSchema } from '../src/models/post';
 import { ICommentSchema } from '../src/models/comment';
 import { getUniqueId } from '../src/utils/helpers';
 import { IUserSchema } from '../src/models/user';
+import { ExtendedLikesInfo, NewestLike } from '../src/view-model/posts/ExtendedLikesInfoView';
+import { ILikeSchema, LikeStatus, ParentType } from '../src/models/like';
 
 export const testSeeder = {
   createUserDto() {
@@ -126,6 +128,29 @@ export const testSeeder = {
         postId,
         createdAt: getCurrentDate(),
         _id: new ObjectId(),
+      };
+    });
+  },
+
+  createPostLikeDto() {
+    return {
+      createdAt: getCurrentDate(),
+      status: LikeStatus.LIKE,
+      authorId: new ObjectId().toString(),
+      parentId: new ObjectId().toString(),
+      parentType: ParentType.POST,
+    };
+  },
+
+  createPostLikeListDto(count: number, parentId: string, status: LikeStatus, parentType: ParentType, authorId= new ObjectId().toString()): ILikeSchema[] {
+    return new Array(count).fill(null).map((item, i) => {
+      return {
+        _id: new ObjectId(),
+        createdAt: getCurrentDate(),
+        status,
+        authorId,
+        parentId,
+        parentType,
       };
     });
   },
