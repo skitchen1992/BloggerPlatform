@@ -93,9 +93,10 @@ export class PostRepository {
     };
   }
 
-  public async getPostById(id: string): Promise<Result<PostDTO | null>> {
+  public async getPostById(id: string, userId?: string): Promise<Result<PostDTO | null>> {
     const post = await this.postModel.findById(id).lean();
-    const extendedLikesInfo = await this.getLikesInfoForNotAuthUser(id);
+
+    const extendedLikesInfo = userId ? await this.getLikesInfoForAuthUser(id, userId) : await this.getLikesInfoForNotAuthUser(id);
 
     return {
       data: post ? PostMapper.toPostDTO(post, extendedLikesInfo) : null,

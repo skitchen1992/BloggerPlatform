@@ -28,6 +28,7 @@ postsRouter.get(
 
 postsRouter.get(
   PATH_URL.ID,
+  bearerTokenUserInterceptorMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   postController.getPostById.bind(postController),

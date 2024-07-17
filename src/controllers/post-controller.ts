@@ -53,7 +53,9 @@ export class PostController {
     id: string
   }>, res: Response<GetPostResponseView | ResponseErrorResponseView>) {
     try {
-      const { data, status } = await this.postRepository.getPostById(req.params.id);
+      const currentUserId = res.locals.user?.id.toString();
+
+      const { data, status } = await this.postRepository.getPostById(req.params.id, currentUserId);
 
       if (status === ResultStatus.Success && data) {
         res.status(HTTP_STATUSES.OK_200).json(data);
