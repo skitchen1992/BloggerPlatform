@@ -36,6 +36,7 @@ export const searchQueryBuilder = {
       sort[sortBy] = sortDirection || DEFAULT_SORT;
     } else {
       sort.createdAt = sortDirection || DEFAULT_SORT;
+      sort._id = 1;
     }
 
     const defaultPageNumber = Number(pageNumber) || DEFAULT_PAGE_NUMBER;
@@ -59,7 +60,7 @@ export const searchQueryBuilder = {
       sort[sortBy] = sortDirection || DEFAULT_SORT;
     } else {
       sort.createdAt = sortDirection || DEFAULT_SORT;
-      sort._id = 1
+      sort._id = 1;
     }
 
     const defaultPageNumber = Number(pageNumber) || DEFAULT_PAGE_NUMBER;
@@ -83,7 +84,7 @@ export const searchQueryBuilder = {
       sort[sortBy] = sortDirection || DEFAULT_SORT;
     } else {
       sort.createdAt = sortDirection || DEFAULT_SORT;
-      sort._id = 1
+      sort._id = 1;
     }
 
     const defaultPageNumber = Number(pageNumber) || DEFAULT_PAGE_NUMBER;
@@ -117,6 +118,7 @@ export const searchQueryBuilder = {
       sort[sortBy] = sortDirection || DEFAULT_SORT;
     } else {
       sort.createdAt = sortDirection || DEFAULT_SORT;
+      sort._id = 1;
     }
 
     const defaultPageNumber = Number(pageNumber) || DEFAULT_PAGE_NUMBER;
