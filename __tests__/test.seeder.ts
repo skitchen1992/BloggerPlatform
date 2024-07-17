@@ -1,9 +1,8 @@
-import { add, getCurrentDate, getDateFromObjectId } from '../src/utils/dates/dates';
+import { add, getCurrentDate } from '../src/utils/dates/dates';
 import { ObjectId } from 'mongodb';
 import { IBlogSchema } from '../src/models/blog';
 import { IPostSchema } from '../src/models/post';
 import { ICommentSchema } from '../src/models/comment';
-import { ID } from './e2e/comments/datasets';
 import { getUniqueId } from '../src/utils/helpers';
 import { IUserSchema } from '../src/models/user';
 
@@ -37,7 +36,7 @@ export const testSeeder = {
     return {
       ip: '1',
       url: 'url',
-      date: getDateFromObjectId(new ObjectId()),
+      date: getCurrentDate(),
       _id: new ObjectId(),
     };
   },
@@ -47,7 +46,7 @@ export const testSeeder = {
       return {
         ip: '1',
         url: 'url',
-        date: getDateFromObjectId(new ObjectId()),
+        date: getCurrentDate(),
         _id: new ObjectId(),
       };
     });

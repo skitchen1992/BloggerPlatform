@@ -11,6 +11,7 @@ import { LikeModel, LikeStatus, ParentType } from '../models/like';
 import { ExtendedLikesInfo, NewestLike } from '../view-model/posts/ExtendedLikesInfoView';
 import { UserModel } from '../models/user';
 import { NEWEST_LIKES_COUNT } from '../utils/consts';
+import { Post } from '../dto/new-post-dto';
 
 export class PostRepository {
 
@@ -134,7 +135,7 @@ export class PostRepository {
     return { data: result, status: ResultStatus.Success };
   }
 
-  public async createPost(obj: IPostSchema): Promise<Result<string | null>> {
+  public async createPost(obj: Post): Promise<Result<string | null>> {
     try {
       const data = new this.postModel(obj);
 

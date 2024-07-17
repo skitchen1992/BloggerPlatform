@@ -7,6 +7,7 @@ import { BlogListDTO } from '../dto/blog-list-dto';
 import { BlogDTO } from '../dto/blog-dto';
 import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { Blog } from '../dto/new-blog-dto';
 
 export class BlogRepository {
   public async getBlogById(id: string): Promise<Result<BlogDTO | null>> {
@@ -38,7 +39,7 @@ export class BlogRepository {
 
   }
 
-  public async createBlog(obj: IBlogSchema): Promise<Result<string | null>> {
+  public async createBlog(obj: Blog): Promise<Result<string | null>> {
     try {
       const data = new BlogModel(obj);
 

@@ -1,7 +1,6 @@
 import { getUniqueId, hashBuilder } from '../utils/helpers';
 import { ResultStatus } from '../types/common/result';
-import { fromUnixTimeToISO, getCurrentDate, getDateFromObjectId, isExpiredDate } from '../utils/dates/dates';
-import { ObjectId } from 'mongodb';
+import { fromUnixTimeToISO, getCurrentDate, isExpiredDate } from '../utils/dates/dates';
 import {
   ACCESS_TOKEN_EXPIRED_IN,
   RECOVERY_PASS_TOKEN_EXPIRED,
@@ -34,7 +33,6 @@ export class AuthService {
     try {
       const { userId, ip, title } = payload;
 
-      const objectId = new ObjectId();
       const deviceId = getUniqueId();
 
       const accessToken = this.jwtService.generateToken({ userId }, { expiresIn: ACCESS_TOKEN_EXPIRED_IN });
@@ -42,12 +40,11 @@ export class AuthService {
       const refreshToken = this.jwtService.generateToken({ userId, deviceId }, { expiresIn: REFRESH_TOKEN_EXPIRED_IN });
 
       const session = new Session(
-        objectId,
         userId,
         ip,
         title,
-        getDateFromObjectId(objectId),
-        getDateFromObjectId(objectId),
+        getCurrentDate(),
+        getCurrentDate(),
         this.jwtService.getTokenExpirationDate(refreshToken),
         deviceId);
 

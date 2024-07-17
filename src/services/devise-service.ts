@@ -25,7 +25,6 @@ export class DeviceService {
         await this.sessionRepository.deleteSessionList();
 
         const session = new Session(
-          deviceAuthSession._id,
           deviceAuthSession.userId,
           deviceAuthSession.ip,
           deviceAuthSession.title,

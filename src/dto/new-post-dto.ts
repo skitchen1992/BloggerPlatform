@@ -1,8 +1,6 @@
-import { ObjectId } from 'mongodb';
-import { getDateFromObjectId } from '../utils/dates/dates';
+import { getCurrentDate } from '../utils/dates/dates';
 
 export class Post {
-  _id: ObjectId;
   createdAt: string;
 
   constructor(
@@ -12,7 +10,7 @@ export class Post {
     public blogName: string,
     public blogId: string,
   ) {
-    this._id = new ObjectId();
-    this.createdAt = getDateFromObjectId(this._id);
+
+    this.createdAt = getCurrentDate();
   }
 }
