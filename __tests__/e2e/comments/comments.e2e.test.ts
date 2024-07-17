@@ -525,7 +525,7 @@ describe(`Endpoint (DELETE) - ${PATH_URL.COMMENTS}`, () => {
   });
 });
 
-describe(`Endpoint (PUT) - ${PATH_URL.LIKE_STATUS}`, () => {
+describe(`Endpoint (PUT) - ${PATH_URL.COMMENT_LIKE_STATUS}`, () => {
 
   it('Should create like', async () => {
     const login = 'testLogin';

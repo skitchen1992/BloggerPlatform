@@ -12,11 +12,15 @@ import { checkBlogExistsMiddleware } from '../middlewares/check-blog-exists-midd
 import { checkPostExistsMiddleware } from '../middlewares/check-post-exists-middleware';
 import { postController } from '../compositions/composition-root';
 import { bearerTokenUserInterceptorMiddleware } from '../middlewares/bearer-token-user_interceptor-middleware';
+import {
+  validatePostPutLikeStatusSchema,
+} from '../middlewares/posts/validate-schemas/validate-post-put-like-status-schema';
 
 export const postsRouter = Router();
 
 postsRouter.get(
   PATH_URL.ROOT,
+  bearerTokenUserInterceptorMiddleware,
   sanitizerQueryMiddleware(getPostsQueryParams),
   errorHandlingMiddleware,
   postController.getPosts.bind(postController),
@@ -24,6 +28,7 @@ postsRouter.get(
 
 postsRouter.get(
   PATH_URL.ID,
+  bearerTokenUserInterceptorMiddleware,
   sanitizerQueryMiddleware(),
   errorHandlingMiddleware,
   postController.getPostById.bind(postController),
@@ -74,4 +79,14 @@ postsRouter.get(
   checkPostExistsMiddleware.urlParams('postId'),
   errorHandlingMiddleware,
   postController.getCommentsForPost.bind(postController),
+);
+
+postsRouter.put(
+  PATH_URL.POST_LIKE_STATUS,
+  bearerTokenAuthMiddleware,
+  checkPostExistsMiddleware.urlParams('postId'),
+  sanitizerQueryMiddleware(),
+  checkExactMiddleware(validatePostPutLikeStatusSchema),
+  errorHandlingMiddleware,
+  postController.createLikeForPost.bind(postController),
 );

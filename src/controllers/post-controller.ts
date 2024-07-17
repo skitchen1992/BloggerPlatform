@@ -24,6 +24,7 @@ import { PostRepository } from '../repositories/post-repository';
 import { PostService } from '../services/post-service';
 import { LikeStatus, ParentType } from '../models/like';
 import { LikeService } from '../services/like-service';
+import { CreateLikeRequestView } from '../view-model/likes/CreateLikeRequestView';
 
 export class PostController {
   constructor(
@@ -37,7 +38,9 @@ export class PostController {
 
   async getPosts(req: RequestWithQuery<GetPostsQuery>, res: Response<GetPostListResponseView>) {
     try {
-      const { data } = await this.postRepository.getPosts(req.query);
+      const currentUserId = res.locals.user?.id.toString();
+
+      const { data } = await this.postRepository.getPosts(req.query,{}, currentUserId);
 
       res.status(HTTP_STATUSES.OK_200).json(data);
     } catch (e) {
@@ -50,7 +53,9 @@ export class PostController {
     id: string
   }>, res: Response<GetPostResponseView | ResponseErrorResponseView>) {
     try {
-      const { data, status } = await this.postRepository.getPostById(req.params.id);
+      const currentUserId = res.locals.user?.id.toString();
+
+      const { data, status } = await this.postRepository.getPostById(req.params.id, currentUserId);
 
       if (status === ResultStatus.Success && data) {
         res.status(HTTP_STATUSES.OK_200).json(data);
@@ -179,6 +184,30 @@ export class PostController {
         currentUserId);
 
       res.status(HTTP_STATUSES.OK_200).json(comments);
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
+    }
+  };
+
+  async createLikeForPost(req: RequestWithParamsAndBody<CreateLikeRequestView, {
+    postId: string
+  }>, res: Response) {
+    try {
+      const currentUserId = res.locals.user?.id.toString();
+
+      const { status } = await this.likeService.createLike(req.body.likeStatus, currentUserId!, req.params.postId, ParentType.POST);
+
+      if (status === ResultStatus.Success) {
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+        return;
+      }
+
+      if (status === ResultStatus.NotFound) {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+        return;
+      }
+
     } catch (e) {
       console.log(e);
       res.sendStatus(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);

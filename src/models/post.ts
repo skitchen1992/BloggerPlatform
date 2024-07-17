@@ -10,7 +10,6 @@ export interface IPostSchema {
   blogId: string;
   blogName: string;
   createdAt: string;
-
 }
 
 export const PostSchema = new mongoose.Schema<IPostSchema>({

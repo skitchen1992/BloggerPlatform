@@ -8,6 +8,7 @@ import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { LikeModel, LikeStatus, ParentType } from '../models/like';
 import { ILikesInfo } from '../dto/comment-dto';
+import { Comment } from '../dto/new-comment-dto';
 
 export class CommentRepository {
 
@@ -60,7 +61,7 @@ export class CommentRepository {
       parentType: ParentType.COMMENT,
       authorId: userId,
     }).lean();
-    debugger
+
     return user?.status || LikeStatus.NONE;
   }
 
@@ -171,7 +172,7 @@ export class CommentRepository {
     }
   }
 
-  public async createComment(obj: ICommentSchema): Promise<Result<string | null>> {
+  public async createComment(obj: Comment): Promise<Result<string | null>> {
     try {
       const data = new CommentModel(obj);
 

@@ -25,7 +25,8 @@ export const PATH_URL = {
   BLOGS: '/blogs',
   POSTS_FOR_BLOG: '/:blogId/posts',
   COMMENT_FOR_POST: '/:postId/comments',
-  LIKE_STATUS: '/:commentId/like-status',
+  COMMENT_LIKE_STATUS: '/:commentId/like-status',
+  POST_LIKE_STATUS: '/:postId/like-status',
   COMMENTS: '/comments',
   POSTS: '/posts',
   USERS: '/users',
@@ -59,6 +60,7 @@ export const COOKIE_KEY = {
 export const ACCESS_TOKEN_EXPIRED_IN = "1d";
 export const REFRESH_TOKEN_EXPIRED_IN = 20;
 export const RECOVERY_PASS_TOKEN_EXPIRED = "1h";
+export const NEWEST_LIKES_COUNT = 3;
 
 export const getBlogsQueryParams: (keyof Required<GetBlogsQuery>)[] = [
   'searchNameTerm',

@@ -11,8 +11,7 @@ import { PostModel } from '../../../src/models/post';
 import { PostMapper } from '../../../src/mappers/post-mapper';
 import { ID } from './datasets';
 import { createAuthorizationHeader } from '../../test-helpers';
-
-
+import { LikeStatus } from '../../../src/models/like';
 
 describe(`Endpoint (GET) - ${PATH_URL.BLOGS}`, () => {
 
@@ -119,6 +118,12 @@ describe(`Endpoint (GET) - ${PATH_URL.POSTS_FOR_BLOG}`, () => {
 
     const postList = await PostModel.insertMany(testSeeder.createPostListDto(3, blogId));
 
+    const extendedLikesInfo = {
+      dislikesCount: 0,
+      likesCount: 0,
+      myStatus: LikeStatus.NONE,
+      newestLikes: [],
+    };
     const res = await req.get(`${PATH_URL.BLOGS}/${blogId}/posts`).expect(HTTP_STATUSES.OK_200);
 
     expect(res.body.items.length).toBe(3);
@@ -128,7 +133,7 @@ describe(`Endpoint (GET) - ${PATH_URL.POSTS_FOR_BLOG}`, () => {
       page: 1,
       pageSize: 10,
       totalCount: 3,
-      items: postList.map((post) => (PostMapper.toPostDTO(post))),
+      items: postList.map((post) => (PostMapper.toPostDTO(post, extendedLikesInfo))),
     });
   });
 

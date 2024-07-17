@@ -10,6 +10,7 @@ import {
   validateCreatePostForBlogSchema,
 } from '../middlewares/blogs/validate-schemas/validate-create-post-for-blog-schema';
 import { blogController } from '../compositions/composition-root';
+import { bearerTokenUserInterceptorMiddleware } from '../middlewares/bearer-token-user_interceptor-middleware';
 
 export const blogsRouter = Router();
 
@@ -29,6 +30,7 @@ blogsRouter.get(
 
 blogsRouter.get(
   PATH_URL.POSTS_FOR_BLOG,
+  bearerTokenUserInterceptorMiddleware,
   sanitizerQueryMiddleware(getPostsQueryParams),
   errorHandlingMiddleware,
   blogController.getPostsForBlog.bind(blogController),

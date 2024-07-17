@@ -2,10 +2,11 @@ import { Result, ResultStatus } from '../types/common/result';
 import { ILikeSchema, LikeModel, ParentType } from '../models/like';
 import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { Like } from '../dto/new-like-dto';
 
 export class LikeRepository {
 
-  public async createLike(obj: ILikeSchema): Promise<Result<string | null>> {
+  public async createLike(obj: Like): Promise<Result<string | null>> {
     try {
       const data = new LikeModel(obj);
 

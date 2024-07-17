@@ -71,6 +71,8 @@ export class BlogController {
     res: Response<GetPostListResponseView>,
   ) {
     try {
+      const currentUserId = res.locals.user?.id.toString();
+
       const { status } = await this.blogRepository.getBlogById(req.params.blogId);
 
       if (status !== ResultStatus.Success) {
@@ -78,7 +80,7 @@ export class BlogController {
         return;
       }
 
-      const { data } = await this.postRepository.getPosts(req.query, req.params);
+      const { data } = await this.postRepository.getPosts(req.query, req.params, currentUserId);
       res.status(HTTP_STATUSES.OK_200).json(data);
     } catch (e) {
       console.log(e);

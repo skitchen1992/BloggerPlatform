@@ -1,9 +1,7 @@
-import { ObjectId } from 'mongodb';
 
 export class Session {
 
   constructor(
-    public _id: ObjectId,
     public userId: string,
     public ip: string,
     public title: string,

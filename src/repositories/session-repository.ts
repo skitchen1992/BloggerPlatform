@@ -4,6 +4,7 @@ import { getCurrentDate } from '../utils/dates/dates';
 import { SessionMapper } from '../mappers/session-mapper';
 import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { Session } from '../dto/new-session-dto';
 
 export class SessionRepository {
   public async getDeviceByFields(fields: (keyof ISessionSchema)[], input: string): Promise<Result<ISessionSchema | null>> {
@@ -30,7 +31,7 @@ export class SessionRepository {
     return { data, status: ResultStatus.Success };
   }
 
-  async createSession(obj: ISessionSchema): Promise<Result<string | null>> {
+  async createSession(obj: Session): Promise<Result<string | null>> {
     try {
       const data = new SessionModel(obj);
 

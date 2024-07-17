@@ -1,5 +1,4 @@
-import { ObjectId } from 'mongodb';
-import { add, getDateFromObjectId } from '../utils/dates/dates';
+import { add, getCurrentDate } from '../utils/dates/dates';
 import { getUniqueId } from '../utils/helpers';
 
 interface IEmailConfirmation {
@@ -9,17 +8,15 @@ interface IEmailConfirmation {
 }
 
 export class User {
-  _id: ObjectId;
   createdAt: string;
-  emailConfirmation: IEmailConfirmation
+  emailConfirmation: IEmailConfirmation;
 
   constructor(
     public login: string,
     public password: string,
     public email: string,
   ) {
-    this._id = new ObjectId();
-    this.createdAt = getDateFromObjectId(this._id);
+    this.createdAt = getCurrentDate();
     this.emailConfirmation = {
       isConfirmed: false,
       confirmationCode: getUniqueId(),

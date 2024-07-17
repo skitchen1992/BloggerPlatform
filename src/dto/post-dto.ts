@@ -1,3 +1,5 @@
+import { ExtendedLikesInfo } from '../view-model/posts/ExtendedLikesInfoView';
+
 export class PostDTO {
   id: string;
   title: string;
@@ -6,6 +8,7 @@ export class PostDTO {
   blogId: string;
   blogName: string;
   createdAt: string;
+  extendedLikesInfo: ExtendedLikesInfo;
 
   constructor(
     id: string,
@@ -15,6 +18,7 @@ export class PostDTO {
     blogId: string,
     blogName: string,
     createdAt: string,
+    extendedLikesInfo: ExtendedLikesInfo,
   ) {
     this.id = id;
     this.title = title;
@@ -23,5 +27,6 @@ export class PostDTO {
     this.blogId = blogId;
     this.blogName = blogName;
     this.createdAt = createdAt;
+    this.extendedLikesInfo = extendedLikesInfo;
   }
 }

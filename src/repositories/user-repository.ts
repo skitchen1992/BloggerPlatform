@@ -7,6 +7,7 @@ import { UserDTO } from '../dto/user-dto';
 import { UserListDTO } from '../dto/user-list-dto';
 import { ObjectId } from 'mongodb';
 import { UpdateQuery } from 'mongoose';
+import { User } from '../dto/new-user-dto';
 
 export class UserRepository {
 
@@ -118,7 +119,7 @@ export class UserRepository {
     }
   }
 
-  public async createUser(obj: IUserSchema): Promise<Result<string | null>> {
+  public async createUser(obj: User): Promise<Result<string | null>> {
     try {
       const data = new UserModel(obj);
 
