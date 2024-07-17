@@ -38,7 +38,7 @@ export class PostRepository {
   }
 
   private async getNewestLikes(postId: string, count: number): Promise<NewestLike[]> {
-    const newestLikes = await this.likeModel.find({ parentId: postId, parentType: ParentType.POST })
+    const newestLikes = await this.likeModel.find({ parentId: postId, parentType: ParentType.POST, status: LikeStatus.LIKE })
       .sort({ createdAt: -1 })
       .limit(count)
       .exec();
