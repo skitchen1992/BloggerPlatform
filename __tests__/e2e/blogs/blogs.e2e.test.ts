@@ -11,9 +11,7 @@ import { PostModel } from '../../../src/models/post';
 import { PostMapper } from '../../../src/mappers/post-mapper';
 import { ID } from './datasets';
 import { createAuthorizationHeader } from '../../test-helpers';
-import { LikeModel, LikeStatus, ParentType } from '../../../src/models/like';
-
-
+import { LikeStatus } from '../../../src/models/like';
 
 describe(`Endpoint (GET) - ${PATH_URL.BLOGS}`, () => {
 
